@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_full_init ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_markdownlint setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
