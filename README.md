@@ -1,18 +1,16 @@
-# Python Ralph-Loop Template
+# RDI-AgentBeats-TheBulletproofProtocol
 
-> What a time to be alive
-
-Out-of-the-box Python project template using Ralph Loop autonomous development with Claude Code (plugins, skills, rules), TDD, uv, ruff, pyright, pytest. Also including interactive User Story and PRD generation.
+A recursive adversarial agent system where a "Virtual IRS Auditor" ruthlessly critiques and trains a "Generator Agent" to write audit-proof R> What a time to be aliveD tax credit claims.
 
 ![Version](https://img.shields.io/badge/version-0.0.0-58f4c2.svg)
 [![License](https://img.shields.io/badge/license-BSD3Clause-58f4c2.svg)](LICENSE.md)
-[![CodeQL](https://github.com/[GITHUB-REPO]/actions/workflows/codeql.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/codeql.yaml)
-[![CodeFactor](https://www.codefactor.io/repository/github/[GITHUB-REPO]/badge)](https://www.codefactor.io/repository/github/[GITHUB-REPO])
-[![ruff](https://github.com/[GITHUB-REPO]/actions/workflows/ruff.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/ruff.yaml)
-[![pyright](https://github.com/[GITHUB-REPO]/actions/workflows/pyright.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/pyright.yaml)
-[![pytest](https://github.com/[GITHUB-REPO]/actions/workflows/pytest.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/pytest.yaml)
-[![Link Checker](https://github.com/[GITHUB-REPO]/actions/workflows/links-fail-fast.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/links-fail-fast.yaml)
-[![Deploy Docs](https://github.com/[GITHUB-REPO]/actions/workflows/generate-deploy-mkdocs-ghpages.yaml/badge.svg)](https://github.com/[GITHUB-REPO]/actions/workflows/generate-deploy-mkdocs-ghpages.yaml)
+[![CodeQL](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/codeql.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/codeql.yaml)
+[![CodeFactor](https://www.codefactor.io/repository/github/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/badge)](https://www.codefactor.io/repository/github/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol)
+[![ruff](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/ruff.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/ruff.yaml)
+[![pyright](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pyright.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pyright.yaml)
+[![pytest](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pytest.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pytest.yaml)
+[![Link Checker](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/links-fail-fast.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/links-fail-fast.yaml)
+[![Deploy Docs](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/generate-deploy-mkdocs-ghpages.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/generate-deploy-mkdocs-ghpages.yaml)
 
 ## Features
 
