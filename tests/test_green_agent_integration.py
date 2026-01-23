@@ -13,8 +13,6 @@ This test module validates the acceptance criteria for STORY-010:
 - Evaluator no longer uses simple keyword heuristics from STORY-005 placeholder implementation
 """
 
-import pytest
-
 from bulletproof_green.evaluator import NarrativeEvaluator
 
 
