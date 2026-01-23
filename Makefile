@@ -85,7 +85,7 @@ ralph_prd:  ## [Optional] Generate PRD.md from UserStory.md
 
 ralph_prd_json:  ## [Optional] Generate PRD.json from PRD.md
 	echo "Generating PRD.json from PRD.md ..."
-	claude -p "/generating-prd-json-from-prd-md"
+	claude "/generating-prd-json-from-prd-md"
 
 ralph_init:  ## Initialize Ralph loop environment
 	echo "Initializing Ralph loop environment ..."
