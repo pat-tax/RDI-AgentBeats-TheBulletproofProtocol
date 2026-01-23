@@ -1,5 +1,5 @@
 ---
-name: generating-prd-from-userstory
+name: generating-prd-md-from-userstory-md
 description: Transforms UserStory.md into PRD.md by extracting features and converting user stories into functional requirements.
 ---
 

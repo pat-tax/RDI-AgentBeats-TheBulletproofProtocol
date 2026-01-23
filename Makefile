@@ -77,11 +77,15 @@ quick_validate:  ## Fast development cycle validation
 
 ralph_userstory:  ## [Optional] Create UserStory.md interactively. Usage: make ralph_userstory
 	echo "Creating UserStory.md through interactive Q&A ..."
-	claude /building-userstory
+	claude -p "/generating-interactive-userstory-md"
 
 ralph_prd:  ## [Optional] Generate PRD.md from UserStory.md
 	echo "Generating PRD.md from UserStory.md ..."
-	claude /generating-prd-from-userstory
+	claude -p "/generating-prd-md-from-userstory-md"
+
+ralph_prd_json:  ## [Optional] Generate PRD.md from UserStory.md
+	echo "Generating PRD.md from UserStory.md ..."
+	claude -p "/generating-prd-json-from-prd-md"
 
 ralph_init:  ## Initialize Ralph loop environment
 	echo "Initializing Ralph loop environment ..."
