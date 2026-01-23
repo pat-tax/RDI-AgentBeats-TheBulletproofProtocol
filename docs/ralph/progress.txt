@@ -53,7 +53,22 @@ Story: STORY-009
 Status: PASS
 Notes: Implement risk scorer
 
+## Iteration 10 - 2026-01-23T13:11:06Z
+Story: STORY-010
+Status: PASS
+Notes: Integrate detectors into evaluator
+
+## Iteration 11 - 2026-01-23T13:11:06Z
+Story: STORY-011
+Status: PASS
+Notes: Create Dockerfile for Green Agent
+
+## Iteration 12 - 2026-01-23T13:17:21Z
+Story: STORY-012
+Status: PASS
+Notes: Create docker-compose for local testing
+
 ---
 
-Progress: 9/21 stories completed
-Next: STORY-010 (Integrate detectors into evaluator)
+Progress: 12/21 stories completed
+Next: STORY-013 (Create scenario.toml configuration)
