@@ -157,14 +157,24 @@ Your images will be available at:
 - `ghcr.io/YOUR_USERNAME/bulletproof-green:latest`
 - `ghcr.io/YOUR_USERNAME/bulletproof-purple:latest`
 
-### Update scenario.toml
+### Register on AgentBeats Platform
 
-For production AgentBeats deployment, update `scenario.toml`:
+For production deployment, register your agents on the AgentBeats platform and update `scenario.toml` with your agent IDs.
+
+**See the complete registration guide**: [docs/AGENTBEATS_REGISTRATION.md](docs/AGENTBEATS_REGISTRATION.md)
+
+Quick overview:
+1. Sign up at [agentbeats.dev](https://agentbeats.dev)
+2. Register your green agent (benchmark) and purple agent (baseline)
+3. Copy the `agentbeats_id` for each agent
+4. Update `scenario.toml`:
 
 ```toml
 [green_agent]
-ghcr_url = "ghcr.io/YOUR_USERNAME/bulletproof-green:latest"
-# Or use agentbeats_id after registration
+agentbeats_id = "agent_xyz123abc456"  # Your registered green agent ID
+
+[[participants]]
+agentbeats_id = "agent_abc789def012"  # Your registered purple agent ID
 ```
 
 For local testing, use `docker-compose.yml` instead.
