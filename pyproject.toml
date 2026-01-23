@@ -18,6 +18,14 @@ dev = [
     "ruff>=0.8.0",
     "pyright>=1.1.0",
 ]
+purple = [
+    "a2a-sdk[http-server]>=0.3.0",
+    "uvicorn>=0.30.0",
+]
+green = [
+    "a2a-sdk[http-server]>=0.3.0",
+    "uvicorn>=0.30.0",
+]
 
 [tool.uv]
 dev-dependencies = [

@@ -199,9 +199,37 @@ purpose: Functional requirements and acceptance criteria for all user stories
 - **Responsiveness**: CLI operations provide feedback within 2 seconds (except long-running tasks which show progress)
 
 ### Compliance & Accuracy
-- **IRS Section 41 Adherence**: All generated narratives must align with IRS Section 41 statutes and Form 6765 requirements
-- **Risk Score Validity**: Agent B Risk Score < 20 must correlate with real-world low audit risk (validated against SVT historical data)
-- **Precision**: ≥ 90% accuracy in distinguishing business risk from technical risk (measured against labeled test set)
+
+**Agent B (Green Agent) Evaluation Metrics**:
+
+| Metric | Target | Validation Method | Benchmark |
+|--------|--------|-------------------|-----------|
+| **Classification Accuracy** | ≥ 70% | 20-case labeled test set | IRS AI: 61.2% ([TIGTA 2025](https://www.tigta.gov/reports/audit/irs-could-leverage-examination-results-artificial-intelligence-examination-case)) |
+| **F1 Score** | ≥ 0.72 | Precision/Recall harmonic mean | IRS AI: 0.42 |
+| **Precision** | ≥ 75% | TP / (TP + FP) | Minimize false approvals |
+| **Recall** | ≥ 70% | TP / (TP + FN) | Catch non-qualifying claims |
+| **Inter-Rater Reliability** | κ ≥ 0.75 | Cohen's kappa vs 2 tax professionals | Substantial agreement |
+| **Test-Retest Reliability** | r ≥ 0.95 | Same narrative, 2 evaluations | Reproducibility |
+
+**Risk Score Calibration**:
+- **0-20**: LOW RISK (audit-proof, meets all criteria)
+- **21-40**: MODERATE (minor issues, likely passes)
+- **41-60**: HIGH (significant gaps, needs revision)
+- **61-80**: VERY HIGH (multiple disqualifying patterns)
+- **81-100**: CRITICAL (obvious non-qualifying, immediate rejection)
+
+**Component Detection Rates** (Diagnostic Metrics):
+- Routine Engineering: ≥ 90% detection
+- Vagueness: ≥ 80% detection
+- Business Risk: ≥ 85% detection
+- Missing Experimentation: ≥ 75% detection
+- Lack of Specificity: ≥ 70% detection
+
+**IRS Section 41 Adherence**: All evaluation rules cite specific IRS statutes (Section 41(d), 26 CFR § 1.41-4)
+
+**Ground Truth Dataset**: 20 labeled narratives (10 qualifying, 10 non-qualifying) validated by 3 tax professionals
+
+**See**: `docs/Green-Agent-Metrics-Specification.md` for complete metrics framework
 
 ### Security & Privacy
 - **Data Anonymization**: All SVT training data must be anonymized (PII redacted) before processing
@@ -226,6 +254,90 @@ purpose: Functional requirements and acceptance criteria for all user stories
 
 ---
 
+## AgentBeats Competition Requirements
+
+### Competition Track: Legal Domain Agent Benchmark
+
+**Track**: Legal Track (agentbeats.org)
+**Submission Type**: Agentified Agent Benchmark
+**Role**: Green Agent = Benchmark (judges purple agents), Purple Agent = Reference Implementation (demonstrates benchmark usage)
+
+**Judging Environment Architecture**:
+- **1 Green Agent** (this project's benchmark) evaluates **N Purple Agents** (competitors)
+- Leaderboard repo GitHub Action spins up judging environment using `scenario.toml`
+- All agents pulled from GHCR (public images)
+- Results sent to agentbeats.dev as structured JSON
+
+### A2A Protocol Compliance
+
+Both Green (Examiner/Benchmark) and Purple (Substantiator/Reference) agents must implement A2A protocol:
+
+- **AgentCard Discovery**: Expose `/.well-known/agent-card.json` with name, description, version, capabilities
+- **Task Execution**: Handle `task/send` requests, return `task/result` with artifacts
+- **Streaming Updates**: Emit progress updates via SSE during long-running evaluations
+- **Error Handling**: Return structured errors (4xx/5xx) with actionable messages
+
+### Infrastructure Requirements
+
+| Requirement | Specification |
+|-------------|---------------|
+| **Docker Platform** | `linux/amd64` (required by AgentBeats) |
+| **Container Registry** | GHCR (`ghcr.io/{username}/{agent-name}:latest`) |
+| **Visibility** | Public (required for AgentBeats to pull images) |
+| **Configuration** | `scenario.toml` with agent IDs and environment variables |
+| **Local Testing** | `docker-compose.yml` for end-to-end validation |
+
+### Agent Registration Process
+
+**Step 1: Register agents on agentbeats.dev**
+1. Create account at agentbeats.dev
+2. Register Green Agent (Benchmark) → receive `agentbeats_id` for green agent
+3. Register Purple Agent (Reference) → receive `agentbeats_id` for purple agent
+4. Save both IDs for scenario.toml configuration
+
+**Step 2: scenario.toml Configuration**
+
+```toml
+[green]
+agentbeats_id = "green-agent-id-from-agentbeats-dev"  # Production
+# For local testing, use: ghcr_url = "ghcr.io/username/bulletproof-green:latest"
+
+[[participants]]
+name = "bulletproof-purple-reference"
+agentbeats_id = "purple-agent-id-from-agentbeats-dev"  # Production
+# For local testing, use: ghcr_url = "ghcr.io/username/bulletproof-purple:latest"
+```
+
+**Local Testing vs Production**:
+- **Local Testing**: Use `ghcr_url` field with direct GHCR image URLs
+- **Production Submission**: Use `agentbeats_id` field with registered agent IDs
+- Leaderboard repo accepts both formats
+
+### Submission Deliverables
+
+**Phase 1 (January 31, 2026)**:
+- [ ] Register both agents on agentbeats.dev (get agent IDs)
+- [ ] Green agent Docker image on GHCR (public, `ghcr.io/{username}/bulletproof-green:latest`)
+- [ ] Purple agent Docker image on GHCR (public, `ghcr.io/{username}/bulletproof-purple:latest`)
+- [ ] `scenario.toml` with registered `agentbeats_id` for both agents
+- [ ] Leaderboard repo fork with updated scenario.toml
+- [ ] Abstract.md (≤500 words)
+- [ ] README.md with usage instructions
+- [ ] Demo video (3-5 minutes)
+- [ ] Verify GitHub Action sends valid JSON to agentbeats.dev
+
+### Files Required
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile.green` | Green agent container build |
+| `Dockerfile.purple` | Purple agent container build |
+| `docker-compose.yml` | Local testing infrastructure |
+| `scenario.toml` | AgentBeats assessment configuration |
+| `.github/workflows/docker-publish.yml` | CI/CD to GHCR |
+
+---
+
 ## Out of Scope
 
 1. **Non-software R&D claims**: Focus only on software/high-tech R&D. Manufacturing, biotech, pharmaceutical, or other industries are excluded.
@@ -237,9 +349,33 @@ purpose: Functional requirements and acceptance criteria for all user stories
 
 ---
 
+## Reference Documentation
+
+The following documents provide detailed research and implementation guidance:
+
+| Document | Purpose |
+|----------|---------|
+| `docs/research/AgentBeats-Research.md` | Competition overview, timeline, Phase 1 requirements, judging criteria |
+| `docs/research/AgentBeats-Benchmark-Design-Principles.md` | AAA paradigm, task/outcome validity, benchmark quality checklist |
+| `docs/research/Green-Agent-Metrics-Specification.md` | Detailed metrics framework, validation plan, ground truth dataset spec |
+| `docs/research/Technical-Implementation-Guide.md` | 9-day implementation roadmap, IRS Section 41 rules, risk scoring algorithm |
+| `docs/research/Local-Testing-and-Deployment.md` | Docker setup, docker-compose, GHCR deployment, scenario.toml configuration |
+| `docs/UserStory.md` | User stories and acceptance criteria |
+
+### Key External Resources
+
+- **A2A Protocol**: [a2a-protocol.org/latest/](https://a2a-protocol.org/latest/)
+- **IRS Audit Techniques Guide**: [irs.gov/businesses/research-credit-claims-audit-techniques-guide](https://www.irs.gov/businesses/research-credit-claims-audit-techniques-guide-rccatg-credit-for-increasing-research-activities)
+- **IRS AI Baseline (TIGTA 2025)**: [tigta.gov/reports/audit/irs-could-leverage-examination-results-artificial-intelligence-examination-case](https://www.tigta.gov/reports/audit/irs-could-leverage-examination-results-artificial-intelligence-examination-case)
+- **AgentBeats Leaderboard Template**: [github.com/RDI-Foundation/agentbeats-leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template)
+
+---
+
 ## Notes for Ralph Loop
 
 When using the `generating-prd` skill to convert this PRD to `docs/ralph/prd.json`:
+
+### Story Structure Guidelines
 
 1. **Atomic Stories**: Each feature should be broken into atomic stories implementable in a single context window (100-300 lines)
 2. **Story Breakdown Example**:
@@ -252,4 +388,105 @@ When using the `generating-prd` skill to convert this PRD to `docs/ralph/prd.jso
 4. **Files Expected**: List of files becomes the `files` field in prd.json
 5. **Dependencies**: Consider story dependencies (e.g., orchestrator depends on Agent A and Agent B being implemented first)
 
-Keep stories atomic, specific, and testable. Prioritize core adversarial loop (Features 1-3) before SVT integration and CLI polish.
+### CRITICAL: AgentBeats Deployment Workflow
+
+**Legal Track Benchmark Submission Process:**
+
+This project is submitting a **benchmark** (green agent) to the Legal Track. The green agent will judge purple agents (including our reference implementation and competitor agents).
+
+**Implementation must follow this exact sequence:**
+
+1. **Purple Agent FIRST** (Reference Implementation):
+   - Implement A2A-compatible server (`src/bulletproof_purple/server.py`)
+   - Simple narrative generator that demonstrates benchmark usage
+   - Create `Dockerfile.purple` (platform: `linux/amd64`)
+   - Build and push to GHCR: `ghcr.io/{username}/bulletproof-purple:latest`
+   - Make image **PUBLIC** in GHCR settings
+   - **WHY**: Green agent (benchmark) needs purple agent to test against. Cannot validate the benchmark without a test subject.
+
+2. **Green Agent SECOND** (The Actual Benchmark):
+   - Implement A2A-compatible server (`src/bulletproof_green/server.py`)
+   - Implement IRS Section 41 evaluation logic (this is the benchmark's core value)
+   - Must produce consistent, reliable judgments of purple agents
+   - Create `Dockerfile.green` (platform: `linux/amd64`)
+   - Build and push to GHCR: `ghcr.io/{username}/bulletproof-green:latest`
+   - Make image **PUBLIC** in GHCR settings
+   - **WHY**: This is the deliverable being submitted to AgentBeats
+
+3. **Agent Registration** (agentbeats.dev):
+   - Create account at agentbeats.dev
+   - Register green agent → get `agentbeats_id`
+   - Register purple agent (reference) → get `agentbeats_id`
+   - Save both IDs for scenario.toml
+   - **WHY**: AgentBeats platform needs to track which agents are benchmarks vs participants
+
+4. **Leaderboard Repo Setup** (The Judging Environment):
+   - Clone/fork `github.com/RDI-Foundation/agentbeats-leaderboard-template`
+   - Update `scenario.toml`:
+     ```toml
+     [green]
+     agentbeats_id = "your-green-agent-id"  # Production
+     # ghcr_url = "ghcr.io/{username}/bulletproof-green:latest"  # Local testing
+
+     [[participants]]
+     name = "bulletproof-purple-reference"
+     agentbeats_id = "your-purple-agent-id"  # Production
+     # ghcr_url = "ghcr.io/{username}/bulletproof-purple:latest"  # Local testing
+     ```
+   - GitHub Actions in leaderboard repo will:
+     - Spin up judging environment: 1 green agent + N purple agents
+     - Pull all agents from GHCR based on scenario.toml
+     - Run assessment scenarios (green judges all purples)
+     - **Send results to agentbeats.dev as structured JSON**
+   - **WHY**: This is the actual submission mechanism - leaderboard repo orchestrates the benchmark evaluation
+
+5. **Validation Requirements**:
+   - Both agents must expose `/.well-known/agent-card.json` (A2A protocol)
+   - Both agents must handle `task/send` requests and return `task/result` with artifacts
+   - **Green agent MUST return structured output**: `{risk_score: 0-100, classification: "QUALIFYING"|"NON_QUALIFYING", component_scores: {...}, redline: {...}}`
+   - Purple agent must accept prompts and return R&D narratives
+   - Scenario.toml must contain valid `agentbeats_id` for production, or `ghcr_url` for local testing
+   - Leaderboard GitHub Action must send valid JSON to agentbeats.dev (results endpoint)
+
+### Implementation Priority for prd.json
+
+**MUST-HAVE (P0) - Required for competition submission:**
+- [ ] Purple agent A2A server + basic narrative generation
+- [ ] Green agent A2A server + IRS Section 41 evaluation
+- [ ] `Dockerfile.purple` and `Dockerfile.green` (linux/amd64)
+- [ ] `scenario.toml` configuration
+- [ ] GHCR deployment scripts
+- [ ] `docker-compose.yml` for local testing
+
+**SHOULD-HAVE (P1) - Improves benchmark quality:**
+- [ ] Advanced purple agent (adversarial narratives)
+- [ ] Ground truth dataset (20 labeled cases)
+- [ ] Inter-rater reliability validation
+- [ ] GitHub Actions workflow for automated GHCR push
+
+**NICE-TO-HAVE (P2) - Polish:**
+- [ ] CLI for local testing
+- [ ] SVT fine-tuning integration
+- [ ] Recursive adversarial loop
+
+### Testing Checklist for prd.json Stories
+
+**Local Testing Phase** (use `ghcr_url` in scenario.toml):
+1. ✅ Local docker-compose runs both agents successfully
+2. ✅ `curl http://localhost:8001/.well-known/agent-card.json` returns valid AgentCard
+3. ✅ Can send test narrative to purple agent and receive narrative response
+4. ✅ Can send narrative to green agent and receive structured judgment (`{risk_score, classification}`)
+5. ✅ Docker images build for `linux/amd64` platform
+6. ✅ Images successfully push to GHCR and are publicly accessible
+
+**Production Testing Phase** (use `agentbeats_id` in scenario.toml):
+7. ✅ Both agents registered on agentbeats.dev with valid agent IDs
+8. ✅ Scenario.toml updated with production `agentbeats_id` values
+9. ✅ Cloned leaderboard repo can pull agents from GHCR using agent IDs
+10. ✅ Leaderboard GitHub Action completes successfully
+11. ✅ Leaderboard GitHub Action sends valid JSON to agentbeats.dev
+12. ✅ Results appear on agentbeats.dev dashboard
+
+**Critical Path**: Purple Agent → Green Agent → GHCR Deployment → Local Testing → Agent Registration → Production Testing → Submission
+
+Keep stories atomic, specific, and testable. **Prioritize Purple Agent → Green Agent → Deployment → Registration** in that order.

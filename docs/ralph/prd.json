@@ -1,18 +1,373 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
-  "desciption": "A concise project descripion",
+  "desciption": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator using adversarial validation",
   "source": "docs/PRD.md",
-  "generated": "2026-01-22T22:01:48Z",
+  "generated": "2026-01-23 12:00:00",
   "stories": [
     {
-      "id": "STORY-EXAMPLE",
-      "title": "Example story - replace with real stories",
-      "description": "This is a placeholder. Use generating-prd skill to populate from PRD.md",
+      "id": "STORY-001",
+      "title": "Implement Purple Agent A2A server",
+      "description": "Create A2A-compatible HTTP server for purple agent (reference implementation) with AgentCard discovery and task execution endpoints",
       "acceptance": [
-        "Run: claude -p and ask 'Use generating-prd skill to create prd.json'",
-        "Skill will parse PRD.md and populate real stories here"
+        "Server exposes /.well-known/agent-card.json with name, description, version, capabilities",
+        "Server handles task/send POST requests and returns task/result with artifacts",
+        "Server runs on configurable host/port (default 0.0.0.0:8000)",
+        "curl http://localhost:8000/.well-known/agent-card.json returns valid JSON"
       ],
-      "files": ["docs/ralph/prd.json"],
+      "files": [
+        "src/bulletproof_purple/server.py",
+        "src/bulletproof_purple/__init__.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-002",
+      "title": "Implement Purple Agent executor",
+      "description": "Create AgentExecutor implementation for purple agent that generates simple R&D narratives for testing the benchmark",
+      "acceptance": [
+        "Executor accepts task with prompt input",
+        "Generates 300-500 word R&D narrative in IRS Section 41 format",
+        "Returns structured artifact with narrative text",
+        "Handles async execution pattern",
+        "Includes at least 3 narrative templates (qualifying, non-qualifying, edge cases)"
+      ],
+      "files": [
+        "src/bulletproof_purple/executor.py",
+        "src/bulletproof_purple/generator.py",
+        "src/bulletproof_purple/templates.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-003",
+      "title": "Create Dockerfile for Purple Agent",
+      "description": "Build Docker container for purple agent targeting linux/amd64 platform with a2a-sdk dependencies",
+      "acceptance": [
+        "Dockerfile.purple builds successfully on linux/amd64 platform",
+        "Container includes Python 3.13 and a2a-sdk[http-server]>=0.3.0",
+        "Container exposes port 8000",
+        "Container runs purple agent server on startup",
+        "docker run successfully starts the purple agent server"
+      ],
+      "files": [
+        "Dockerfile.purple",
+        "pyproject.toml"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-004",
+      "title": "Implement Green Agent A2A server",
+      "description": "Create A2A-compatible HTTP server for green agent (benchmark) with AgentCard discovery and task execution endpoints",
+      "acceptance": [
+        "Server exposes /.well-known/agent-card.json with name='bulletproof-green-examiner'",
+        "Server handles task/send POST requests and returns task/result with evaluation artifacts",
+        "Server runs on configurable host/port (default 0.0.0.0:8000)",
+        "curl http://localhost:8000/.well-known/agent-card.json returns valid JSON",
+        "AgentCard includes 'IRS Section 41 Evaluator' in description"
+      ],
+      "files": [
+        "src/bulletproof_green/server.py",
+        "src/bulletproof_green/__init__.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-005",
+      "title": "Implement Green Agent executor core",
+      "description": "Create AgentExecutor implementation for green agent that evaluates narratives and returns structured judgments",
+      "acceptance": [
+        "Executor accepts task with narrative input",
+        "Returns structured artifact: {risk_score: 0-100, classification: QUALIFYING|NON_QUALIFYING, component_scores: {}, redline: {}}",
+        "Handles async execution pattern",
+        "Validates input narrative is present before evaluation",
+        "Returns error for invalid inputs"
+      ],
+      "files": [
+        "src/bulletproof_green/executor.py",
+        "src/bulletproof_green/evaluator.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-006",
+      "title": "Implement routine engineering detector",
+      "description": "Detect routine engineering patterns in narratives using IRS Section 41 criteria (30% weight in risk score)",
+      "acceptance": [
+        "Detects 10+ routine engineering keywords: debugging, bug fix, production issue, maintenance, refactor, upgrade, migration, optimization, performance tuning, code cleanup",
+        "Each detection includes rejection reason citing IRS guidance",
+        "Returns component score (0-30) based on pattern frequency",
+        "Passes test cases: routine narrative scores >20, research narrative scores <10"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/routine_engineering.py",
+        "tests/test_routine_engineering.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-007",
+      "title": "Implement vagueness detector",
+      "description": "Flag vague language without numeric substantiation (25% weight in risk score)",
+      "acceptance": [
+        "Detects vague phrases: optimize, improve, enhance, upgrade, better, faster, user experience",
+        "Checks for numeric substantiation (percentages, metrics, measurements)",
+        "Penalizes vague claims without evidence",
+        "Returns component score (0-25) based on vagueness density",
+        "Passes test: 'improved performance' scores high, 'reduced latency by 40ms' scores low"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/vagueness_detector.py",
+        "tests/test_vagueness_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-008",
+      "title": "Implement experimentation checker",
+      "description": "Verify IRS Section 41(d) process of experimentation is documented (15% weight in risk score)",
+      "acceptance": [
+        "Checks for uncertainty indicators: unknown, uncertain, unclear, hypothesis, experiment",
+        "Verifies alternatives were evaluated: tried, tested, compared, alternative",
+        "Confirms failures documented: failed, didn't work, unsuccessful, issue",
+        "Returns component score (0-15) based on experimentation evidence",
+        "Passes test: narrative with all 4 elements scores <5, narrative missing elements scores >10"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/experimentation_checker.py",
+        "tests/test_experimentation_checker.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-009",
+      "title": "Implement risk scorer",
+      "description": "Aggregate component scores into final 0-100 risk score with weighted algorithm",
+      "acceptance": [
+        "Combines routine_engineering (30%), vagueness (25%), business_risk (20%), experimentation (15%), specificity (10%)",
+        "Returns risk_score: 0-100 integer",
+        "Returns classification: QUALIFYING if risk_score < 20, else NON_QUALIFYING",
+        "Returns component_scores breakdown for transparency",
+        "Passes test: perfect narrative scores <10, problematic narrative scores >60"
+      ],
+      "files": [
+        "src/bulletproof_green/scorer.py",
+        "tests/test_scorer.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-010",
+      "title": "Create Dockerfile for Green Agent",
+      "description": "Build Docker container for green agent targeting linux/amd64 platform with a2a-sdk and evaluation dependencies",
+      "acceptance": [
+        "Dockerfile.green builds successfully on linux/amd64 platform",
+        "Container includes Python 3.13 and a2a-sdk[http-server]>=0.3.0",
+        "Container exposes port 8000",
+        "Container runs green agent server on startup",
+        "docker run successfully starts the green agent server"
+      ],
+      "files": [
+        "Dockerfile.green",
+        "pyproject.toml"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-011",
+      "title": "Create docker-compose for local testing",
+      "description": "Docker Compose configuration to run both agents locally for integration testing",
+      "acceptance": [
+        "docker-compose.yml defines bulletproof-green service on port 8001",
+        "docker-compose.yml defines bulletproof-purple service on port 8002",
+        "Both services build from local Dockerfiles with platform: linux/amd64",
+        "Services connect via shared network (agentbeats)",
+        "docker-compose up -d starts both agents successfully",
+        "curl http://localhost:8001/.well-known/agent-card.json and http://localhost:8002/.well-known/agent-card.json both return valid responses"
+      ],
+      "files": [
+        "docker-compose.yml"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-012",
+      "title": "Create scenario.toml configuration",
+      "description": "AgentBeats scenario configuration for local testing and production deployment",
+      "acceptance": [
+        "scenario.toml includes [green] section with agentbeats_id placeholder and commented ghcr_url example",
+        "scenario.toml includes [[participants]] section for purple agent reference",
+        "scenario.toml includes [config] section with difficulty and target_risk_score",
+        "File includes comments explaining local testing (ghcr_url) vs production (agentbeats_id)",
+        "File is valid TOML syntax"
+      ],
+      "files": [
+        "scenario.toml"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-013",
+      "title": "Create GHCR deployment scripts",
+      "description": "Bash scripts for building and pushing Docker images to GitHub Container Registry",
+      "acceptance": [
+        "scripts/build.sh builds both Dockerfiles for linux/amd64",
+        "scripts/push.sh pushes images to ghcr.io/{username}/bulletproof-{green|purple}:latest",
+        "Scripts accept GITHUB_USERNAME environment variable",
+        "Scripts include error handling and status messages",
+        "Scripts authenticate with GHCR using CR_PAT token",
+        "README.md documents GHCR deployment process"
+      ],
+      "files": [
+        "scripts/build.sh",
+        "scripts/push.sh",
+        "README.md"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-014",
+      "title": "Create integration test suite",
+      "description": "End-to-end integration tests for purple agent, green agent, and agent-to-agent evaluation flow",
+      "acceptance": [
+        "tests/integration/test_purple_agent.py tests purple agent task execution",
+        "tests/integration/test_green_agent.py tests green agent evaluation",
+        "tests/integration/test_e2e_assessment.py tests purple generates narrative, green evaluates it",
+        "All tests use docker-compose services or mock A2A protocol",
+        "make test runs all integration tests successfully"
+      ],
+      "files": [
+        "tests/integration/test_purple_agent.py",
+        "tests/integration/test_green_agent.py",
+        "tests/integration/test_e2e_assessment.py",
+        "tests/integration/__init__.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-015",
+      "title": "Create ground truth dataset",
+      "description": "20 labeled R&D narratives (10 qualifying, 10 non-qualifying) for benchmark validation",
+      "acceptance": [
+        "data/ground_truth.json contains 20 narrative objects",
+        "Each object includes: id, narrative (text), label (QUALIFYING|NON_QUALIFYING), irs_rationale",
+        "10 narratives labeled QUALIFYING with clear technical uncertainty",
+        "10 narratives labeled NON_QUALIFYING with routine engineering or vague language",
+        "JSON schema validated",
+        "README.md documents dataset structure and labeling criteria"
+      ],
+      "files": [
+        "data/ground_truth.json",
+        "data/README.md"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-016",
+      "title": "Validate benchmark metrics",
+      "description": "Run green agent against ground truth dataset and measure classification accuracy, F1 score, precision, recall",
+      "acceptance": [
+        "scripts/validate_benchmark.py evaluates all 20 ground truth cases",
+        "Outputs classification accuracy >= 70% (target: beat IRS AI 61.2%)",
+        "Outputs F1 score >= 0.72 (target: beat IRS AI 0.42)",
+        "Outputs precision >= 75%, recall >= 70%",
+        "Results saved to results/benchmark_validation.json",
+        "Script documents metric calculations with sklearn.metrics"
+      ],
+      "files": [
+        "scripts/validate_benchmark.py",
+        "tests/test_benchmark_validation.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-017",
+      "title": "Create GitHub Actions workflow",
+      "description": "CI/CD pipeline for automated Docker image builds and GHCR pushes on git push",
+      "acceptance": [
+        ".github/workflows/docker-publish.yml builds both Dockerfiles on push to main",
+        "Workflow authenticates with GHCR using secrets.GITHUB_TOKEN",
+        "Workflow tags images with :latest and :${{github.sha}}",
+        "Workflow pushes images to ghcr.io/${{github.repository_owner}}/bulletproof-{green|purple}",
+        "Workflow runs on platform: linux/amd64",
+        "README.md documents GitHub Actions setup and required secrets"
+      ],
+      "files": [
+        ".github/workflows/docker-publish.yml",
+        "README.md"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-018",
+      "title": "Create AgentBeats registration guide",
+      "description": "Documentation for registering agents on agentbeats.dev and updating scenario.toml",
+      "acceptance": [
+        "docs/AGENTBEATS_REGISTRATION.md explains registration process step-by-step",
+        "Guide includes screenshots or examples of agentbeats.dev UI",
+        "Guide shows how to copy agentbeats_id from platform",
+        "Guide explains difference between ghcr_url (local) vs agentbeats_id (production)",
+        "Guide includes verification steps to confirm agents are registered correctly",
+        "README.md links to registration guide"
+      ],
+      "files": [
+        "docs/AGENTBEATS_REGISTRATION.md",
+        "README.md"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-019",
+      "title": "Create Abstract.md for submission",
+      "description": "500-word abstract explaining the benchmark, evaluation criteria, and Legal Track contribution",
+      "acceptance": [
+        "Abstract.md is <= 500 words",
+        "Explains benchmark purpose: IRS Section 41 R&D tax credit narrative evaluator",
+        "Describes evaluation methodology: routine engineering, vagueness, experimentation checks",
+        "Cites IRS Section 41 statutory basis and audit techniques",
+        "Includes metrics: accuracy >= 70%, F1 >= 0.72 (beats IRS AI baseline)",
+        "Explains Legal Track contribution: first agentified benchmark for tax compliance domain"
+      ],
+      "files": [
+        "Abstract.md"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-020",
+      "title": "Update README with submission checklist",
+      "description": "Comprehensive README with usage instructions, local testing guide, and AgentBeats submission checklist",
+      "acceptance": [
+        "README.md includes project overview and purpose",
+        "README.md includes local testing instructions (docker-compose up)",
+        "README.md includes GHCR deployment instructions",
+        "README.md includes AgentBeats registration process",
+        "README.md includes Phase 1 submission checklist with all deliverables",
+        "README.md includes links to all supporting docs (PRD.md, research docs)",
+        "README.md includes contribution guidelines and license"
+      ],
+      "files": [
+        "README.md"
+      ],
       "passes": false,
       "completed_at": null
     }
