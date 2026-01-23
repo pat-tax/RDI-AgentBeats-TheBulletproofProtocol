@@ -6,12 +6,12 @@
 # Generate/update README.md in src directory
 # Returns the path to the generated README (empty if not generated)
 generate_app_readme() {
-    log_info "Generating application README.md..."
+    log_info "Generating application README.md..." >&2
 
     # Find src directory (first dir in src/)
     local src_dir=$(find src -mindepth 1 -maxdepth 1 -type d | head -1)
     if [ -z "$src_dir" ]; then
-        log_warn "No src directory found, skipping README generation"
+        log_warn "No src directory found, skipping README generation" >&2
         echo ""
         return 0
     fi
@@ -70,19 +70,19 @@ $architecture
 Built with Ralph Loop autonomous development using TDD.
 EOF
 
-    log_info "README.md created at $readme_path"
+    log_info "README.md created at $readme_path" >&2
     echo "$readme_path"
 }
 
 # Generate/update example.py in src directory
 # Returns the path to the generated example (empty if not generated)
 generate_app_example() {
-    log_info "Generating application example.py..."
+    log_info "Generating application example.py..." >&2
 
     # Find src directory (first dir in src/)
     local src_dir=$(find src -mindepth 1 -maxdepth 1 -type d | head -1)
     if [ -z "$src_dir" ]; then
-        log_warn "No src directory found, skipping example generation"
+        log_warn "No src directory found, skipping example generation" >&2
         echo ""
         return 0
     fi
@@ -107,6 +107,6 @@ if __name__ == "__main__":
     main()
 EOF
 
-    log_info "example.py created at $example_path"
+    log_info "example.py created at $example_path" >&2
     echo "$example_path"
 }
