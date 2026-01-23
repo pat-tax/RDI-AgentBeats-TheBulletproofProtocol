@@ -2,7 +2,7 @@
 
 ## What
 
-Application description
+Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.
 
 ## Why
 
@@ -41,10 +41,12 @@ tests/
 │   ├── test_dockerfile_purple.cpython-314-pytest-9.0.2.pyc
 │   ├── test_experimentation_checker.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_executor.cpython-314-pytest-9.0.2.pyc
+│   ├── test_green_agent_integration.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_server.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_server.cpython-314-pytest-9.0.2.pyc
 │   ├── test_routine_engineering.cpython-314-pytest-9.0.2.pyc
+│   ├── test_scenario_config.cpython-314-pytest-9.0.2.pyc
 │   ├── test_scorer.cpython-314-pytest-9.0.2.pyc
 │   └── test_vagueness_detector.cpython-314-pytest-9.0.2.pyc
 ├── test_docker_compose.py
@@ -52,6 +54,7 @@ tests/
 ├── test_dockerfile_purple.py
 ├── test_experimentation_checker.py
 ├── test_green_agent_executor.py
+├── test_green_agent_integration.py
 ├── test_green_agent_server.py
 ├── test_purple_agent_executor.py
 ├── test_purple_agent_server.py
