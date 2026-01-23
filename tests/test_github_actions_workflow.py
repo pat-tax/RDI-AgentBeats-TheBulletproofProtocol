@@ -83,9 +83,9 @@ class TestDockerPublishWorkflow:
         """Workflow tags images with commit SHA."""
         content = workflow_file.read_text()
 
-        # Check for GitHub SHA variable
-        assert "github.sha" in content or "${{ github.sha }}" in content or "${GITHUB_SHA}" in content, \
-            "Workflow must tag images with commit SHA using github.sha"
+        # Check for GitHub SHA variable or docker metadata-action with type=sha
+        assert "github.sha" in content or "${{ github.sha }}" in content or "${GITHUB_SHA}" in content or "type=sha" in content, \
+            "Workflow must tag images with commit SHA using github.sha or type=sha"
 
     def test_workflow_pushes_to_ghcr(self, workflow_file):
         """Workflow pushes images to ghcr.io."""
