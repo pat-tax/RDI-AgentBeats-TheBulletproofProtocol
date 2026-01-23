@@ -59,6 +59,7 @@ tests/
 ├── test_purple_agent_executor.py
 ├── test_purple_agent_server.py
 ├── test_routine_engineering.py
+├── test_scenario_config.py
 ├── test_scorer.py
 └── test_vagueness_detector.py
 ```
