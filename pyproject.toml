@@ -1,7 +1,7 @@
 [project]
 name = "RDI-AgentBeats-TheBulletproofProtocol"
 version = "0.0.0"
-description = "A recursive adversarial agent system where a "Virtual IRS Auditor" ruthlessly critiques and trains a "Generator Agent" to write audit-proof R&D tax credit claims."
+description = "A recursive adversarial agent system where a Virtual IRS Auditor ruthlessly critiques and trains a Generator Agent to write audit-proof R&D tax credit claims."
 requires-python = ">=3.13"
 readme = "README.md"
 license = { file = "LICENSE.md" }

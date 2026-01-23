@@ -6,30 +6,39 @@ green agent benchmark.
 """
 
 import argparse
-from typing import Any
+from typing import Optional
 
 import uvicorn
 from a2a.server.apps import A2AFastAPIApplication
 from a2a.server.handlers import DefaultRequestHandler
-from a2a.types import AgentCard
+from a2a.server.request_handlers.request_handler_params import MessageSendParams
+from a2a.server.server_call_context import ServerCallContext
+from a2a.types import AgentCard, Message, Task
 
 
 class PurpleAgentHandler(DefaultRequestHandler):
     """Request handler for purple agent tasks."""
 
-    async def handle_task(self, task_input: dict[str, Any]) -> dict[str, Any]:
-        """Handle task execution for narrative generation.
+    async def async_on_message_send(
+        self,
+        params: MessageSendParams,
+        context: Optional[ServerCallContext] = None,
+    ) -> Task | Message:
+        """Handle message/send requests for narrative generation.
+
+        This implements the A2A protocol's message/send JSON-RPC method.
 
         Args:
-            task_input: Task input containing prompt or parameters
+            params: Message parameters including the input message
+            context: Server call context (optional)
 
         Returns:
-            Task result with generated narrative artifact
+            Task object with generated narrative artifact
         """
-        # Simple narrative generation for now (STORY-002 will implement full executor)
-        prompt = task_input.get("prompt", "Generate an R&D narrative")
+        # Extract message text from params
+        message_text = params.message.text if params.message else "Generate an R&D narrative"
 
-        # Return a simple narrative artifact
+        # Simple narrative generation for now (STORY-002 will implement full executor)
         narrative = (
             "Our engineering team developed a novel distributed caching system "
             "to reduce database latency by 40ms. The technical uncertainty centered "
@@ -37,11 +46,17 @@ class PurpleAgentHandler(DefaultRequestHandler):
             "with three different algorithms before finding a solution."
         )
 
-        return {
-            "narrative": narrative,
-            "prompt": prompt,
-            "status": "completed",
-        }
+        # Return a Task with the narrative as an artifact
+        return Task(
+            id="task-" + str(hash(message_text)),
+            status="completed",
+            artifacts=[
+                {
+                    "name": "narrative",
+                    "data": narrative,
+                }
+            ],
+        )
 
 
 def create_app(card_url: str) -> A2AFastAPIApplication:
