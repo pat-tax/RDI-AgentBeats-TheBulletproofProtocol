@@ -12,8 +12,8 @@ import uvicorn
 from a2a.server.apps import A2AFastAPIApplication
 from a2a.server.request_handlers.request_handler import RequestHandler
 from a2a.types import (
-    AgentCard,
     AgentCapabilities,
+    AgentCard,
     Artifact,
     Message,
     MessageSendParams,
@@ -58,13 +58,18 @@ class PurpleAgentHandler(RequestHandler):
         )
 
         # Return a Task with the narrative as an artifact
+        context_id = (
+            params.message.context_id
+            if params.message and params.message.context_id
+            else str(uuid.uuid4())
+        )
         return Task(
             id=str(uuid.uuid4()),
-            contextId=params.message.context_id if params.message and params.message.context_id else str(uuid.uuid4()),
+            context_id=context_id,
             status=TaskStatus(state="completed"),
             artifacts=[
                 Artifact(
-                    artifactId=str(uuid.uuid4()),
+                    artifact_id=str(uuid.uuid4()),
                     name="narrative",
                     parts=[TextPart(text=narrative)],
                 )
@@ -116,13 +121,16 @@ def create_app(card_url: str) -> A2AFastAPIApplication:
     """
     agent_card = AgentCard(
         name="bulletproof-purple-substantiator",
-        description="R&D Tax Credit Narrative Generator - Reference Implementation for AgentBeats Legal Track",
+        description=(
+            "R&D Tax Credit Narrative Generator - "
+            "Reference Implementation for AgentBeats Legal Track"
+        ),
         version="0.0.0",
         url=card_url,
         capabilities=AgentCapabilities(),  # Use empty AgentCapabilities object
         skills=[],  # No specific skills defined
-        defaultInputModes=["text"],  # Accepts text input
-        defaultOutputModes=["text"],  # Returns text output
+        default_input_modes=["text"],  # Accepts text input
+        default_output_modes=["text"],  # Returns text output
     )
 
     handler = PurpleAgentHandler()
@@ -135,9 +143,7 @@ def create_app(card_url: str) -> A2AFastAPIApplication:
 
 def main() -> None:
     """Run the purple agent A2A server."""
-    parser = argparse.ArgumentParser(
-        description="Bulletproof Purple Agent - A2A Server"
-    )
+    parser = argparse.ArgumentParser(description="Bulletproof Purple Agent - A2A Server")
     parser.add_argument(
         "--host",
         default="0.0.0.0",
