@@ -3,8 +3,6 @@
 import json
 from pathlib import Path
 
-import pytest
-
 
 def test_ground_truth_json_exists() -> None:
     """Verify data/ground_truth.json file exists."""
@@ -40,7 +38,9 @@ def test_ground_truth_schema_validation() -> None:
     for i, item in enumerate(data):
         # Check all required fields exist
         assert isinstance(item, dict), f"Item {i} must be a dictionary"
-        assert set(item.keys()) == required_fields, f"Item {i} must have exactly these fields: {required_fields}"
+        assert set(item.keys()) == required_fields, (
+            f"Item {i} must have exactly these fields: {required_fields}"
+        )
 
         # Check field types
         assert isinstance(item["id"], str), f"Item {i}: id must be a string"
@@ -49,7 +49,9 @@ def test_ground_truth_schema_validation() -> None:
         assert isinstance(item["irs_rationale"], str), f"Item {i}: irs_rationale must be a string"
 
         # Check label values
-        assert item["label"] in ["QUALIFYING", "NON_QUALIFYING"], f"Item {i}: label must be QUALIFYING or NON_QUALIFYING"
+        assert item["label"] in ["QUALIFYING", "NON_QUALIFYING"], (
+            f"Item {i}: label must be QUALIFYING or NON_QUALIFYING"
+        )
 
         # Check narrative is not empty
         assert len(item["narrative"]) > 0, f"Item {i}: narrative must not be empty"
@@ -83,8 +85,16 @@ def test_qualifying_narratives_have_technical_uncertainty() -> None:
         data = json.load(f)
 
     uncertainty_keywords = [
-        "uncertain", "unknown", "unclear", "hypothesis", "experiment",
-        "novel", "innovative", "research", "discovery", "investigation"
+        "uncertain",
+        "unknown",
+        "unclear",
+        "hypothesis",
+        "experiment",
+        "novel",
+        "innovative",
+        "research",
+        "discovery",
+        "investigation",
     ]
 
     qualifying_narratives = [item for item in data if item["label"] == "QUALIFYING"]
@@ -92,7 +102,9 @@ def test_qualifying_narratives_have_technical_uncertainty() -> None:
     for item in qualifying_narratives:
         narrative_lower = item["narrative"].lower()
         has_uncertainty = any(keyword in narrative_lower for keyword in uncertainty_keywords)
-        assert has_uncertainty, f"QUALIFYING narrative {item['id']} must contain technical uncertainty indicators"
+        assert has_uncertainty, (
+            f"QUALIFYING narrative {item['id']} must contain technical uncertainty indicators"
+        )
 
 
 def test_non_qualifying_narratives_have_disqualifying_patterns() -> None:
@@ -102,13 +114,19 @@ def test_non_qualifying_narratives_have_disqualifying_patterns() -> None:
         data = json.load(f)
 
     routine_keywords = [
-        "debug", "bug fix", "production issue", "maintenance", "refactor",
-        "upgrade", "migration", "optimization", "performance tuning", "code cleanup"
+        "debug",
+        "bug fix",
+        "production issue",
+        "maintenance",
+        "refactor",
+        "upgrade",
+        "migration",
+        "optimization",
+        "performance tuning",
+        "code cleanup",
     ]
 
-    vague_keywords = [
-        "optimize", "improve", "enhance", "upgrade", "better", "faster"
-    ]
+    vague_keywords = ["optimize", "improve", "enhance", "upgrade", "better", "faster"]
 
     non_qualifying_narratives = [item for item in data if item["label"] == "NON_QUALIFYING"]
 
@@ -117,7 +135,10 @@ def test_non_qualifying_narratives_have_disqualifying_patterns() -> None:
         has_routine = any(keyword in narrative_lower for keyword in routine_keywords)
         has_vague = any(keyword in narrative_lower for keyword in vague_keywords)
 
-        assert has_routine or has_vague, f"NON_QUALIFYING narrative {item['id']} must contain routine engineering or vague language"
+        assert has_routine or has_vague, (
+            f"NON_QUALIFYING narrative {item['id']} must contain "
+            "routine engineering or vague language"
+        )
 
 
 def test_data_readme_exists() -> None:
