@@ -9,8 +9,6 @@
 #   docker-compose logs -f        # View logs
 #   docker-compose down           # Stop and remove containers
 
-version: '3.8'
-
 services:
   bulletproof-green:
     build:
