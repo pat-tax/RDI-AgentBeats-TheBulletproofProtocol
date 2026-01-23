@@ -100,7 +100,29 @@ Mandatory for Both:
 
 Deploy Docker images to GitHub Container Registry for AgentBeats production use.
 
-### Prerequisites
+### Automated Deployment (GitHub Actions)
+
+The repository includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that automatically builds and pushes Docker images to GHCR on every push to the `main` branch.
+
+**How it works:**
+1. Triggers on push to `main` branch
+2. Builds both `Dockerfile.green` and `Dockerfile.purple` for `linux/amd64`
+3. Authenticates with GHCR using `secrets.GITHUB_TOKEN` (automatically provided)
+4. Tags images with `:latest` and `:${{ github.sha }}`
+5. Pushes to `ghcr.io/${{ github.repository_owner }}/bulletproof-{green|purple}`
+
+**No setup required** - the workflow uses GitHub's built-in `GITHUB_TOKEN` with automatic permissions for pushing to GHCR. Just push to `main` and the workflow handles the rest.
+
+**View workflow runs:**
+```
+https://github.com/YOUR_USERNAME/YOUR_REPO/actions
+```
+
+### Manual Deployment
+
+For manual deployment or local testing:
+
+#### Prerequisites
 
 1. **Create GitHub Personal Access Token (PAT)**:
    - Go to https://github.com/settings/tokens
@@ -114,7 +136,7 @@ Deploy Docker images to GitHub Container Registry for AgentBeats production use.
    export CR_PAT=your-github-pat
    ```
 
-### Build and Push
+#### Build and Push
 
 ```bash
 # Build Docker images for linux/amd64
@@ -126,7 +148,7 @@ bash scripts/push.sh
 
 ### Verify Deployment
 
-After pushing, verify your packages at:
+After pushing (automated or manual), verify your packages at:
 ```
 https://github.com/YOUR_USERNAME?tab=packages
 ```
