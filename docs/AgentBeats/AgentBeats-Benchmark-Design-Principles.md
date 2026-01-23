@@ -89,6 +89,7 @@
 **Question**: Does the task evaluate what we claim to evaluate?
 
 **Bulletproof Protocol Application**:
+
 - ✓ Task: Evaluate IRS Section 41 compliance of R&D narratives
 - ✓ Measures: Ability to detect non-qualifying activities (routine engineering)
 - ✓ Validates: Legal reasoning, technical vs business risk distinction
@@ -99,12 +100,14 @@
 **Question**: Is the evaluation methodology accurate and rigorous?
 
 **Critical Requirements**:
+
 - **No Substring Matching**: Simple pattern matching is insufficient
 - **LLM-as-Judge Must Be Accurate**: If using LLM scoring, validate against ground truth
 - **Provide Ground Truth**: We need labeled examples (qualifying vs non-qualifying)
 - **Rigorous Rubrics**: Explicit scoring criteria, not subjective judgment
 
 **Bulletproof Protocol Application**:
+
 - ✓ Rule-based scoring (not pure LLM judgment)
 - ✓ IRS Section 41 statutes = ground truth
 - ✓ Weighted rubric: 30% routine engineering + 25% vagueness + 20% business risk + 15% experimentation + 10% specificity
@@ -154,6 +157,7 @@
 - Evaluation: Did agent achieve goal using tools correctly?
 
 **Challenge**: Tool trace not directly visible to assessor
+
 - **Solution**: Observe side effects (database changes, API calls, file system)
 
 ### Tau Papers
@@ -211,27 +215,33 @@
 ## Best Practices from Research
 
 ### From "Establishing Best Practices for Building Rigorous Agentic Benchmarks"
+
 [arxiv.org/pdf/2507.02825](https://arxiv.org/pdf/2507.02825)
 
 **Key Takeaways**:
+
 1. Define evaluation criteria BEFORE collecting data
 2. Use multiple evaluators to establish ground truth
 3. Test for shortcut exploitation (can trivial agents score well?)
 4. Document limitations and failure modes
 
 ### From "Can We Trust AI Benchmarks?"
+
 [arxiv.org/pdf/2502.06559](https://arxiv.org/pdf/2502.06559)
 
 **Risks to Avoid**:
+
 - Benchmark saturation (agents memorize answers)
 - Evaluation shortcuts (pattern matching vs understanding)
 - Lack of transparency in scoring methodology
 - Mismatch between benchmark and real-world performance
 
 ### From CyberGym
+
 [arxiv.org/abs/2506.02548](https://arxiv.org/abs/2506.02548), [cybergym.io](https://cybergym.io)
 
 **Lessons**:
+
 - Provide interactive environments, not just static datasets
 - Measure capability progression (novice → expert)
 - Include both success metrics and risk assessment

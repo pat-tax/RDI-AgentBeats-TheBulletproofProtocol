@@ -34,6 +34,7 @@ The system transforms a 4-hour manual legal drafting process into a 5-minute aut
 ### AgentBeats Naming Convention
 
 For AgentBeats competition submission:
+
 - **Agent A (The R&D Substantiator)** = **Purple Agent** (generates narratives to be evaluated)
 - **Agent B (The Virtual Examiner)** = **Green Agent** (benchmark that evaluates narratives)
 
@@ -46,6 +47,7 @@ For AgentBeats competition submission:
 **so that** I can reduce manual drafting time from 4 hours to 5 minutes.
 
 **Acceptance Criteria:**
+
 - Ingests Git commit messages (identifying "refactor," "failed," "latency" patterns)
 - Parses Jira ticket comments for technical uncertainty indicators
 - Processes interview transcripts from Pro Bono Patents interview scripts
@@ -60,6 +62,7 @@ For AgentBeats competition submission:
 **so that** only audit-proof narratives are approved.
 
 **Acceptance Criteria:**
+
 - Detects "Routine Engineering" patterns (standard debugging language → REJECT)
 - Applies "Business Component" test (product improvement vs. process improvement)
 - Flags vague language ("optimize," "upgrade," "user experience") unless backed by specific metrics
@@ -78,6 +81,7 @@ For AgentBeats competition submission:
 **so that** the final output survives real IRS scrutiny.
 
 **Acceptance Criteria:**
+
 - Agent A drafts Version 1
 - Agent B issues "Notice of Proposed Adjustment" (Rejection)
 - Agent A re-queries raw data for stronger evidence (specific metrics, failed experiments)
@@ -96,12 +100,14 @@ For AgentBeats competition submission:
 **so that** the Virtual Examiner mirrors real-world IRS behavior.
 
 **Acceptance Criteria:**
+
 - Training data includes narratives that passed audit vs. narratives that triggered inquiries
 - All data is anonymized and redacted to protect client confidentiality
 - Agent B evaluation criteria matches actual IRS Section 41 enforcement patterns
 - Human-in-the-loop validation with SVT Partner before production deployment
 
 **Phase 2 Scope** (partial implementation):
+
 - Ground truth dataset with 20 labeled narratives
 - LLM-as-Judge uses general IRS Section 41 knowledge
 - Fine-tune Agent B on anonymized historical audit data from SVT (future enhancement)
@@ -113,6 +119,7 @@ For AgentBeats competition submission:
 **so that** I can evaluate purple agents' ability to respond to critique and improve.
 
 **Acceptance Criteria:**
+
 - Green agent accepts `mode=arena` parameter
 - Green agent calls purple agent via A2A protocol for each iteration
 - Loop terminates when risk_score < target OR max_iterations reached
@@ -126,6 +133,7 @@ For AgentBeats competition submission:
 **so that** I get reproducible scores AND semantic understanding.
 
 **Acceptance Criteria:**
+
 - Rule-based evaluation remains deterministic
 - LLM-as-Judge provides semantic analysis with chain-of-thought reasoning
 - Combined scoring: final_score = α*rule_score + β*llm_score

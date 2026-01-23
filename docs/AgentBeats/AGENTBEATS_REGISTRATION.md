@@ -50,9 +50,11 @@ Your **green agent** is the assessor/benchmark that evaluates other agents.
    - Verifying A2A protocol compliance
 
 5. **Copy your agentbeats_id**: After successful registration, you'll see an ID like:
+
    ```
    agentbeats_id: "agent_xyz123abc456"
    ```
+
    **Important**: Save this ID - you'll need it for `scenario.toml`
 
 ### Step 4: Register Your Purple Agent (Baseline)
@@ -166,6 +168,7 @@ curl http://localhost:8002/.well-known/agent-card.json
 ```
 
 Expected response:
+
 ```json
 {
   "name": "bulletproof-green-examiner",
@@ -210,6 +213,7 @@ docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
 **Important**: GHCR packages must be **public** for the platform to access them.
 
 To make packages public:
+
 1. Go to `https://github.com/YOUR_USERNAME?tab=packages`
 2. Click on `bulletproof-green` or `bulletproof-purple`
 3. Click **"Package settings"**
@@ -221,6 +225,7 @@ To make packages public:
 ### Issue: "Agent registration failed - image not found"
 
 **Solution**:
+
 - Verify image is pushed to GHCR: `https://github.com/YOUR_USERNAME?tab=packages`
 - Ensure image is **public** (not private)
 - Check image name matches exactly: `ghcr.io/YOUR_USERNAME/bulletproof-green:latest`
@@ -228,6 +233,7 @@ To make packages public:
 ### Issue: "Agent card validation failed"
 
 **Solution**:
+
 - Test agent card endpoint locally: `curl http://localhost:8001/.well-known/agent-card.json`
 - Verify agent starts correctly: `docker-compose up`
 - Check container logs for startup errors
@@ -235,6 +241,7 @@ To make packages public:
 ### Issue: "Platform can't reach my agent"
 
 **Solution**:
+
 - Ensure agent listens on `0.0.0.0:8000` (not `localhost:8000`)
 - Verify `EXPOSE 8000` in Dockerfile
 - Check agent runs correctly: `docker run -p 8000:8000 ghcr.io/YOUR_USERNAME/bulletproof-green:latest`
@@ -242,6 +249,7 @@ To make packages public:
 ### Issue: "agentbeats_id not showing after registration"
 
 **Solution**:
+
 - Refresh the dashboard page
 - Check email for confirmation
 - Contact support on Discord

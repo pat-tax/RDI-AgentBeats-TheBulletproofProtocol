@@ -19,6 +19,7 @@
 | **F1 Score** | 2 × (Precision × Recall) / (Precision + Recall) | ≥ 0.72 (beat IRS 0.42 baseline) |
 
 **Why These Metrics**:
+
 - [Google ML Guide](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall): Standard classification metrics
 - [TIGTA IRS AI Report](https://www.tigta.gov/reports/audit/irs-could-leverage-examination-results-artificial-intelligence-examination-case): IRS AI achieving 61.2% accuracy, F1=0.42
 - **Our Goal**: Demonstrate agent-based evaluation outperforms traditional ML models
@@ -36,6 +37,7 @@
 | **81-100** | CRITICAL | Obvious non-qualifying activity, immediate rejection |
 
 **Validation**:
+
 - Correlate with actual SVT audit outcomes (when available)
 - Inter-rater reliability: Multiple tax professionals review same narrative
 - Test-retest reliability: Same narrative → same score
@@ -47,6 +49,7 @@
 Predicted vs Actual IRS Audit Outcomes
 
 **Validation Metrics**:
+
 ```
 Confusion Matrix:
                 Predicted PASS    Predicted FAIL
@@ -74,6 +77,7 @@ Negative Predictive Value (NPV) = TN / (TN + FN) ≥ 0.75
 | **Lack of Specificity** | 10% | 10 pts | ≥ 70% (require metrics) |
 
 **Why Weighted**:
+
 - [IRS Audit Guide](https://www.irs.gov/businesses/research-credit-claims-audit-techniques-guide-rccatg-credit-for-increasing-research-activities): Most audits fail on routine engineering (30% weight)
 - Vagueness second-most common rejection reason (25% weight)
 
@@ -239,6 +243,7 @@ When you submit assessment results to agentbeats.dev, the API returns a detailed
 ```
 
 **Key Fields**:
+
 - `rankings[].overall_score`: Aggregate performance score (0.0-1.0)
 - `rankings[].participant_id`: Agent identifier
 - `rankings[].rank`: Comparative ranking across participants
@@ -250,6 +255,7 @@ When you submit assessment results to agentbeats.dev, the API returns a detailed
 - `participants.<agent_id>.total_tasks`: Number of tasks evaluated
 
 **Green Agent Component Mapping**:
+
 ```
 overall_score = (100 - risk_score) / 100
 correctness = (30 - routine_engineering_penalty) / 30
@@ -282,6 +288,7 @@ ORDER BY "Overall Score" DESC
 **Usage**: Replace `<agent_id>` with your agent ID (e.g., `green_agent`). This query extracts component scores and rankings from the detailed scoring format.
 
 **Example Output**:
+
 ```
 id          | Agent       | Overall Score | Correctness | Safety | Specificity | Experimentation | Tasks
 ------------|-------------|---------------|-------------|--------|-------------|-----------------|------
@@ -306,12 +313,14 @@ uuid-123... | green_agent | 72.5          | 80.0        | 90.0   | 75.0        |
 ### Phase 1: Ground Truth Dataset (Days 1-2)
 
 **Create 20 Test Cases**:
+
 - 5 **Obvious Qualifying**: Novel algorithms, documented experimentation
 - 5 **Obvious Non-Qualifying**: Debugging, maintenance, porting
 - 5 **Edge Cases - Qualifying**: Subtle technical uncertainty
 - 5 **Edge Cases - Non-Qualifying**: Routine engineering disguised as research
 
 **Labeling Process**:
+
 1. Draft narratives based on IRS examples
 2. 3 tax professionals independently label (qualifying vs not)
 3. Resolve disagreements via discussion
@@ -320,6 +329,7 @@ uuid-123... | green_agent | 72.5          | 80.0        | 90.0   | 75.0        |
 ### Phase 2: Metric Validation (Days 3-4)
 
 **Test Green Agent Performance**:
+
 ```python
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
@@ -340,6 +350,7 @@ print(f"F1 Score: {f1:.2f} (target: ≥0.72)")
 ### Phase 3: Inter-Rater Reliability (Days 5-6)
 
 **Compare Agent vs Humans**:
+
 1. Green Agent evaluates 10 narratives
 2. 2 tax professionals independently evaluate same 10
 3. Calculate Cohen's κ (inter-rater agreement)
@@ -348,6 +359,7 @@ print(f"F1 Score: {f1:.2f} (target: ≥0.72)")
 ### Phase 4: Robustness Testing (Day 7)
 
 **Adversarial Evaluation**:
+
 - Keyword stuffing: Add "experimentation" 100 times
 - Capitalization changes: ALL CAPS vs lowercase
 - Whitespace variations: Extra spaces, line breaks
@@ -380,21 +392,25 @@ print(f"F1 Score: {f1:.2f} (target: ≥0.72)")
 ## Key Sources
 
 ### Classification Metrics
+
 - [Google ML Crash Course - Classification Metrics](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall)
 - [Understanding F1 Score - Medium](https://medium.com/@piyushkashyap045/understanding-precision-recall-and-f1-score-metrics-ea219b908093)
 - [F1 Score in LLM Evaluation - Data Science Dojo](https://datasciencedojo.com/blog/understanding-f1-score/)
 
 ### IRS AI Benchmarks
+
 - [TIGTA: IRS AI Audit Selection](https://www.tigta.gov/reports/audit/irs-could-leverage-examination-results-artificial-intelligence-examination-case)
 - [IRS AI for Tax Audits 2025](https://www.ryanandwetmore.com/insights/irs-using-ai-for-tax-audits-in-2025-what-businesses-must-know)
 - [Tax Audit ML Models - PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC9710839/)
 
 ### Legal Compliance Metrics
+
 - [Gartner Compliance Score](https://www.gartner.com/en/legal-compliance/research/compliance-score)
 - [Ethisphere 2026 Ethics & Compliance Metrics](https://ethisphere.com/resources/ec-metrics-and-reporting-guide/)
 - [Harvard Law - Quality Metrics](https://clp.law.harvard.edu/research/research-projects/quality-metrics/)
 
 ### IRS Section 41
+
 - [IRS Audit Techniques Guide](https://www.irs.gov/businesses/research-credit-claims-audit-techniques-guide-rccatg-credit-for-increasing-research-activities)
 - [IRS Software Development Guidelines](https://www.irs.gov/businesses/audit-guidelines-on-the-application-of-the-process-of-experimentation-for-all-software)
 

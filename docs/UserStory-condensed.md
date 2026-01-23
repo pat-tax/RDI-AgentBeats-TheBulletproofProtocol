@@ -14,6 +14,7 @@ A recursive adversarial agent system where a "Virtual IRS Auditor" ruthlessly cr
 ## Problem Statement
 
 Tax compliance isn't about creative writing; it's about surviving an audit. Current LLMs are too agreeable to act as effective legal defense. Traditional approaches result in:
+
 - 4-hour manual legal drafting processes
 - High audit risk (vague language, business-speak)
 - Missed non-dilutive capital for startups
@@ -31,6 +32,7 @@ The Bulletproof Protocol treats R&D tax credit substantiation as a Generative Ad
 ### AgentBeats Naming Convention
 
 For AgentBeats competition submission:
+
 - **Agent A (The R&D Substantiator)** = **Purple Agent** (generates narratives to be evaluated)
 - **Agent B (The Virtual Examiner)** = **Green Agent** (benchmark that evaluates narratives)
 
@@ -43,6 +45,7 @@ For AgentBeats competition submission:
 **so that** I reduce drafting time from 4 hours to 5 minutes.
 
 **Acceptance Criteria:**
+
 - Ingests Git commits (identifying "refactor," "failed," "latency" patterns)
 - Parses Jira ticket comments for technical uncertainty indicators
 - Processes interview transcripts from Pro Bono Patents scripts
@@ -57,6 +60,7 @@ For AgentBeats competition submission:
 **so that** only audit-proof narratives are approved.
 
 **Acceptance Criteria:**
+
 - Detects "Routine Engineering" patterns (standard debugging → REJECT)
 - Applies "Business Component" test (product improvement vs process improvement)
 - Flags vague language ("optimize," "upgrade") unless backed by specific metrics
@@ -71,6 +75,7 @@ For AgentBeats competition submission:
 **so that** the final output survives real IRS scrutiny.
 
 **Acceptance Criteria:**
+
 - **Draft**: Agent A writes Version 1
 - **Audit**: Agent B issues "Notice of Proposed Adjustment" (Rejection)
 - **Refine**: Agent A re-queries raw data for stronger evidence (specific metrics, failed experiments)
@@ -84,6 +89,7 @@ For AgentBeats competition submission:
 **so that** the Virtual Examiner mirrors real-world IRS behavior.
 
 **Acceptance Criteria:**
+
 - Training data: narratives that passed audit vs narratives that triggered inquiries
 - All data anonymized and redacted (client confidentiality)
 - Agent B evaluation matches actual IRS Section 41 enforcement patterns

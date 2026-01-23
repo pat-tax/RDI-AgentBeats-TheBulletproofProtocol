@@ -45,11 +45,13 @@
 ### Python SDK Setup
 
 **Installation**:
+
 ```bash
 pip install "a2a-sdk[http-server]"
 ```
 
 **Dependencies**:
+
 - Python 3.13 (project standard)
 - a2a-sdk
 - FastAPI/Starlette (HTTP server)
@@ -234,6 +236,7 @@ risk_score = (
 **Goal**: Basic A2A server with 5 core IRS rules
 
 **Files to Create**:
+
 ```
 src/bulletproof_green/
 ├── __init__.py
@@ -252,6 +255,7 @@ agent-card-green.json
 ```
 
 **Core Rules (Minimal Set)**:
+
 1. Routine engineering keyword detection (10 keywords)
 2. Vagueness detection (lack of metrics)
 3. Experimentation evidence check (alternatives mentioned?)
@@ -263,6 +267,7 @@ agent-card-green.json
 **Goal**: Template-based narrative generator with mock data
 
 **Files to Create**:
+
 ```
 src/bulletproof_purple/
 ├── __init__.py
@@ -279,6 +284,7 @@ agent-card-purple.json
 ```
 
 **Mock Data Sources**:
+
 - 5 sample "projects" with commit messages
 - 3-5 technical uncertainties per project
 - 2-3 alternatives evaluated
@@ -289,6 +295,7 @@ agent-card-purple.json
 **Goal**: End-to-end A2A assessment working locally
 
 **Files to Create**:
+
 ```
 scenario.toml
 docker-compose.yml
@@ -296,6 +303,7 @@ docker-compose.yml
 ```
 
 **Testing**:
+
 ```bash
 # Build and start containers
 docker-compose build
@@ -321,6 +329,7 @@ duckdb -c "SELECT participant_id, ROUND(pass_rate, 2) AS pass_rate, ROUND(traffi
 **Goal**: Submission package ready
 
 **Deliverables**:
+
 - README.md with setup instructions
 - Abstract (300 words) describing benchmark
 - Record 3-minute demo video
@@ -329,6 +338,7 @@ duckdb -c "SELECT participant_id, ROUND(pass_rate, 2) AS pass_rate, ROUND(traffi
 ### Day 9: Submit
 
 **Actions**:
+
 1. Register agents on agentbeats.dev
 2. Push Docker images to GHCR
 3. Submit Phase 1 form
@@ -368,12 +378,14 @@ bulletproof-protocol/
 ## Key Sources & References
 
 ### A2A Protocol
+
 - [Official Python SDK](https://github.com/a2aproject/a2a-python)
 - [A2A Protocol Spec](https://a2a-protocol.org/latest/)
 - [Google ADK Docs](https://google.github.io/adk-docs/a2a/intro/)
 - [AgentBeats Tutorial](https://github.com/RDI-Foundation/agentbeats-tutorial)
 
 ### IRS Section 41
+
 - [IRS Audit Techniques Guide - Qualified Research Activities](https://www.irs.gov/businesses/audit-techniques-guide-credit-for-increasing-research-activities-ie-research-tax-credit-irc-ss-41-qualified-research-activities)
 - [IRS Software Development Guidelines](https://www.irs.gov/businesses/audit-guidelines-on-the-application-of-the-process-of-experimentation-for-all-software)
 - [26 USC 41 - Credit for Increasing Research Activities](https://uscode.house.gov/view.xhtml?req=(title:26+section:41+edition:prelim))
@@ -384,6 +396,7 @@ bulletproof-protocol/
 ## Success Criteria
 
 **Phase 1 Submission Requirements Met**:
+
 - [ ] A2A-compatible green agent (Docker image)
 - [ ] A2A-compatible baseline purple agent (Docker image)
 - [ ] End-to-end assessment flow works
@@ -394,6 +407,7 @@ bulletproof-protocol/
 - [ ] Submitted via Phase 1 form
 
 **Technical Quality**:
+
 - [ ] Docker builds on linux/amd64
 - [ ] Accepts --host, --port, --card-url arguments
 - [ ] Returns valid JSON artifacts
@@ -401,6 +415,7 @@ bulletproof-protocol/
 - [ ] Redline markup actionable
 
 **Benchmark Validity**:
+
 - [ ] Evaluates real legal domain criteria (IRS Section 41)
 - [ ] Clear scoring methodology (0-100 scale)
 - [ ] Reproducible results (same input → same score)

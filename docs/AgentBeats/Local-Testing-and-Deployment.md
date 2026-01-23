@@ -260,6 +260,7 @@ docker-compose up
 ### 4. Push to GHCR (GitHub Container Registry)
 
 **Prerequisites**:
+
 1. GitHub Personal Access Token (PAT) with `write:packages` scope
 2. GitHub repository (public or private)
 
@@ -311,6 +312,7 @@ docker push ghcr.io/$GITHUB_USERNAME/bulletproof-purple:v1.0.0
 ### 5. Make Images Public
 
 **Via GitHub Web UI**:
+
 1. Go to `https://github.com/users/$GITHUB_USERNAME/packages`
 2. Click on `bulletproof-green` package
 3. Click **Package settings** (right sidebar)
