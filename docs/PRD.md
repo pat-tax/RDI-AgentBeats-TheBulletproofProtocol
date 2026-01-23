@@ -476,16 +476,19 @@ This project is submitting a **benchmark** (green agent) to the Legal Track. The
 2. ✅ `curl http://localhost:8001/.well-known/agent-card.json` returns valid AgentCard
 3. ✅ Can send test narrative to purple agent and receive narrative response
 4. ✅ Can send narrative to green agent and receive structured judgment (`{risk_score, classification}`)
-5. ✅ Docker images build for `linux/amd64` platform
-6. ✅ Images successfully push to GHCR and are publicly accessible
+5. ✅ E2E test runs: purple generates narrative, green evaluates, results saved to `results/local_benchmark.json`
+6. ✅ Results JSON contains: `{participant_id, pass_rate, traffic_light_green_pct, n_tasks, risk_scores[]}`
+7. ✅ Results are queryable with DuckDB for leaderboard-style analysis
+8. ✅ Docker images build for `linux/amd64` platform
+9. ✅ Images successfully push to GHCR and are publicly accessible
 
 **Production Testing Phase** (use `agentbeats_id` in scenario.toml):
-7. ✅ Both agents registered on agentbeats.dev with valid agent IDs
-8. ✅ Scenario.toml updated with production `agentbeats_id` values
-9. ✅ Cloned leaderboard repo can pull agents from GHCR using agent IDs
-10. ✅ Leaderboard GitHub Action completes successfully
-11. ✅ Leaderboard GitHub Action sends valid JSON to agentbeats.dev
-12. ✅ Results appear on agentbeats.dev dashboard
+10. ✅ Both agents registered on agentbeats.dev with valid agent IDs
+11. ✅ Scenario.toml updated with production `agentbeats_id` values
+12. ✅ Cloned leaderboard repo can pull agents from GHCR using agent IDs
+13. ✅ Leaderboard GitHub Action completes successfully
+14. ✅ Leaderboard GitHub Action sends valid JSON to agentbeats.dev
+15. ✅ Results appear on agentbeats.dev dashboard
 
 **Critical Path**: Purple Agent → Green Agent → GHCR Deployment → Local Testing → Agent Registration → Production Testing → Submission
 

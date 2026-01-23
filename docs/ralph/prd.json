@@ -241,11 +241,14 @@
     {
       "id": "STORY-014",
       "title": "Create integration test suite",
-      "description": "End-to-end integration tests for purple agent, green agent, and agent-to-agent evaluation flow",
+      "description": "End-to-end integration tests for purple agent, green agent, and agent-to-agent evaluation flow with structured results output",
       "acceptance": [
         "tests/integration/test_purple_agent.py tests purple agent task execution",
         "tests/integration/test_green_agent.py tests green agent evaluation",
         "tests/integration/test_e2e_assessment.py tests purple generates narrative, green evaluates it",
+        "E2E test outputs results to results/local_benchmark.json with structure: {participant_id, pass_rate, traffic_light_green_pct, n_tasks, risk_scores[]}",
+        "Results JSON is queryable with DuckDB for leaderboard-style analysis",
+        "Test validates green agent returns structured output: {risk_score, classification, component_scores, redline}",
         "All tests use docker-compose services or mock A2A protocol",
         "make test runs all integration tests successfully"
       ],
@@ -253,7 +256,8 @@
         "tests/integration/test_purple_agent.py",
         "tests/integration/test_green_agent.py",
         "tests/integration/test_e2e_assessment.py",
-        "tests/integration/__init__.py"
+        "tests/integration/__init__.py",
+        "results/local_benchmark.json"
       ],
       "passes": false,
       "completed_at": null
