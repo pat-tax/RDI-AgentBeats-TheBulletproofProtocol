@@ -180,8 +180,8 @@
         "Dockerfile.green",
         "pyproject.toml"
       ],
-      "passes": false,
-      "completed_at": null
+      "passes": true,
+      "completed_at": "2026-01-23T14:30:00Z"
     },
     {
       "id": "STORY-011",
