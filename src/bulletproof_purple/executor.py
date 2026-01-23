@@ -5,7 +5,7 @@ Handles task execution and returns structured artifacts.
 
 import uuid
 
-from a2a.types import Artifact, Task, TaskStatus, TextPart
+from a2a.types import Artifact, Part, Task, TaskStatus, TextPart
 
 from bulletproof_purple.generator import NarrativeGenerator
 
@@ -37,14 +37,14 @@ class PurpleAgentExecutor:
         artifact = Artifact(
             artifact_id=str(uuid.uuid4()),
             name="narrative",
-            parts=[TextPart(text=narrative)],
+            parts=[Part(root=TextPart(text=narrative))],
         )
 
         # Return task with completed status
         return Task(
             id=str(uuid.uuid4()),
             context_id=context_id or str(uuid.uuid4()),
-            status=TaskStatus(state="completed"),
+            status=TaskStatus(state="completed"),  # type: ignore[arg-type]
             artifacts=[artifact],
         )
 

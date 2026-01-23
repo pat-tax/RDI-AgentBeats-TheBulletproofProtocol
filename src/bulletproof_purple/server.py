@@ -17,6 +17,7 @@ from a2a.types import (
     Artifact,
     Message,
     MessageSendParams,
+    Part,
     Task,
     TaskStatus,
     TextPart,
@@ -46,8 +47,8 @@ class PurpleAgentHandler(RequestHandler):
         message_text = ""
         if params.message and hasattr(params.message, "parts"):
             for part in params.message.parts:
-                if hasattr(part, "text"):
-                    message_text += part.text
+                if hasattr(part, "root") and hasattr(part.root, "text"):
+                    message_text += part.root.text  # type: ignore[attr-defined]
 
         # Simple narrative generation for now (STORY-002 will implement full executor)
         narrative = (
@@ -66,12 +67,12 @@ class PurpleAgentHandler(RequestHandler):
         return Task(
             id=str(uuid.uuid4()),
             context_id=context_id,
-            status=TaskStatus(state="completed"),
+            status=TaskStatus(state="completed"),  # type: ignore[arg-type]
             artifacts=[
                 Artifact(
                     artifact_id=str(uuid.uuid4()),
                     name="narrative",
-                    parts=[TextPart(text=narrative)],
+                    parts=[Part(root=TextPart(text=narrative))],
                 )
             ],
         )
