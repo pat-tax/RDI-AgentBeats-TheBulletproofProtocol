@@ -3,6 +3,7 @@
 Handles task execution and returns structured evaluation artifacts.
 """
 
+import json
 import uuid
 
 from a2a.types import Artifact, Part, Task, TaskStatus, TextPart
@@ -36,14 +37,17 @@ class GreenAgentExecutor:
         if not narrative or narrative.strip() == "":
             raise ValueError("narrative cannot be empty")
 
-        # Evaluate narrative
+        # Evaluate narrative (returns dict)
         evaluation_result = self.evaluator.evaluate(narrative)
+
+        # Convert dict result to JSON string for artifact
+        result_text = json.dumps(evaluation_result, indent=2)
 
         # Create structured artifact with evaluation result
         artifact = Artifact(
             artifact_id=str(uuid.uuid4()),
             name="evaluation",
-            parts=[Part(root=TextPart(text=evaluation_result))],
+            parts=[Part(root=TextPart(text=result_text))],
         )
 
         # Return task with completed status
