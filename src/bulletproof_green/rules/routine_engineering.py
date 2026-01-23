@@ -32,16 +32,31 @@ class RoutineEngineeringDetector:
 
     # Routine engineering keywords with IRS guidance citations
     ROUTINE_KEYWORDS: dict[str, str] = {
-        "debugging": "IRS Section 41(d)(3): Debugging is routine data collection, not qualified research",
-        "bug fix": "IRS Section 41(d)(3): Bug fixes are routine maintenance, not qualified research",
-        "production issue": "IRS Section 41(d)(3): Fixing production issues is routine troubleshooting",
-        "maintenance": "IRS Section 41(d)(3): Routine maintenance is explicitly excluded",
-        "refactor": "IRS Section 41(d)(3): Code refactoring is routine engineering without technical uncertainty",
-        "upgrade": "IRS Section 41(d)(3): Upgrades are routine adaptations of existing technology",
-        "migration": "IRS Section 41(d)(3): Data migration is routine engineering activity",
-        "optimization": "IRS Section 41(d)(3): Performance optimization is routine engineering unless novel",
-        "performance tuning": "IRS Section 41(d)(3): Performance tuning is routine engineering activity",
-        "code cleanup": "IRS Section 41(d)(3): Code cleanup is routine maintenance activity",
+        "debugging": (
+            "IRS Section 41(d)(3): Debugging is routine data collection, not qualified research"
+        ),
+        "bug fix": (
+            "IRS Section 41(d)(3): Bug fixes are routine maintenance, not qualified research"
+        ),
+        "production issue": (
+            "IRS Section 41(d)(3): Fixing production issues is routine troubleshooting"
+        ),
+        "maintenance": ("IRS Section 41(d)(3): Routine maintenance is explicitly excluded"),
+        "refactor": (
+            "IRS Section 41(d)(3): Code refactoring is routine engineering "
+            "without technical uncertainty"
+        ),
+        "upgrade": (
+            "IRS Section 41(d)(3): Upgrades are routine adaptations of existing technology"
+        ),
+        "migration": ("IRS Section 41(d)(3): Data migration is routine engineering activity"),
+        "optimization": (
+            "IRS Section 41(d)(3): Performance optimization is routine engineering unless novel"
+        ),
+        "performance tuning": (
+            "IRS Section 41(d)(3): Performance tuning is routine engineering activity"
+        ),
+        "code cleanup": ("IRS Section 41(d)(3): Code cleanup is routine maintenance activity"),
     }
 
     # Maximum score for this component (30% weight in total risk score)
