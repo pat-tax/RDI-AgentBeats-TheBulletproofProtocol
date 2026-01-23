@@ -47,7 +47,7 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
-ignore = []
+ignore = ["N999"]  # Allow PascalCase module name for TheBulletproofProtocol
 
 [tool.pyright]
 pythonVersion = "3.13"
