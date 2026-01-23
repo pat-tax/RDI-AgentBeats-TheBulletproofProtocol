@@ -230,11 +230,16 @@ For local e2e testing and leaderboard-style validation:
 **Used By**: STORY-014 integration tests
 
 **Metrics Computed**:
-- `pass_rate`: Percentage of tasks with risk_score < 20 (qualifying threshold)
-- `traffic_light_green_pct`: Percentage of tasks classified as QUALIFYING
-- `n_tasks`: Total number of narratives evaluated
-- `risk_scores[]`: Array of individual risk scores for analysis
-- `avg_risk_score`: Mean risk score across all tasks
+- `pass_rate`: Percentage of tasks that completed successfully (technical execution, excludes errors/crashes)
+- `traffic_light_green_pct`: Percentage of completed tasks classified as QUALIFYING (risk_score < 20)
+- `n_tasks`: Total number of narratives evaluated (attempted tasks)
+- `risk_scores[]`: Array of individual risk scores for analysis (only for completed tasks)
+- `avg_risk_score`: Mean risk score across all completed tasks
+
+**Semantic Distinction**:
+- `pass_rate` = technical success (did the agent execute without errors?)
+- `traffic_light_green_pct` = quality success (of successful executions, how many passed IRS criteria?)
+- Example: If 10 tasks attempted, 9 completed, 8 were QUALIFYING → pass_rate=0.90, green_pct=0.89 (8/9)
 
 ---
 

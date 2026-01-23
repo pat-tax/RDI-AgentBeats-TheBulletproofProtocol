@@ -1,5 +1,6 @@
 """Minimal viable example demonstrating how to use this application."""
 
+import TheBulletproofProtocol
 
 
 def main():
