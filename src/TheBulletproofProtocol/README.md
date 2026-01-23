@@ -52,6 +52,7 @@ tests/
 │   ├── test_dockerfile_purple.cpython-314-pytest-9.0.2.pyc
 │   ├── test_experimentation_checker.cpython-314-pytest-9.0.2.pyc
 │   ├── test_ghcr_scripts.cpython-314-pytest-9.0.2.pyc
+│   ├── test_github_actions_workflow.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_integration.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_server.cpython-314-pytest-9.0.2.pyc
@@ -68,6 +69,7 @@ tests/
 ├── test_dockerfile_purple.py
 ├── test_experimentation_checker.py
 ├── test_ghcr_scripts.py
+├── test_github_actions_workflow.py
 ├── test_green_agent_executor.py
 ├── test_green_agent_integration.py
 ├── test_green_agent_server.py
