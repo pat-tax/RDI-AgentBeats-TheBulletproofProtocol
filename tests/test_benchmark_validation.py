@@ -8,8 +8,6 @@ import json
 import subprocess
 from pathlib import Path
 
-import pytest
-
 
 def test_validate_benchmark_script_exists():
     """Test that the validate_benchmark.py script exists."""
@@ -178,11 +176,12 @@ def test_prediction_output_structure():
         assert "risk_score" in pred, f"Prediction {i} must include risk_score"
 
         # Check label values
-        assert pred["true_label"] in ["QUALIFYING", "NON_QUALIFYING"], \
+        assert pred["true_label"] in ["QUALIFYING", "NON_QUALIFYING"], (
             f"Prediction {i} true_label must be QUALIFYING or NON_QUALIFYING"
-        assert pred["predicted_label"] in ["QUALIFYING", "NON_QUALIFYING"], \
+        )
+        assert pred["predicted_label"] in ["QUALIFYING", "NON_QUALIFYING"], (
             f"Prediction {i} predicted_label must be QUALIFYING or NON_QUALIFYING"
+        )
 
         # Check risk score range
-        assert 0 <= pred["risk_score"] <= 100, \
-            f"Prediction {i} risk_score must be 0-100"
+        assert 0 <= pred["risk_score"] <= 100, f"Prediction {i} risk_score must be 0-100"

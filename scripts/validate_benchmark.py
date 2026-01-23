@@ -16,12 +16,12 @@ import json
 import sys
 from pathlib import Path
 
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score  # type: ignore[import-untyped]
 
 # Add src to path so we can import our modules
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from bulletproof_green.evaluator import NarrativeEvaluator
+from bulletproof_green.evaluator import EvaluationResult, NarrativeEvaluator
 
 
 def load_ground_truth() -> list[dict]:
@@ -35,7 +35,7 @@ def load_ground_truth() -> list[dict]:
         return json.load(f)
 
 
-def evaluate_narrative(evaluator: NarrativeEvaluator, narrative: str) -> dict:
+def evaluate_narrative(evaluator: NarrativeEvaluator, narrative: str) -> EvaluationResult:
     """Evaluate a single narrative using the green agent.
 
     Args:
@@ -78,12 +78,14 @@ def run_validation() -> dict:
         risk_score = result["risk_score"]
 
         # Store results
-        predictions.append({
-            "id": narrative_id,
-            "true_label": true_label,
-            "predicted_label": predicted_label,
-            "risk_score": risk_score,
-        })
+        predictions.append(
+            {
+                "id": narrative_id,
+                "true_label": true_label,
+                "predicted_label": predicted_label,
+                "risk_score": risk_score,
+            }
+        )
 
         true_labels.append(true_label)
         predicted_labels.append(predicted_label)
@@ -97,20 +99,20 @@ def run_validation() -> dict:
     f1 = f1_score(
         true_labels,
         predicted_labels,
-        pos_label="QUALIFYING",
-        zero_division=0.0,
+        pos_label="QUALIFYING",  # type: ignore[arg-type]
+        zero_division=0.0,  # type: ignore[arg-type]
     )
     precision = precision_score(
         true_labels,
         predicted_labels,
-        pos_label="QUALIFYING",
-        zero_division=0.0,
+        pos_label="QUALIFYING",  # type: ignore[arg-type]
+        zero_division=0.0,  # type: ignore[arg-type]
     )
     recall = recall_score(
         true_labels,
         predicted_labels,
-        pos_label="QUALIFYING",
-        zero_division=0.0,
+        pos_label="QUALIFYING",  # type: ignore[arg-type]
+        zero_division=0.0,  # type: ignore[arg-type]
     )
 
     # Compile results
@@ -189,6 +191,7 @@ def main() -> int:
     except Exception as e:
         print(f"Error during validation: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         return 1
 
