@@ -38,7 +38,7 @@
         "src/bulletproof_purple/templates.py"
       ],
       "passes": true,
-      "completed_at": "2026-01-23T13:00:00Z"
+      "completed_at": "2026-01-23T12:24:54Z"
     },
     {
       "id": "STORY-003",
@@ -204,12 +204,12 @@
     {
       "id": "STORY-012",
       "title": "Create scenario.toml configuration",
-      "description": "AgentBeats scenario configuration for local testing and production deployment",
+      "description": "AgentBeats scenario configuration for local testing and production deployment. Copy from docs/research/scenario.toml and adapt as needed.",
       "acceptance": [
-        "scenario.toml includes [green] section with agentbeats_id placeholder and commented ghcr_url example",
+        "scenario.toml includes [green_agent] section with agentbeats_id placeholder",
         "scenario.toml includes [[participants]] section for purple agent reference",
         "scenario.toml includes [config] section with difficulty and target_risk_score",
-        "File includes comments explaining local testing (ghcr_url) vs production (agentbeats_id)",
+        "File matches format from official leaderboard template (see docs/research/scenario.toml)",
         "File is valid TOML syntax"
       ],
       "files": [

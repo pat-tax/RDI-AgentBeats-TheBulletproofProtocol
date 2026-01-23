@@ -305,8 +305,6 @@
 
 - **Gemini in Browserbase**: [gemini.browserbase.com](https://gemini.browserbase.com) (headless browser agent sponsor)
 
----
-
 ## Next Steps Before Implementation
 
 1. **Create Ground Truth Dataset**: 10 narratives with known Risk Scores

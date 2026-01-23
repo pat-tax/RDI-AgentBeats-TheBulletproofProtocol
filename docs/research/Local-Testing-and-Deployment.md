@@ -24,9 +24,9 @@ Development Flow:
 # Assessment configuration for Bulletproof Protocol
 # Green agent evaluates purple agent's R&D tax credit narrative
 
-[green]
+[green_agent]
 agentbeats_id = ""  # Fill after registering on agentbeats.dev
-env.OPENAI_API_KEY = "${OPENAI_API_KEY}"  # Optional if using LLM features
+env = { OPENAI_API_KEY = "${OPENAI_API_KEY}" }  # Optional if using LLM features
 
 [[participants]]
 name = "substantiator"  # Purple agent role
@@ -137,7 +137,7 @@ def generate_compose(scenario_path: Path, output_path: Path) -> None:
     with open(scenario_path, "rb") as f:
         config = tomli.load(f)
 
-    green_agent = config["green"]["agentbeats_id"]
+    green_agent = config["green_agent"]["agentbeats_id"]
     participants = config["participants"]
 
     compose = {
@@ -151,7 +151,7 @@ def generate_compose(scenario_path: Path, output_path: Path) -> None:
         "image": f"ghcr.io/agentbeats/{green_agent}:latest",
         "container_name": "green-agent",
         "ports": ["8001:8000"],
-        "environment": list(config["green"].get("env", {}).values()),
+        "environment": list(config["green_agent"].get("env", {}).values()),
         "networks": ["agentbeats"],
     }
 
@@ -554,7 +554,7 @@ if __name__ == "__main__":
 ### 3. Update scenario.toml
 
 ```toml
-[green]
+[green_agent]
 agentbeats_id = "bp-green-examiner-2026"  # From registration
 
 [[participants]]

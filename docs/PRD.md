@@ -298,7 +298,7 @@ Both Green (Examiner/Benchmark) and Purple (Substantiator/Reference) agents must
 **Step 2: scenario.toml Configuration**
 
 ```toml
-[green]
+[green_agent]
 agentbeats_id = "green-agent-id-from-agentbeats-dev"  # Production
 # For local testing, use: ghcr_url = "ghcr.io/username/bulletproof-green:latest"
 
@@ -424,7 +424,7 @@ This project is submitting a **benchmark** (green agent) to the Legal Track. The
    - Clone/fork `github.com/RDI-Foundation/agentbeats-leaderboard-template`
    - Update `scenario.toml`:
      ```toml
-     [green]
+     [green_agent]
      agentbeats_id = "your-green-agent-id"  # Production
      # ghcr_url = "ghcr.io/{username}/bulletproof-green:latest"  # Local testing
 
