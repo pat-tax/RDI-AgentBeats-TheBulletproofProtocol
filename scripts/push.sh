@@ -1,16 +1,16 @@
 #!/bin/bash
 # Push Docker images to GitHub Container Registry (GHCR)
 #
-# Authenticates with GHCR using CR_PAT token and pushes both
+# Authenticates with GHCR using GHCR_PAT token and pushes both
 # Bulletproof Green and Purple agent images with :latest tag.
 #
 # Prerequisites:
-#   - CR_PAT environment variable must be set with a GitHub Personal Access Token
+#   - GHCR_PAT environment variable must be set with a GitHub Personal Access Token
 #   - Images must be built first (run scripts/build.sh)
 #
 # Usage:
-#   export CR_PAT=<your-github-pat>
-#   export GITHUB_USERNAME=<your-github-username>
+#   export GHCR_PAT=<your-github-pat>
+#   export GH_USERNAME=<your-github-username>
 #   bash scripts/push.sh
 
 set -e
@@ -27,24 +27,24 @@ echo "=============================="
 echo ""
 
 # Validate required environment variables
-GITHUB_USERNAME="${GITHUB_USERNAME:-}"
-CR_PAT="${CR_PAT:-}"
+GH_USERNAME="${GH_USERNAME:-}"
+GHCR_PAT="${GHCR_PAT:-}"
 
-if [ -z "$GITHUB_USERNAME" ]; then
-  echo -e "${RED}Error: GITHUB_USERNAME environment variable is not set${NC}"
+if [ -z "$GH_USERNAME" ]; then
+  echo -e "${RED}Error: GH_USERNAME environment variable is not set${NC}"
   echo ""
   echo "Usage:"
-  echo "  export GITHUB_USERNAME=<your-github-username>"
-  echo "  export CR_PAT=<your-github-pat>"
+  echo "  export GH_USERNAME=<your-github-username>"
+  echo "  export GHCR_PAT=<your-github-pat>"
   echo "  bash scripts/push.sh"
   echo ""
   exit 1
 fi
 
-if [ -z "$CR_PAT" ]; then
-  echo -e "${RED}Error: CR_PAT environment variable is not set${NC}"
+if [ -z "$GHCR_PAT" ]; then
+  echo -e "${RED}Error: GHCR_PAT environment variable is not set${NC}"
   echo ""
-  echo "The CR_PAT token is required for GHCR authentication."
+  echo "The GHCR_PAT token is required for GHCR authentication."
   echo ""
   echo "To create a Personal Access Token (PAT):"
   echo "  1. Go to https://github.com/settings/tokens"
@@ -53,34 +53,34 @@ if [ -z "$CR_PAT" ]; then
   echo "  4. Copy the generated token"
   echo ""
   echo "Usage:"
-  echo "  export GITHUB_USERNAME=<your-github-username>"
-  echo "  export CR_PAT=<your-github-pat>"
+  echo "  export GH_USERNAME=<your-github-username>"
+  echo "  export GHCR_PAT=<your-github-pat>"
   echo "  bash scripts/push.sh"
   echo ""
   exit 1
 fi
 
-echo -e "${BLUE}GitHub username:${NC} $GITHUB_USERNAME"
+echo -e "${BLUE}GitHub username:${NC} $GH_USERNAME"
 echo -e "${BLUE}Registry:${NC} ghcr.io"
 echo ""
 
 # Authenticate with GHCR
 echo -e "${GREEN}[1/3] Authenticating with GitHub Container Registry...${NC}"
-echo "$CR_PAT" | docker login ghcr.io -u "$GITHUB_USERNAME" --password-stdin
+echo "$GHCR_PAT" | docker login ghcr.io -u "$GH_USERNAME" --password-stdin
 
 echo -e "${GREEN}✓ Authentication successful${NC}"
 echo ""
 
 # Push Green Agent
 echo -e "${GREEN}[2/3] Pushing Bulletproof Green Agent...${NC}"
-docker push ghcr.io/${GITHUB_USERNAME}/bulletproof-green:latest
+docker push ghcr.io/${GH_USERNAME}/bulletproof-green:latest
 
 echo -e "${GREEN}✓ Green agent pushed successfully${NC}"
 echo ""
 
 # Push Purple Agent
 echo -e "${GREEN}[3/3] Pushing Bulletproof Purple Agent...${NC}"
-docker push ghcr.io/${GITHUB_USERNAME}/bulletproof-purple:latest
+docker push ghcr.io/${GH_USERNAME}/bulletproof-purple:latest
 
 echo -e "${GREEN}✓ Purple agent pushed successfully${NC}"
 echo ""
@@ -89,12 +89,12 @@ echo ""
 echo -e "${GREEN}Push Complete!${NC}"
 echo ""
 echo "Images pushed to GHCR:"
-echo "  - ghcr.io/${GITHUB_USERNAME}/bulletproof-green:latest"
-echo "  - ghcr.io/${GITHUB_USERNAME}/bulletproof-purple:latest"
+echo "  - ghcr.io/${GH_USERNAME}/bulletproof-green:latest"
+echo "  - ghcr.io/${GH_USERNAME}/bulletproof-purple:latest"
 echo ""
 echo "View your packages at:"
-echo "  https://github.com/${GITHUB_USERNAME}?tab=packages"
+echo "  https://github.com/${GH_USERNAME}?tab=packages"
 echo ""
 echo "To use these images, update scenario.toml with:"
-echo "  ghcr_url = \"ghcr.io/${GITHUB_USERNAME}/bulletproof-green:latest\""
+echo "  ghcr_url = \"ghcr.io/${GH_USERNAME}/bulletproof-green:latest\""
 echo ""
