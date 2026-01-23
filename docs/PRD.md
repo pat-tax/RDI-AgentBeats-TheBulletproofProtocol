@@ -324,15 +324,16 @@ When using the `generating-prd` skill to convert this PRD to `docs/ralph/prd.jso
 ### Story Structure Guidelines
 
 1. **Atomic Stories**: Each feature should be broken into atomic stories implementable in a single context window (100-300 lines)
-2. **Story Breakdown (Actual Implementation)**:
+2. **Story Breakdown (Actual Implementation)** (21 stories total):
    - Feature 1 (Purple Agent) → STORY-001: Purple A2A server, STORY-002: Purple executor, STORY-003: Dockerfile.purple
-   - Feature 2 (Green Agent) → STORY-004: Green A2A server, STORY-005: Green executor, STORY-006: Routine engineering detector, STORY-007: Vagueness detector, STORY-008: Experimentation checker, STORY-009: Risk scorer, STORY-010: Dockerfile.green
-   - Infrastructure → STORY-011: docker-compose, STORY-012: scenario.toml, STORY-013: GHCR scripts
-   - Testing & Validation → STORY-014: Integration tests, STORY-015: Ground truth dataset, STORY-016: Benchmark validation
-   - Deployment → STORY-017: GitHub Actions, STORY-018: Registration guide, STORY-019: Abstract, STORY-020: README
-3. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
-4. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
-5. **Dependencies**: Green agent depends on Purple agent for testing
+   - Feature 2 (Green Agent) → STORY-004: Green A2A server, STORY-005: Green executor, STORY-006: Routine engineering detector, STORY-007: Vagueness detector, STORY-008: Experimentation checker, STORY-009: Risk scorer, **STORY-010: Integrate detectors into evaluator**, STORY-011: Dockerfile.green
+   - Infrastructure → STORY-012: docker-compose, STORY-013: scenario.toml, STORY-014: GHCR scripts
+   - Testing & Validation → STORY-015: Integration tests, STORY-016: Ground truth dataset, STORY-017: Benchmark validation
+   - Deployment → STORY-018: GitHub Actions, STORY-019: Registration guide, STORY-020: Abstract, STORY-021: README
+3. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `docs/LEARNING.md` for lessons learned.
+4. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
+5. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
+6. **Dependencies**: Green agent depends on Purple agent for testing; STORY-010 depends on STORY-006, 007, 008, 009
 
 ### CRITICAL: AgentBeats Deployment Workflow
 

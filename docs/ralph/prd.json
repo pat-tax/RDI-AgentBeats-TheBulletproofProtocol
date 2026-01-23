@@ -1,8 +1,9 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
-  "desciption": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator using adversarial validation",
+  "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
+  "scope": "Phase 1 AgentBeats submission: Green agent benchmark + Purple agent baseline. Out of scope: Adversarial loop, SVT integration, CLI (future enhancements).",
   "source": "docs/PRD.md",
-  "generated": "2026-01-23 12:00:00",
+  "generated": "2026-01-23 14:28:38",
   "stories": [
     {
       "id": "STORY-001",
@@ -167,6 +168,27 @@
     },
     {
       "id": "STORY-010",
+      "title": "Integrate detectors into evaluator",
+      "description": "Wire the rule-based detectors (STORY-006 through STORY-009) into the NarrativeEvaluator to replace simple keyword heuristics with sophisticated IRS Section 41 evaluation logic",
+      "acceptance": [
+        "NarrativeEvaluator imports and instantiates RoutineEngineeringDetector, VaguenessDetector, ExperimentationChecker, and RiskScorer",
+        "evaluate() method calls each detector's analyze() method with the narrative",
+        "Component scores from detectors are aggregated using RiskScorer.calculate_risk()",
+        "Returns structured dict (not string) with risk_score, classification, component_scores, redline",
+        "component_scores dict contains all 5 components: routine_engineering, vagueness, business_risk, experimentation, specificity",
+        "redline dict contains detection details from each detector for transparency",
+        "Integration tests verify purple agent narrative → green agent evaluation returns proper weighted scores",
+        "Evaluator no longer uses simple keyword heuristics from STORY-005 placeholder implementation"
+      ],
+      "files": [
+        "src/bulletproof_green/evaluator.py",
+        "tests/test_green_agent_integration.py"
+      ],
+      "passes": false,
+      "completed_at": null
+    },
+    {
+      "id": "STORY-011",
       "title": "Create Dockerfile for Green Agent",
       "description": "Build Docker container for green agent targeting linux/amd64 platform with a2a-sdk and evaluation dependencies",
       "acceptance": [
@@ -184,7 +206,7 @@
       "completed_at": "2026-01-23T13:11:06Z"
     },
     {
-      "id": "STORY-011",
+      "id": "STORY-012",
       "title": "Create docker-compose for local testing",
       "description": "Docker Compose configuration to run both agents locally for integration testing",
       "acceptance": [
@@ -202,7 +224,7 @@
       "completed_at": "2026-01-23T13:17:21Z"
     },
     {
-      "id": "STORY-012",
+      "id": "STORY-013",
       "title": "Create scenario.toml configuration",
       "description": "AgentBeats scenario configuration for local testing and production deployment. Copy from docs/research/scenario.toml and adapt as needed.",
       "acceptance": [
@@ -219,7 +241,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-013",
+      "id": "STORY-014",
       "title": "Create GHCR deployment scripts",
       "description": "Bash scripts for building and pushing Docker images to GitHub Container Registry",
       "acceptance": [
@@ -239,7 +261,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-014",
+      "id": "STORY-015",
       "title": "Create integration test suite",
       "description": "End-to-end integration tests for purple agent, green agent, and agent-to-agent evaluation flow with structured results output",
       "acceptance": [
@@ -263,7 +285,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-015",
+      "id": "STORY-016",
       "title": "Create ground truth dataset",
       "description": "20 labeled R&D narratives (10 qualifying, 10 non-qualifying) for benchmark validation",
       "acceptance": [
@@ -282,7 +304,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-016",
+      "id": "STORY-017",
       "title": "Validate benchmark metrics",
       "description": "Run green agent against ground truth dataset and measure classification accuracy, F1 score, precision, recall",
       "acceptance": [
@@ -301,7 +323,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-017",
+      "id": "STORY-018",
       "title": "Create GitHub Actions workflow",
       "description": "CI/CD pipeline for automated Docker image builds and GHCR pushes on git push",
       "acceptance": [
@@ -320,7 +342,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-018",
+      "id": "STORY-019",
       "title": "Create AgentBeats registration guide",
       "description": "Documentation for registering agents on agentbeats.dev and updating scenario.toml",
       "acceptance": [
@@ -339,7 +361,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-019",
+      "id": "STORY-020",
       "title": "Create Abstract.md for submission",
       "description": "500-word abstract explaining the benchmark, evaluation criteria, and Legal Track contribution",
       "acceptance": [
@@ -357,7 +379,7 @@
       "completed_at": null
     },
     {
-      "id": "STORY-020",
+      "id": "STORY-021",
       "title": "Update README with submission checklist",
       "description": "Comprehensive README with usage instructions, local testing guide, and AgentBeats submission checklist",
       "acceptance": [
