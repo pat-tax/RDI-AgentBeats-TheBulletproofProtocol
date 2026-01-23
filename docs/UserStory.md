@@ -1,6 +1,6 @@
 ---
 title: User Story
-version: 1.0
+version: 2.0
 applies-to: Agents and humans
 purpose: Product vision, value proposition, and success metrics
 ---
@@ -24,12 +24,18 @@ Current LLMs are too agreeable to act as effective legal defense in tax complian
 
 ## Value Proposition
 
-The Bulletproof Protocol treats R&D tax credit substantiation as a Generative Adversarial Network (GAN) of text, deploying two opposing agents in a recursive loop:
+The Bulletproof Protocol treats R&D tax credit substantiation as a Generative Adversarial Network (GAN) of text using a Recursive Adversarial Agents (RAA) architecture, deploying two opposing agents in a recursive loop:
 
 - **Agent A (The R&D Substantiator)**: Ingests raw engineering signals (Git commits, Jira tickets, interview transcripts) to draft IRS Section 41 compliant "Technical Narrative"
 - **Agent B (The Virtual Examiner)**: A fine-tuned "Cynical Auditor" trained on IRS statutes and rejected claims, whose only goal is to find weaknesses
 
 The system transforms a 4-hour manual legal drafting process into a 5-minute automated review, unlocking millions in non-dilutive capital for startups while ensuring audit-proof claims.
+
+### AgentBeats Naming Convention
+
+For AgentBeats competition submission:
+- **Agent A (The R&D Substantiator)** = **Purple Agent** (generates narratives to be evaluated)
+- **Agent B (The Virtual Examiner)** = **Green Agent** (benchmark that evaluates narratives)
 
 ## User Stories
 
@@ -60,6 +66,10 @@ The system transforms a 4-hour manual legal drafting process into a 5-minute aut
 - Requires citation of specific failure events (No failure = No uncertainty)
 - Outputs Risk Score (0-100) and Redline Markup
 - Rejects claims until Risk Score < 20 (Low Audit Risk)
+- **[Phase 2]** Provides LLM-as-Judge semantic evaluation alongside rule-based checks
+- **[Phase 2]** Detects business-speak indicators (market, revenue, customers, ROI)
+- **[Phase 2]** Verifies specific failure citations (dates, error codes, metrics)
+- **[Phase 2]** Returns structured output per Green-Agent-Metrics-Specification.md
 
 ### Recursive Adversarial Loop
 
@@ -74,6 +84,10 @@ The system transforms a 4-hour manual legal drafting process into a 5-minute aut
 - Agent A submits Version 2
 - Loop continues until Agent B assigns Risk Score < 20
 - Final output delivered to SVT Partner for 5-minute human review
+- **[Phase 2 - Arena Mode]** Green agent orchestrates multi-turn loop via A2A protocol
+- **[Phase 2]** Configurable max_iterations (default: 5) and target_risk_score (default: 20)
+- **[Phase 2]** Each iteration includes: narrative, evaluation, critique
+- **[Phase 2]** Returns ArenaResult with full iteration history
 
 ### SVT Integration & Training
 
@@ -86,6 +100,37 @@ The system transforms a 4-hour manual legal drafting process into a 5-minute aut
 - All data is anonymized and redacted to protect client confidentiality
 - Agent B evaluation criteria matches actual IRS Section 41 enforcement patterns
 - Human-in-the-loop validation with SVT Partner before production deployment
+
+**Phase 2 Scope** (partial implementation):
+- Ground truth dataset with 20 labeled narratives
+- LLM-as-Judge uses general IRS Section 41 knowledge
+- Fine-tune Agent B on anonymized historical audit data from SVT (future enhancement)
+
+### Arena Mode Benchmark (Phase 2)
+
+**As a** benchmark operator,
+**I want to** run the green agent in arena mode to iteratively improve purple agent narratives,
+**so that** I can evaluate purple agents' ability to respond to critique and improve.
+
+**Acceptance Criteria:**
+- Green agent accepts `mode=arena` parameter
+- Green agent calls purple agent via A2A protocol for each iteration
+- Loop terminates when risk_score < target OR max_iterations reached
+- Returns structured ArenaResult with iteration history
+- Supports configurable parameters via environment variables
+
+### Hybrid Evaluation (Phase 2)
+
+**As a** benchmark user,
+**I want** both rule-based and LLM-based evaluation of narratives,
+**so that** I get reproducible scores AND semantic understanding.
+
+**Acceptance Criteria:**
+- Rule-based evaluation remains deterministic
+- LLM-as-Judge provides semantic analysis with chain-of-thought reasoning
+- Combined scoring: final_score = α*rule_score + β*llm_score
+- Fallback to rule-only if LLM unavailable
+- LLM uses temperature=0 for consistency
 
 ## Success Criteria
 
@@ -100,9 +145,12 @@ The system transforms a 4-hour manual legal drafting process into a 5-minute aut
 2. **Data privacy/anonymization**: Training data from SVT must be anonymized and redacted to protect client confidentiality
 3. **AgentBeats competition timeline**: Must be completed and demo-ready for AgentBeats submission deadline
 4. **Python 3.13 tech stack**: Implementation constrained to Python 3.13 environment with existing project dependencies
+5. **Domain focus**: LegalTech / FinTech / RegTech - tax compliance and R&D substantiation
 
 ## Out of Scope
 
 1. **Non-software R&D claims**: Focus only on software/high-tech R&D, exclude manufacturing, biotech, or other industries
 2. **Direct IRS submission**: System generates claims for review but doesn't directly file with IRS
 3. **Multi-jurisdiction support**: Initially US-only (IRS Section 41), exclude state-level or international R&D credits
+4. **Git/Jira/transcript ingestion**: Purple agent uses template-based generation (future: data extraction)
+5. **Personnel-to-failure mapping**: Manual input only (future: payroll integration)

@@ -206,40 +206,98 @@ Negative Predictive Value (NPV) = TN / (TN + FN) ≥ 0.75
 }
 ```
 
-### Local Benchmark Results Format (Aggregated)
+### AgentBeats Submission Response Format
 
-For local e2e testing and leaderboard-style validation:
+When you submit assessment results to agentbeats.dev, the API returns a detailed scoring format with component-based metrics:
 
 ```json
 {
-  "participant_id": "bulletproof-purple-reference",
-  "pass_rate": 0.85,
-  "traffic_light_green_pct": 0.90,
-  "n_tasks": 10,
-  "risk_scores": [15, 18, 12, 22, 16, 14, 19, 21, 13, 17],
-  "classifications": ["QUALIFYING", "QUALIFYING", "QUALIFYING", "NON_QUALIFYING", "QUALIFYING", "QUALIFYING", "QUALIFYING", "NON_QUALIFYING", "QUALIFYING", "QUALIFYING"],
-  "avg_risk_score": 16.7,
-  "timestamp": "2026-01-23T10:00:00Z"
+  "participants": {
+    "<agent_id>": "<uuid>"
+  },
+  "results": [{
+    "assessment_id": "...",
+    "rankings": [{
+      "rank": 1,
+      "participant_id": "green_agent",
+      "overall_score": 0.7250
+    }],
+    "participants": {
+      "<agent_id>": {
+        "total_tasks": 20,
+        "scores": {
+          "overall": 0.7250,
+          "correctness": 0.8000,
+          "safety": 0.9000,
+          "specificity": 0.7500,
+          "experimentation": 0.8800
+        }
+      }
+    }
+  }]
 }
 ```
 
-**Purpose**: DuckDB-queryable format matching AgentBeats leaderboard structure.
+**Key Fields**:
+- `rankings[].overall_score`: Aggregate performance score (0.0-1.0)
+- `rankings[].participant_id`: Agent identifier
+- `rankings[].rank`: Comparative ranking across participants
+- `participants.<agent_id>.scores.overall`: Overall score derived from component penalties
+- `participants.<agent_id>.scores.correctness`: Score for avoiding routine engineering patterns (0.0-1.0)
+- `participants.<agent_id>.scores.safety`: Score for business risk assessment (0.0-1.0)
+- `participants.<agent_id>.scores.specificity`: Score for technical specificity vs vagueness (0.0-1.0)
+- `participants.<agent_id>.scores.experimentation`: Score for documented experimentation evidence (0.0-1.0)
+- `participants.<agent_id>.total_tasks`: Number of tasks evaluated
 
-**Output Location**: `results/local_benchmark.json`
+**Green Agent Component Mapping**:
+```
+overall_score = (100 - risk_score) / 100
+correctness = (30 - routine_engineering_penalty) / 30
+safety = (20 - business_risk_penalty) / 20
+specificity = (25 - vagueness_penalty) / 25
+experimentation = (15 - experimentation_penalty) / 15
+```
 
-**Used By**: STORY-014 integration tests
+### Leaderboard SQL Query (DuckDB)
 
-**Metrics Computed**:
-- `pass_rate`: Percentage of tasks that completed successfully (technical execution, excludes errors/crashes)
-- `traffic_light_green_pct`: Percentage of completed tasks classified as QUALIFYING (risk_score < 20)
-- `n_tasks`: Total number of narratives evaluated (attempted tasks)
-- `risk_scores[]`: Array of individual risk scores for analysis (only for completed tasks)
-- `avg_risk_score`: Mean risk score across all completed tasks
+To query your results from the agentbeats.dev leaderboard:
 
-**Semantic Distinction**:
-- `pass_rate` = technical success (did the agent execute without errors?)
-- `traffic_light_green_pct` = quality success (of successful executions, how many passed IRS criteria?)
-- Example: If 10 tasks attempted, 9 completed, 8 were QUALIFYING → pass_rate=0.90, green_pct=0.89 (8/9)
+```sql
+SELECT t.participants.<agent_id> AS id,
+       rank.participant_id AS Agent,
+       ROUND(rank.overall_score * 100, 1) AS "Overall Score",
+       ROUND(r.result.participants.<agent_id>.scores.correctness * 100, 1) AS "Correctness",
+       ROUND(r.result.participants.<agent_id>.scores.safety * 100, 1) AS "Safety",
+       ROUND(r.result.participants.<agent_id>.scores.specificity * 100, 1) AS "Specificity",
+       ROUND(r.result.participants.<agent_id>.scores.experimentation * 100, 1) AS "Experimentation",
+       r.result.participants.<agent_id>.total_tasks AS "Tasks"
+FROM results t
+CROSS JOIN UNNEST(t.results) AS r(result)
+CROSS JOIN UNNEST(r.result.rankings) AS rk(rank)
+WHERE rank.participant_id = '<agent_id>'
+  AND t.participants.<agent_id> IS NOT NULL
+ORDER BY "Overall Score" DESC
+```
+
+**Usage**: Replace `<agent_id>` with your agent ID (e.g., `green_agent`). This query extracts component scores and rankings from the detailed scoring format.
+
+**Example Output**:
+```
+id          | Agent       | Overall Score | Correctness | Safety | Specificity | Experimentation | Tasks
+------------|-------------|---------------|-------------|--------|-------------|-----------------|------
+uuid-123... | green_agent | 72.5          | 80.0        | 90.0   | 75.0        | 88.0            | 20
+```
+
+#### Field Mappings
+
+| Column | JSON Path | Description | Range |
+|--------|-----------|-------------|-------|
+| Overall Score | `rank.overall_score` | Aggregate performance score | 0-100 |
+| Correctness | `participants.<id>.scores.correctness` | Avoidance of routine engineering | 0-100 |
+| Safety | `participants.<id>.scores.safety` | Business risk assessment quality | 0-100 |
+| Specificity | `participants.<id>.scores.specificity` | Technical detail vs vagueness | 0-100 |
+| Experimentation | `participants.<id>.scores.experimentation` | Documented experimentation evidence | 0-100 |
+| Tasks | `participants.<id>.total_tasks` | Number of narratives evaluated | Integer |
 
 ---
 

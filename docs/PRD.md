@@ -1,6 +1,6 @@
 ---
 title: Product Requirements Document
-version: 1.0
+version: 2.0
 applies-to: Agents and humans
 purpose: Functional requirements and acceptance criteria for all user stories
 ---
@@ -11,7 +11,11 @@ purpose: Functional requirements and acceptance criteria for all user stories
 
 **Project Name**: The Bulletproof Protocol (Adversarial R&D Tax Agent)
 
-**Description**: A recursive adversarial agent system that treats R&D tax credit substantiation as a Generative Adversarial Network (GAN) of text. Two opposing agents—Agent A (The R&D Substantiator) and Agent B (The Virtual Examiner)—engage in recursive debate to generate audit-proof IRS Section 41 compliant narratives.
+**Description**: A Recursive Adversarial Agents (RAA) system that treats R&D tax credit substantiation as a Generative Adversarial Network (GAN) of text. Two opposing agents—Agent A (The R&D Substantiator) and Agent B (The Virtual Examiner)—engage in recursive debate to generate audit-proof IRS Section 41 compliant narratives.
+
+**AgentBeats Naming Convention**:
+- **Agent A (The R&D Substantiator)** → **Purple Agent** (generates narratives to be evaluated)
+- **Agent B (The Virtual Examiner)** → **Green Agent** (benchmark that evaluates narratives)
 
 **Problem Statement**: Current LLMs are too agreeable to act as effective legal defense in tax compliance. Traditional approaches to R&D tax credit claims lack adversarial validation, resulting in 4-hour manual drafting processes, high audit risk, and missed opportunities for startups to access non-dilutive capital.
 
@@ -110,30 +114,369 @@ purpose: Functional requirements and acceptance criteria for all user stories
 **Component Weights**:
 - Routine Engineering: 30% (max 30 points)
 - Vagueness: 25% (max 25 points)
-- Business Risk: 20% (max 20 points) - *pending implementation*
+- Business Risk: 20% (max 20 points) - *see Feature 6*
 - Experimentation: 15% (max 15 points)
-- Specificity: 10% (max 10 points) - *pending implementation*
+- Specificity: 10% (max 10 points) - *see Feature 7*
+
+---
+
+#### Feature 3: Arena Mode (Multi-Agent Orchestration)
+
+**Description**: Enable green agent to directly communicate with purple agents for iterative adversarial evaluation, supporting AgentBeats Arena Mode where the benchmark orchestrates multi-turn refinement.
+
+**Original Vision Mapping**: "The Loop" (Draft → Audit → Refine → Finalize)
+
+**User Stories**:
+- As a benchmark user, I want the green agent to iteratively refine narratives with purple agents until they meet compliance thresholds
+- As a competition participant, I want my purple agent to receive critique feedback and improve its responses
+
+**Acceptance Criteria**:
+- [ ] Green agent exposes arena mode via `mode=arena` parameter
+- [ ] Green agent calls purple agent via A2A protocol (outbound messaging)
+- [ ] Supports configurable `max_iterations` (default: 5)
+- [ ] Supports configurable `target_risk_score` (default: 20)
+- [ ] Returns structured ArenaResult with iteration history
+- [ ] Each iteration includes: narrative, evaluation, critique
+- [ ] Terminates when risk_score < target OR max_iterations reached
+
+**Technical Requirements**:
+- `messenger.py` - A2A client utilities (create_message, send_message, Messenger class)
+- `arena_executor.py` - Multi-turn orchestration logic
+- Server extension to handle arena mode requests
+
+**Files**:
+- `src/bulletproof_green/messenger.py`
+- `src/bulletproof_green/arena_executor.py`
+- `src/bulletproof_green/server.py` (modify)
+- `tests/test_messenger.py`
+- `tests/test_arena_executor.py`
+- `tests/integration/test_arena_mode.py`
+
+---
+
+#### Feature 4: Hybrid Evaluation (Rule-Based + LLM-as-Judge)
+
+**Description**: Enhance green agent evaluation with LLM-as-Judge capability to provide nuanced semantic analysis alongside deterministic rule-based checks.
+
+**Original Vision Mapping**: "Cynical Auditor" fine-tuned on SVT data (Phase 2 uses LLM-as-Judge, full fine-tuning deferred)
+
+**User Stories**:
+- As a benchmark user, I want semantic understanding of narratives beyond keyword matching
+- As a benchmark developer, I want both reproducible scores AND nuanced evaluation
+
+**Acceptance Criteria**:
+- [ ] LLM judge evaluates narratives for semantic IRS compliance
+- [ ] Rule-based scores remain deterministic (existing implementation)
+- [ ] Combined scoring: `final_score = α*rule_score + β*llm_score`
+- [ ] LLM judge uses structured JSON output format
+- [ ] LLM judge uses temperature=0 for consistency
+- [ ] LLM judge includes chain-of-thought reasoning
+- [ ] Fallback to rule-only if LLM unavailable
+
+**ABC Checklist Alignment (O.c.1-2)**:
+- [ ] Document LLM judge accuracy vs human annotators
+- [ ] Report self-consistency (same input → same output)
+- [ ] Protect against adversarial inputs / reward hacking
+- [ ] Report agreement with human tax professionals (κ coefficient)
+
+**Technical Requirements**:
+- Support OpenAI and Anthropic APIs (configurable)
+- API key via environment variable (`LLM_API_KEY`)
+- Configurable model (`LLM_MODEL`, default: gpt-4o-mini or claude-3-haiku)
+- Timeout and retry logic
+
+**Files**:
+- `src/bulletproof_green/llm_judge.py`
+- `src/bulletproof_green/evaluator.py` (modify)
+- `src/bulletproof_green/scorer.py` (modify)
+- `tests/test_llm_judge.py`
+- `pyproject.toml` (add openai/anthropic deps)
+
+---
+
+#### Feature 5: Benchmark Rigor (ABC Checklist Compliance)
+
+**Description**: Implement additional rigor measures per the "Establishing Best Practices for Building Rigorous Agentic Benchmarks" paper (arXiv:2507.02825).
+
+**ABC Checklist Reference**: `docs/AgentBeats/AgentBeats-Benchmark-Design-Principles.md`
+
+##### 5.1 Trivial Agent Baseline (ABC R.13)
+
+**Acceptance Criteria**:
+- [ ] Test benchmark with trivial agent (empty response)
+- [ ] Test benchmark with random text agent
+- [ ] Document baseline scores in results
+- [ ] Ensure trivial agents score > 80 (high risk = failing)
+
+**Files**:
+- `tests/test_trivial_agent_baseline.py`
+- `src/validate_benchmark.py` (extend)
+
+##### 5.2 Statistical Rigor (ABC R.10)
+
+**Acceptance Criteria**:
+- [ ] Report 95% confidence intervals for accuracy
+- [ ] Run benchmark multiple times for reproducibility
+- [ ] Calculate inter-rater reliability (Cohen's κ)
+- [ ] Document statistical methodology
+
+**Files**:
+- `src/validate_benchmark.py` (extend)
+- `results/benchmark_validation.json` (extend schema)
+
+##### 5.3 Data Contamination Prevention (ABC R.3)
+
+**Acceptance Criteria**:
+- [ ] Maintain held-out test set (not in public ground truth)
+- [ ] Version tracking for all narratives
+- [ ] Document data provenance
+
+**Files**:
+- `data/ground_truth_holdout.json` (private)
+- `data/README.md` (extend)
+
+##### 5.4 Flaw Documentation (ABC R.7-9)
+
+**Acceptance Criteria**:
+- [ ] Document known benchmark limitations
+- [ ] Quantify impact of keyword-based evaluation gaps
+- [ ] Provide guidance on result interpretation
+
+**Files**:
+- `docs/AgentBeats/BENCHMARK_LIMITATIONS.md`
+
+---
+
+#### Feature 6: Business Component Test (Original Vision Gap)
+
+**Description**: Implement the "Business Component Test" rule to distinguish business risk from technical risk - a key requirement from the original pitch.
+
+**Original Requirement**: "Did they improve a product, or just a process?"
+
+**Acceptance Criteria**:
+- [ ] Detect business-speak indicators (market, revenue, customers, sales, ROI)
+- [ ] Flag narratives focused on business outcomes vs technical challenges
+- [ ] Weight: 20% of total risk score (replacing placeholder)
+- [ ] Each detection includes IRS rationale (Section 41(d)(1))
+
+**Files**:
+- `src/bulletproof_green/rules/business_risk_detector.py` (CREATE)
+- `src/bulletproof_green/evaluator.py` (modify)
+- `src/bulletproof_green/scorer.py` (modify)
+- `tests/test_business_risk_detector.py`
+
+---
+
+#### Feature 7: Citation Check Enhancement (Original Vision Gap)
+
+**Description**: Enhance experimentation checker to verify specific failure event citations - per original pitch "No failure = No uncertainty".
+
+**Original Requirement**: "Does the narrative cite a specific failure event?"
+
+**Acceptance Criteria**:
+- [ ] Detect specific failure citations (dates, error codes, metrics)
+- [ ] Flag generic failure mentions without specifics
+- [ ] Verify "Hypothesis → Test → Failure → Iteration" pattern
+- [ ] Part of Specificity score (10% weight)
+
+**Files**:
+- `src/bulletproof_green/rules/specificity_detector.py` (CREATE)
+- `src/bulletproof_green/rules/experimentation_checker.py` (modify)
+- `tests/test_specificity_detector.py`
+
+---
+
+#### Feature 8: Difficulty Levels (AgentBeats Best Practice)
+
+**Description**: Implement tiered difficulty levels per AgentBeats benchmark best practices.
+
+**AgentBeats Requirement**: "Difficulty Levels: Easy/medium/hard tasks"
+
+**Acceptance Criteria**:
+- [ ] Ground truth dataset tagged with difficulty: easy/medium/hard
+- [ ] Easy: Clear qualifying/non-qualifying narratives
+- [ ] Medium: Edge cases with ambiguous language
+- [ ] Hard: Sophisticated attempts to game the evaluation
+- [ ] Report accuracy breakdown by difficulty level
+
+**Files**:
+- `data/ground_truth.json` (modify - add difficulty field)
+- `src/validate_benchmark.py` (extend - report by difficulty)
+- `tests/test_benchmark_validation.py` (extend)
+
+---
+
+#### Feature 9: Anti-Gaming Measures (AgentBeats Best Practice)
+
+**Description**: Ensure evaluation cannot be gamed or shortcut per "Eval can be gamed (shortcuts)" concern.
+
+**AgentBeats Requirement**: "Contamination-resistant: Not easily gamed or saturated"
+
+**Acceptance Criteria**:
+- [ ] Test with adversarial narratives (keyword stuffing, template gaming)
+- [ ] LLM-as-Judge resists reward hacking (per ABC O.c.2)
+- [ ] Rule-based detection handles obfuscation attempts
+- [ ] Document known gaming vectors and mitigations
+
+**Files**:
+- `tests/test_anti_gaming.py` (CREATE)
+- `data/adversarial_narratives.json` (CREATE - test cases)
+- `docs/AgentBeats/BENCHMARK_LIMITATIONS.md` (extend)
+
+---
+
+#### Feature 10: Technical Requirements Compliance
+
+**Description**: Verify and enhance compliance with AgentBeats Technical Requirements.
+
+##### 10.1 A2A Task Updates (Streaming Logs)
+
+**Requirement**: "Emits task updates (logs)"
+
+**Acceptance Criteria**:
+- [ ] Green agent emits progress updates during evaluation
+- [ ] SSE (Server-Sent Events) for long-running assessments
+- [ ] Task status transitions logged (PENDING → RUNNING → COMPLETED)
+
+**Files**:
+- `src/bulletproof_green/server.py` (verify/extend)
+
+##### 10.2 Docker ENTRYPOINT Parameters
+
+**Requirement**: "--host, --port, --card-url"
+
+**Acceptance Criteria**:
+- [ ] Dockerfile.green supports --host parameter
+- [ ] Dockerfile.green supports --port parameter
+- [ ] Dockerfile.green supports --card-url parameter
+- [ ] Server reads these from command line args
+
+**Files**:
+- `Dockerfile.green` (verify/extend)
+- `src/bulletproof_green/server.py` (verify argparse)
+
+##### 10.3 Task Isolation (Namespacing)
+
+**Requirement**: "Clean stateless initial state. Use task_id for namespacing"
+
+**Acceptance Criteria**:
+- [ ] Each assessment uses unique task_id
+- [ ] No state persisted between assessments
+- [ ] Verify container starts clean on each run
+
+**Files**:
+- `src/bulletproof_green/server.py` (verify)
+- `tests/test_task_isolation.py` (CREATE)
+
+---
+
+#### Feature 11: Align Green Agent Output with Metrics Specification (CRITICAL P0)
+
+**Description**: Fix mismatch between Green Agent code output and documented schema in Green-Agent-Metrics-Specification.md.
+
+**Priority**: P0 (Critical - blocks AgentBeats integration)
+
+**Problem**: Current code outputs flat structure that does NOT match documented schema.
+
+**Current Output (WRONG)**:
+```json
+{
+  "risk_score": 65,
+  "classification": "NON_QUALIFYING",
+  "component_scores": {
+    "routine_engineering": 20,
+    "vagueness": 16
+  },
+  "redline": {}
+}
+```
+
+**Expected Output (per specification)**:
+```json
+{
+  "version": "1.0",
+  "timestamp": "2026-01-22T10:00:00Z",
+  "narrative_id": "uuid",
+  "primary_metrics": {
+    "compliance_classification": "NON_QUALIFYING",
+    "confidence": 0.89,
+    "risk_score": 65,
+    "risk_category": "HIGH",
+    "predicted_audit_outcome": "FAIL_AUDIT"
+  },
+  "component_scores": {
+    "routine_engineering_penalty": 20,
+    "vagueness_penalty": 16,
+    "business_risk_penalty": 10,
+    "experimentation_penalty": 12,
+    "specificity_penalty": 7,
+    "total_penalty": 65
+  },
+  "diagnostics": {
+    "routine_patterns_detected": 2,
+    "vague_phrases_detected": 4,
+    "business_keywords_detected": 3,
+    "experimentation_evidence_score": 0.35,
+    "specificity_score": 0.60
+  },
+  "redline": {
+    "total_issues": 9,
+    "critical": 2,
+    "high": 3,
+    "medium": 4,
+    "issues": []
+  },
+  "metadata": {
+    "evaluation_time_ms": 245,
+    "rules_version": "1.0.0",
+    "irs_citations": ["IRS Section 41(d)(1)", "26 CFR § 1.41-4"]
+  }
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Add version, timestamp, narrative_id to output
+- [ ] Nest metrics under `primary_metrics`
+- [ ] Add confidence score (computed from component weights)
+- [ ] Add risk_category (LOW/MODERATE/HIGH/VERY HIGH/CRITICAL)
+- [ ] Add predicted_audit_outcome (PASS_AUDIT/FAIL_AUDIT)
+- [ ] Rename component keys to use `_penalty` suffix
+- [ ] Add total_penalty field
+- [ ] Add diagnostics section (detection counts, evidence scores)
+- [ ] Add metadata section (timing, version, citations)
+- [ ] Wire server.py to use GreenAgentExecutor (currently hardcoded placeholder!)
+- [ ] Update all tests for new output structure
+
+**Additional Issue**: server.py (lines 52-56) has hardcoded placeholder that MUST be wired to use GreenAgentExecutor.
+
+**Files**:
+- `src/bulletproof_green/evaluator.py` (update EvaluationResult TypedDict)
+- `src/bulletproof_green/scorer.py` (update RiskResult TypedDict)
+- `src/bulletproof_green/server.py` (wire to use executor!)
+- `tests/test_green_agent_evaluator.py` (update expected output)
+- `tests/test_green_agent_executor.py` (update expected output)
+- `tests/test_green_agent_server.py` (update expected output)
 
 ---
 
 ## Out of Scope (Future Enhancements)
 
-The following features are **NOT required for AgentBeats Phase 1 benchmark submission** and are deferred to future versions:
+The following features are deferred to future versions:
 
-### Feature 3: Recursive Adversarial Loop (Future Enhancement)
-- **Status**: Out of scope for Phase 1
-- **Rationale**: AgentBeats requires a benchmark (evaluator), not a full product with iterative refinement
-- **Future Use**: Production deployment for actual tax credit claim generation
-
-### Feature 4: SVT Integration & Training Data Pipeline (Future Enhancement)
-- **Status**: Out of scope for Phase 1
-- **Rationale**: Benchmark uses rule-based evaluation, not ML requiring training data
+### Future Feature: SVT Integration & Training Data Pipeline
+- **Status**: Out of scope for Phase 2
+- **Rationale**: Phase 2 uses LLM-as-Judge; full fine-tuning requires extensive labeled dataset
 - **Future Use**: Production deployment with historical audit data fine-tuning
 
-### Feature 5: CLI Interface & Workflow Management (Future Enhancement)
-- **Status**: Out of scope for Phase 1
+### Future Feature: CLI Interface & Workflow Management
+- **Status**: Out of scope for Phase 2
 - **Rationale**: AgentBeats agents interact via A2A protocol, not CLI
 - **Future Use**: Production deployment for tax professionals
+
+### Future Feature: Purple Agent Data Ingestion (Git/Jira)
+- **Status**: Out of scope for Phase 2
+- **Rationale**: Template-based purple agent sufficient for benchmark validation
+- **Future Use**: Production deployment with automatic data extraction
 
 ---
 
@@ -177,6 +520,39 @@ The following features are **NOT required for AgentBeats Phase 1 benchmark submi
 
 **See**: `docs/Green-Agent-Metrics-Specification.md` for complete metrics framework
 
+### ABC Checklist Compliance (Benchmark Rigor)
+
+Per "Establishing Best Practices for Building Rigorous Agentic Benchmarks" (arXiv:2507.02825):
+
+**Recommendation R.3 (Data Contamination Prevention)**:
+- [ ] Maintain held-out test set separate from public ground truth
+- [ ] Version tracking for all narratives with provenance documentation
+- [ ] Public dataset subset for validation, private subset for final evaluation
+
+**Recommendation R.7-9 (Flaw Documentation)**:
+- [ ] Document known benchmark limitations in `BENCHMARK_LIMITATIONS.md`
+- [ ] Quantify impact of keyword-based evaluation gaps
+- [ ] Provide guidance on result interpretation and confidence intervals
+
+**Recommendation R.10 (Statistical Rigor)**:
+- [ ] Report 95% confidence intervals for all accuracy metrics
+- [ ] Run benchmark multiple times for reproducibility testing
+- [ ] Calculate and report inter-rater reliability (Cohen's κ)
+
+**Recommendation R.13 (Trivial Agent Baseline)**:
+- [ ] Test with trivial agent (empty response) - expect risk_score > 80
+- [ ] Test with random text agent - expect risk_score > 70
+- [ ] Document baseline scores to validate benchmark is not trivially solvable
+
+**Outcome O.c.1 (LLM Judge Accuracy)**:
+- [ ] Report LLM judge accuracy vs human annotators (target ≥ 70%)
+- [ ] Report self-consistency (same input → same output, r ≥ 0.95)
+
+**Outcome O.c.2 (Anti-Gaming / Reward Hacking)**:
+- [ ] Protect against adversarial inputs (keyword stuffing, template gaming)
+- [ ] Test LLM-as-Judge with known reward hacking attempts
+- [ ] Document gaming vectors and implemented mitigations
+
 ### Security & Privacy
 - **Data Anonymization**: All SVT training data must be anonymized (PII redacted) before processing
 - **Confidentiality**: No client-specific information exposed in logs or outputs
@@ -197,6 +573,11 @@ The following features are **NOT required for AgentBeats Phase 1 benchmark submi
 - **Python 3.13**: Implementation must be compatible with Python 3.13 environment
 - **Cross-Platform**: CLI works on Linux, macOS, Windows (via bash/zsh/powershell)
 - **Dependencies**: Minimize external dependencies, prefer stdlib where possible
+
+### Domain Focus
+- **Industry**: LegalTech / FinTech / RegTech
+- **Specialization**: Tax compliance and R&D substantiation
+- **Regulatory Framework**: IRS Section 41 compliance
 
 ---
 
@@ -289,9 +670,10 @@ agentbeats_id = "purple-agent-id-from-agentbeats-dev"  # Production
 1. **Non-software R&D claims**: Focus only on software/high-tech R&D. Manufacturing, biotech, pharmaceutical, or other industries are excluded.
 2. **Direct IRS submission**: System generates claims for human review but does NOT directly file with IRS. Tax professionals retain final approval and submission control.
 3. **Multi-jurisdiction support**: Initially US-only (IRS Section 41). State-level R&D credits (California, New York, etc.) and international R&D tax programs are excluded.
-4. **Real-time collaboration**: Single-user workflow initially. Multi-user editing, approval chains, or team collaboration features are not included.
-5. **Graphical UI**: CLI-only interface for initial version. Web-based or desktop GUI is out of scope.
-6. **Automated payroll integration**: Manual input of personnel/payroll data. Automatic integration with payroll systems (Gusto, ADP) is excluded.
+4. **Git/Jira/transcript ingestion**: Purple agent uses template-based generation. Automatic extraction from Git commits, Jira tickets, or interview transcripts is deferred to future versions.
+5. **Real-time collaboration**: Single-user workflow initially. Multi-user editing, approval chains, or team collaboration features are not included.
+6. **Graphical UI**: CLI-only interface for initial version. Web-based or desktop GUI is out of scope.
+7. **Automated payroll integration**: Manual input of personnel/payroll data. Automatic integration with payroll systems (Gusto, ADP) is excluded.
 
 ---
 
@@ -324,16 +706,26 @@ When using the `generating-prd` skill to convert this PRD to `ralph/docs/prd.jso
 ### Story Structure Guidelines
 
 1. **Atomic Stories**: Each feature should be broken into atomic stories implementable in a single context window (100-300 lines)
-2. **Story Breakdown (Actual Implementation)** (21 stories total):
+2. **Story Breakdown - Phase 1 (Complete)** (21 stories: STORY-001 to STORY-021):
    - Feature 1 (Purple Agent) → STORY-001: Purple A2A server, STORY-002: Purple executor, STORY-003: Dockerfile.purple
    - Feature 2 (Green Agent) → STORY-004: Green A2A server, STORY-005: Green executor, STORY-006: Routine engineering detector, STORY-007: Vagueness detector, STORY-008: Experimentation checker, STORY-009: Risk scorer, **STORY-010: Integrate detectors into evaluator**, STORY-011: Dockerfile.green
    - Infrastructure → STORY-012: docker-compose, STORY-013: scenario.toml, STORY-014: GHCR scripts
    - Testing & Validation → STORY-015: Integration tests, STORY-016: Ground truth dataset, STORY-017: Benchmark validation
    - Deployment → STORY-018: GitHub Actions, STORY-019: Registration guide, STORY-020: Abstract, STORY-021: README
-3. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `ralph/docs/LEARNING.md` for lessons learned.
-4. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
-5. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
-6. **Dependencies**: Green agent depends on Purple agent for testing; STORY-010 depends on STORY-006, 007, 008, 009
+3. **Story Breakdown - Phase 2** (22 stories: STORY-022 to STORY-043):
+   - **Feature 11 (P0 - Output Alignment)** → STORY-041: Align evaluator output schema, STORY-042: Wire server to executor, STORY-043: Update tests
+   - **Feature 3 (Arena Mode)** → STORY-022: messenger.py (A2A client), STORY-023: arena_executor.py (multi-turn), STORY-024: Server arena mode support
+   - **Feature 4 (Hybrid Eval)** → STORY-025: llm_judge.py, STORY-026: Integrate hybrid scoring
+   - **Feature 5 (ABC Rigor)** → STORY-027: Trivial agent baseline, STORY-028: Statistical rigor, STORY-029: Held-out test set, STORY-030: Limitations doc
+   - **Feature 6 (Business Risk)** → STORY-031: business_risk_detector.py
+   - **Feature 7 (Specificity)** → STORY-032: specificity_detector.py, STORY-033: Integrate new detectors
+   - **Feature 8 (Difficulty)** → STORY-034: Add difficulty tags, STORY-035: Report by difficulty
+   - **Feature 9 (Anti-Gaming)** → STORY-036: Adversarial test narratives, STORY-037: LLM reward hacking tests
+   - **Feature 10 (Tech Req)** → STORY-038: A2A task updates, STORY-039: Docker parameters, STORY-040: Task isolation
+4. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Similarly, STORY-033 integrates business_risk and specificity detectors. STORY-042 wires server to executor. Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `ralph/docs/LEARNING.md` for lessons learned.
+5. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
+6. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
+7. **Dependencies**: Green agent depends on Purple agent for testing; STORY-010 depends on STORY-006-009; STORY-033 depends on STORY-031-032; STORY-042 depends on STORY-041
 
 ### CRITICAL: AgentBeats Deployment Workflow
 
@@ -422,21 +814,29 @@ This project is submitting a **benchmark** (green agent) to the Legal Track. The
 1. ✅ Local docker-compose runs both agents successfully
 2. ✅ `curl http://localhost:8001/.well-known/agent-card.json` returns valid AgentCard
 3. ✅ Can send test narrative to purple agent and receive narrative response
-4. ✅ Can send narrative to green agent and receive structured judgment (`{risk_score, classification}`)
-5. ✅ E2E test runs: purple generates narrative, green evaluates, results saved to `results/local_benchmark.json`
-6. ✅ Results JSON contains: `{participant_id, pass_rate, traffic_light_green_pct, n_tasks, risk_scores[]}`
-7. ✅ Results are queryable with DuckDB for leaderboard-style analysis
-8. ✅ Docker images build for `linux/amd64` platform
-9. ✅ Images successfully push to GHCR and are publicly accessible
+4. ✅ Can send narrative to green agent and receive structured judgment (with new schema)
+5. [ ] Verify green agent output matches `Green-Agent-Metrics-Specification.md` schema (Feature 11)
+6. [ ] Verify output includes: `version`, `timestamp`, `narrative_id`, `primary_metrics`, `diagnostics`, `metadata`
+7. [ ] Test arena mode: green agent calls purple agent iteratively until risk_score < 20 (Feature 3)
+8. [ ] Test LLM-as-Judge: combined scoring with rule-based + LLM evaluation (Feature 4)
+9. ✅ E2E test runs: purple generates narrative, green evaluates, results saved to `results/local_benchmark.json`
+10. ✅ Results JSON contains: `{participant_id, pass_rate, traffic_light_green_pct, n_tasks, risk_scores[]}`
+11. [ ] Test with trivial agent (empty response) - expect risk_score > 80 (Feature 5.1)
+12. [ ] Test with adversarial narratives (keyword stuffing) - verify detection (Feature 9)
+13. ✅ Results are queryable with DuckDB for leaderboard-style analysis
+14. ✅ Docker images build for `linux/amd64` platform
+15. ✅ Images successfully push to GHCR and are publicly accessible
 
 **Production Testing Phase** (use `agentbeats_id` in scenario.toml):
-10. ✅ Both agents registered on agentbeats.dev with valid agent IDs
-11. ✅ Scenario.toml updated with production `agentbeats_id` values
-12. ✅ Cloned leaderboard repo can pull agents from GHCR using agent IDs
-13. ✅ Leaderboard GitHub Action completes successfully
-14. ✅ Leaderboard GitHub Action sends valid JSON to agentbeats.dev
-15. ✅ Results appear on agentbeats.dev dashboard
+16. ✅ Both agents registered on agentbeats.dev with valid agent IDs
+17. ✅ Scenario.toml updated with production `agentbeats_id` values
+18. ✅ Cloned leaderboard repo can pull agents from GHCR using agent IDs
+19. ✅ Leaderboard GitHub Action completes successfully
+20. ✅ Leaderboard GitHub Action sends valid JSON to agentbeats.dev
+21. ✅ Results appear on agentbeats.dev dashboard
 
-**Critical Path**: Purple Agent → Green Agent → GHCR Deployment → Local Testing → Agent Registration → Production Testing → Submission
+**Critical Path**:
+- **Phase 1 (Complete)**: Purple Agent → Green Agent → GHCR Deployment → Local Testing → Agent Registration → Production Testing → Submission
+- **Phase 2**: Output Schema Alignment (P0) → Arena Mode → Hybrid Evaluation → Benchmark Rigor → Anti-Gaming
 
-Keep stories atomic, specific, and testable. **Prioritize Purple Agent → Green Agent → Deployment → Registration** in that order.
+Keep stories atomic, specific, and testable. **Prioritize Feature 11 (Output Alignment) → Features 3-10** in that order.

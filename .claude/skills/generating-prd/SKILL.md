@@ -5,104 +5,97 @@ description: Generates prd.json task tracking file from PRD.md requirements docu
 
 # PRD to JSON Conversion
 
-Parses `docs/PRD.md` and generates `ralph/docs/prd.json` for Ralph loop task tracking.
+Converts `docs/PRD.md` into `ralph/docs/prd.json` for Ralph loop task tracking.
 
 ## Purpose
 
-The Ralph loop requires a structured JSON file to track task completion. This
-skill extracts implementation stories from PRD.md and creates the required
-prd.json format.
+**Initial generation**: Extracts features from PRD.md → creates prd.json stories
+**Incremental updates**: Preserves completion status, detects content changes via SHA-256 hash
+**Content changes**: Resets story status when title/description/acceptance modified (triggers re-testing)
 
-## Workflow
+## PRD.md Required Structure
 
-1. **Read `docs/PRD.md`** to extract functional requirements
-2. **Identify atomic stories** - tasks that fit in single context window
-3. **Generate `ralph/docs/prd.json`** with proper schema
-4. **Validate JSON** format before saving
-
-## PRD.json Schema
-
-See `ralph/docs/templates/prd.json.template` for the complete schema and structure.
-
-Required fields:
-- `project`: The current project name
-- `desciption`: A concise project description
-- `source`: 'docs/PRD.md'
-- `generated`: "YYYY-MM-DD HH:MM:SS"
-- `stories`: Array of story objects (see below)
-
-## Story Extraction Rules
-
-**Atomic Stories**: Each story must complete within single context window
-
-- Single feature addition (100-300 lines)
-- Single bug fix
-- Single refactoring task
-- Single test suite addition
-
-**From PRD.md Extract**:
-
-- Functional requirements → stories
-- API endpoints → implementation stories
-- CLI commands → feature stories
-- Evaluation metrics → metric implementation stories
-
-**Story Attributes**:
-
-- `id`: Unique identifier (STORY-XXX format)
-- `title`: Brief 3-7 word description
-- `description`: What to implement (1-2 sentences)
-- `acceptance`: Testable completion criteria
-- `files`: Expected files to modify/create
-- `passes`: Boolean (false initially)
-- `completed_at`: Timestamp when marked passing
-
-## Validation Rules
-
-Before saving prd.json:
-
-- [ ] All required fields present for each story
-- [ ] IDs are unique
-- [ ] All stories have `passes: false` initially
-- [ ] Acceptance criteria are specific and testable
-- [ ] File paths match project structure
-
-## Example Story Conversion
-
-**From PRD.md**:
 ```markdown
 ## Functional Requirements
-### CLI
-- Command Line Interface:
-  - Environment setup commands: make setup_dev
+
+#### Feature N: [Name]
+
+**Description**: [What this feature does]
+
+**Acceptance Criteria**:
+- [ ] Criterion 1
+- [ ] Criterion 2
+
+**Files Implemented**:
+- path/to/file.py
 ```
 
-**To prd.json story**:
-```json
-{
-  "id": "STORY-001",
-  "title": "Add make setup_dev command",
-  "description": "Create Makefile recipe for development environment setup",
-  "acceptance": [
-    "Makefile contains setup_dev recipe",
-    "Recipe installs all dev dependencies",
-    "Recipe passes validation checks"
-  ],
-  "files": ["Makefile"],
-  "passes": false,
-  "completed_at": null
-}
-```
+**Extraction**: Parse `#### Feature N:` headings top-to-bottom, extract description, acceptance, files.
 
-Use `ralph/docs/templates/prd.json.template` as the base structure and populate the stories array.
+**Edge cases**: Missing acceptance → extract from description; Missing files → empty array; No features → ABORT
+
+## Story ID Assignment
+
+**Sequential, append-only**: STORY-001, STORY-002, etc. in PRD.md order
+
+**CRITICAL**: Always append new features to END of PRD.md (reordering breaks status preservation)
+
+## prd.json Schema
+
+Template: `ralph/docs/templates/prd.json.template` (read for structure, populate from PRD.md)
+
+**Required fields**:
+- `project`, `description`, `source`, `generated`, `stories[]`
+
+**Each story**:
+- `id`: STORY-XXX (sequential)
+- `title`: 3-7 words
+- `description`: 1-2 sentences
+- `acceptance`: Array of criteria
+- `files`: Array of paths
+- `passes`: Boolean (false initially)
+- `completed_at`: ISO timestamp (null initially)
+- `content_hash`: SHA-256 hex of `title + "|" + description + "|" + json.dumps(acceptance, sort_keys=True)` (use Python `hashlib.sha256().hexdigest()`, not OS tools)
+
+## State Preservation (Incremental Mode)
+
+When `ralph/docs/prd.json` exists:
+
+1. Read existing status: `{story_id: {passes, completed_at, content_hash}}`
+2. Generate new stories from PRD.md
+3. For each story:
+   - **ID exists + hash matches** → preserve `passes` and `completed_at`
+   - **ID exists + hash differs** → reset to `passes: false`, log "STORY-XXX content changed, re-test needed"
+   - **New ID** → set `passes: false`
+4. Write merged result
+
+**Dependency note**: Content changes require re-running integration tests with dependent stories (manual tracking)
+
+## Error Handling
+
+**ABORT** (don't write prd.json):
+- PRD.md not found at `docs/PRD.md`
+- No `#### Feature` headings found
+- Existing prd.json corrupted (invalid JSON)
+- Parsing failure (malformed PRD.md)
+
+**WARN** (write prd.json, log warning):
+- Missing acceptance criteria
+- Missing files list
+- Non-standard heading format
 
 ## Usage
 
-To generate prd.json:
-
 ```bash
-# Run this skill to parse PRD.md
-# Output will be saved to ralph/docs/prd.json
+/generating-prd
 ```
 
-Ralph loop will then use this file to track task completion.
+**Output**: `ralph/docs/prd.json`
+
+**Verify**:
+```bash
+jq '.stories | length' ralph/docs/prd.json
+jq '.stories[] | select(.passes == false)' ralph/docs/prd.json
+```
+
+**Next**: `make ralph_run`
