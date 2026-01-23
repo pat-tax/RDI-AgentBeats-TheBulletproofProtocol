@@ -120,8 +120,7 @@ def create_app(card_url: str) -> A2AFastAPIApplication:
     agent_card = AgentCard(
         name="bulletproof-green-examiner",
         description=(
-            "IRS Section 41 Evaluator - "
-            "Benchmark for R&D Tax Credit Narrative Assessment"
+            "IRS Section 41 Evaluator - Benchmark for R&D Tax Credit Narrative Assessment"
         ),
         version="0.0.0",
         url=card_url,
