@@ -297,11 +297,23 @@ docker-compose.yml
 
 **Testing**:
 ```bash
+# Build and start containers
 docker-compose build
-docker-compose up
+docker-compose up -d
+
 # Verify A2A handshake
-# Run sample assessment
-# Check artifact output
+curl http://localhost:8001/.well-known/agent-card.json
+curl http://localhost:8002/.well-known/agent-card.json
+
+# Run e2e assessment test
+pytest tests/integration/test_e2e_assessment.py
+
+# Check results output
+cat results/local_benchmark.json
+# Verify structure: {participant_id, pass_rate, traffic_light_green_pct, n_tasks, risk_scores[]}
+
+# Query results with DuckDB (optional)
+duckdb -c "SELECT participant_id, ROUND(pass_rate, 2) AS pass_rate, ROUND(traffic_light_green_pct, 2) AS green_pct, n_tasks FROM read_json_auto('results/local_benchmark.json')"
 ```
 
 ### Days 7-8: Demo + Documentation

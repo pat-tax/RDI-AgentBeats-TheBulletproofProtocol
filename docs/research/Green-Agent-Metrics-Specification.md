@@ -206,6 +206,36 @@ Negative Predictive Value (NPV) = TN / (TN + FN) ≥ 0.75
 }
 ```
 
+### Local Benchmark Results Format (Aggregated)
+
+For local e2e testing and leaderboard-style validation:
+
+```json
+{
+  "participant_id": "bulletproof-purple-reference",
+  "pass_rate": 0.85,
+  "traffic_light_green_pct": 0.90,
+  "n_tasks": 10,
+  "risk_scores": [15, 18, 12, 22, 16, 14, 19, 21, 13, 17],
+  "classifications": ["QUALIFYING", "QUALIFYING", "QUALIFYING", "NON_QUALIFYING", "QUALIFYING", "QUALIFYING", "QUALIFYING", "NON_QUALIFYING", "QUALIFYING", "QUALIFYING"],
+  "avg_risk_score": 16.7,
+  "timestamp": "2026-01-23T10:00:00Z"
+}
+```
+
+**Purpose**: DuckDB-queryable format matching AgentBeats leaderboard structure.
+
+**Output Location**: `results/local_benchmark.json`
+
+**Used By**: STORY-014 integration tests
+
+**Metrics Computed**:
+- `pass_rate`: Percentage of tasks with risk_score < 20 (qualifying threshold)
+- `traffic_light_green_pct`: Percentage of tasks classified as QUALIFYING
+- `n_tasks`: Total number of narratives evaluated
+- `risk_scores[]`: Array of individual risk scores for analysis
+- `avg_risk_score`: Mean risk score across all tasks
+
 ---
 
 ## Validation Plan
