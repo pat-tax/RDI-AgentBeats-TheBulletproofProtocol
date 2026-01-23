@@ -28,7 +28,10 @@ def test_docker_compose_defines_green_service_on_port_8001() -> None:
 
     assert result.returncode == 0, f"docker-compose config failed: {result.stderr}"
     assert "bulletproof-green" in result.stdout, "bulletproof-green service not found"
-    assert "8001:8000" in result.stdout, "Port 8001 mapping not found for green service"
+    # Check for port mapping in either short format (8001:8000) or expanded format (published: "8001")
+    assert (
+        "8001:8000" in result.stdout or 'published: "8001"' in result.stdout
+    ), "Port 8001 mapping not found for green service"
 
 
 def test_docker_compose_defines_purple_service_on_port_8002() -> None:
@@ -44,8 +47,9 @@ def test_docker_compose_defines_purple_service_on_port_8002() -> None:
     assert (
         "bulletproof-purple" in result.stdout
     ), "bulletproof-purple service not found"
+    # Check for port mapping in either short format (8002:8000) or expanded format (published: "8002")
     assert (
-        "8002:8000" in result.stdout
+        "8002:8000" in result.stdout or 'published: "8002"' in result.stdout
     ), "Port 8002 mapping not found for purple service"
 
 

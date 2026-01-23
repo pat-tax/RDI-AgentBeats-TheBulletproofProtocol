@@ -1,0 +1,41 @@
+# Docker Compose configuration for local testing of Bulletproof Protocol agents
+#
+# This configuration runs both the green agent (R&D narrative evaluator) and
+# purple agent (R&D narrative generator) locally for integration testing.
+#
+# Usage:
+#   docker-compose up -d          # Start both agents
+#   docker-compose ps             # Check status
+#   docker-compose logs -f        # View logs
+#   docker-compose down           # Stop and remove containers
+
+version: '3.8'
+
+services:
+  bulletproof-green:
+    build:
+      context: .
+      dockerfile: Dockerfile.green
+    platform: linux/amd64
+    ports:
+      - "8001:8000"
+    networks:
+      - agentbeats
+    container_name: bulletproof-green
+    restart: unless-stopped
+
+  bulletproof-purple:
+    build:
+      context: .
+      dockerfile: Dockerfile.purple
+    platform: linux/amd64
+    ports:
+      - "8002:8000"
+    networks:
+      - agentbeats
+    container_name: bulletproof-purple
+    restart: unless-stopped
+
+networks:
+  agentbeats:
+    driver: bridge
