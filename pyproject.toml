@@ -61,6 +61,9 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+markers = [
+    "integration: marks tests as integration tests (requires docker-compose services running)",
+]
 
 [tool.bumpversion]
 current_version = "0.0.0"

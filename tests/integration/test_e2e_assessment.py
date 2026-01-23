@@ -4,80 +4,54 @@ This test module validates complete agent-to-agent evaluation:
 - Purple agent generates narrative
 - Green agent evaluates the generated narrative
 - Results are output to results/local_benchmark.json
-- Results are queryable with DuckDB
+- Results structure is queryable with DuckDB
 """
 
 import json
 from pathlib import Path
 
-import httpx
+import anyio
 import pytest
+
+from bulletproof_green.executor import GreenAgentExecutor
+from bulletproof_purple.executor import PurpleAgentExecutor
 
 
 class TestE2EAssessment:
     """Test end-to-end purple → green evaluation flow."""
 
     @pytest.fixture
-    def purple_agent_url(self):
-        """Return purple agent URL."""
-        return "http://localhost:8002"
-
-    @pytest.fixture
-    def green_agent_url(self):
-        """Return green agent URL."""
-        return "http://localhost:8001"
-
-    @pytest.fixture
     def results_dir(self):
         """Return results directory path."""
         return Path(__file__).parent.parent.parent / "results"
 
-    @pytest.mark.integration
-    def test_purple_generates_narrative_green_evaluates(
-        self, purple_agent_url, green_agent_url
-    ):
+    def test_purple_generates_narrative_green_evaluates(self):
         """Test purple agent generates narrative and green agent evaluates it."""
-        # Step 1: Purple agent generates narrative
-        purple_task = {
-            "context_id": "e2e-test-001",
-            "input": {
-                "parts": [{"text": "Generate a qualifying R&D narrative"}]
-            },
-        }
+        purple_executor = PurpleAgentExecutor()
+        green_executor = GreenAgentExecutor()
 
-        purple_response = httpx.post(
-            f"{purple_agent_url}/task/send",
-            json=purple_task,
-            timeout=10.0,
-        )
+        async def run_test():
+            # Step 1: Purple agent generates narrative
+            purple_task = await purple_executor.execute(
+                prompt="Generate a qualifying R&D narrative"
+            )
 
-        assert purple_response.status_code == 200
-        purple_result = purple_response.json()
+            # Extract generated narrative
+            assert purple_task.artifacts is not None
+            narrative = purple_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
+            assert len(narrative) > 0
 
-        # Extract generated narrative
-        narrative = purple_result["artifacts"][0]["parts"][0]["text"]
-        assert len(narrative) > 0
+            # Step 2: Green agent evaluates the narrative
+            green_task = await green_executor.execute(narrative=narrative)
 
-        # Step 2: Green agent evaluates the narrative
-        green_task = {
-            "context_id": "e2e-test-001-eval",
-            "input": {
-                "parts": [{"text": narrative}]
-            },
-        }
+            # Extract evaluation result
+            assert green_task.artifacts is not None
+            evaluation_text = green_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
+            evaluation = json.loads(evaluation_text)
 
-        green_response = httpx.post(
-            f"{green_agent_url}/task/send",
-            json=green_task,
-            timeout=10.0,
-        )
+            return evaluation
 
-        assert green_response.status_code == 200
-        green_result = green_response.json()
-
-        # Extract evaluation result
-        evaluation_text = green_result["artifacts"][0]["parts"][0]["text"]
-        evaluation = json.loads(evaluation_text)
+        evaluation = anyio.run(run_test)
 
         # Verify evaluation structure
         assert "risk_score" in evaluation
@@ -85,50 +59,38 @@ class TestE2EAssessment:
         assert "component_scores" in evaluation
         assert "redline" in evaluation
 
-    @pytest.mark.integration
-    def test_e2e_outputs_results_to_local_benchmark_json(
-        self, purple_agent_url, green_agent_url, results_dir
-    ):
+    def test_e2e_outputs_results_to_local_benchmark_json(self, results_dir):
         """Test E2E flow outputs results to results/local_benchmark.json."""
-        # Run multiple iterations to generate benchmark data
-        results = []
-        n_tasks = 5
+        purple_executor = PurpleAgentExecutor()
+        green_executor = GreenAgentExecutor()
 
-        for i in range(n_tasks):
-            # Generate narrative
-            purple_task = {
-                "context_id": f"benchmark-{i}",
-                "input": {
-                    "parts": [{"text": f"Generate narrative variation {i}"}]
-                },
-            }
+        async def run_benchmark():
+            # Run multiple iterations to generate benchmark data
+            results = []
+            n_tasks = 5
 
-            purple_response = httpx.post(
-                f"{purple_agent_url}/task/send",
-                json=purple_task,
-                timeout=10.0,
-            )
+            for i in range(n_tasks):
+                # Generate narrative
+                purple_task = await purple_executor.execute(
+                    prompt=f"Generate narrative variation {i}"
+                )
 
-            narrative = purple_response.json()["artifacts"][0]["parts"][0]["text"]
+                assert purple_task.artifacts is not None
+                narrative = purple_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
 
-            # Evaluate narrative
-            green_task = {
-                "context_id": f"benchmark-{i}-eval",
-                "input": {
-                    "parts": [{"text": narrative}]
-                },
-            }
+                # Evaluate narrative
+                green_task = await green_executor.execute(narrative=narrative)
 
-            green_response = httpx.post(
-                f"{green_agent_url}/task/send",
-                json=green_task,
-                timeout=10.0,
-            )
+                assert green_task.artifacts is not None
+                evaluation_text = green_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
+                evaluation = json.loads(evaluation_text)
 
-            evaluation_text = green_response.json()["artifacts"][0]["parts"][0]["text"]
-            evaluation = json.loads(evaluation_text)
+                results.append(evaluation)
 
-            results.append(evaluation)
+            return results
+
+        results = anyio.run(run_benchmark)
+        n_tasks = len(results)
 
         # Calculate benchmark metrics
         risk_scores = [r["risk_score"] for r in results]
@@ -163,7 +125,6 @@ class TestE2EAssessment:
         assert len(saved_data["risk_scores"]) == n_tasks
         assert 0 <= saved_data["traffic_light_green_pct"] <= 100
 
-    @pytest.mark.integration
     def test_benchmark_results_structure(self, results_dir):
         """Test results JSON has correct structure for DuckDB querying."""
         # Expected structure
@@ -191,45 +152,29 @@ class TestE2EAssessment:
             assert all(isinstance(score, int) for score in data["risk_scores"])
             assert all(0 <= score <= 100 for score in data["risk_scores"])
 
-    @pytest.mark.integration
-    def test_e2e_validates_green_agent_structured_output(
-        self, purple_agent_url, green_agent_url
-    ):
+    def test_e2e_validates_green_agent_structured_output(self):
         """Test E2E validates green agent returns structured output (not string)."""
-        # Generate narrative
-        purple_task = {
-            "context_id": "validation-test",
-            "input": {
-                "parts": [{"text": "Generate test narrative"}]
-            },
-        }
+        purple_executor = PurpleAgentExecutor()
+        green_executor = GreenAgentExecutor()
 
-        purple_response = httpx.post(
-            f"{purple_agent_url}/task/send",
-            json=purple_task,
-            timeout=10.0,
-        )
+        async def run_test():
+            # Generate narrative
+            purple_task = await purple_executor.execute(prompt="Generate test narrative")
 
-        narrative = purple_response.json()["artifacts"][0]["parts"][0]["text"]
+            assert purple_task.artifacts is not None
+            narrative = purple_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
 
-        # Evaluate narrative
-        green_task = {
-            "context_id": "validation-test-eval",
-            "input": {
-                "parts": [{"text": narrative}]
-            },
-        }
+            # Evaluate narrative
+            green_task = await green_executor.execute(narrative=narrative)
 
-        green_response = httpx.post(
-            f"{green_agent_url}/task/send",
-            json=green_task,
-            timeout=10.0,
-        )
+            assert green_task.artifacts is not None
+            evaluation_text = green_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
 
-        evaluation_text = green_response.json()["artifacts"][0]["parts"][0]["text"]
+            # Must be valid JSON
+            evaluation = json.loads(evaluation_text)
+            return evaluation
 
-        # Must be valid JSON
-        evaluation = json.loads(evaluation_text)
+        evaluation = anyio.run(run_test)
 
         # Must be dict, not string
         assert isinstance(evaluation, dict)
@@ -239,54 +184,39 @@ class TestE2EAssessment:
         for field in required_fields:
             assert field in evaluation
 
-    @pytest.mark.integration
-    def test_multiple_narratives_produce_varied_risk_scores(
-        self, purple_agent_url, green_agent_url
-    ):
+    def test_multiple_narratives_produce_varied_risk_scores(self):
         """Test that different narrative types produce varied risk scores."""
+        purple_executor = PurpleAgentExecutor()
+        green_executor = GreenAgentExecutor()
+
         prompts = [
             "Generate a qualifying R&D narrative",
             "Generate a non-qualifying routine narrative",
             "Generate an edge case narrative",
         ]
 
-        risk_scores = []
+        async def run_test():
+            risk_scores = []
 
-        for prompt in prompts:
-            # Generate narrative
-            purple_task = {
-                "context_id": f"variety-{prompt[:10]}",
-                "input": {
-                    "parts": [{"text": prompt}]
-                },
-            }
+            for prompt in prompts:
+                # Generate narrative
+                purple_task = await purple_executor.execute(prompt=prompt)
 
-            purple_response = httpx.post(
-                f"{purple_agent_url}/task/send",
-                json=purple_task,
-                timeout=10.0,
-            )
+                assert purple_task.artifacts is not None
+                narrative = purple_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
 
-            narrative = purple_response.json()["artifacts"][0]["parts"][0]["text"]
+                # Evaluate narrative
+                green_task = await green_executor.execute(narrative=narrative)
 
-            # Evaluate narrative
-            green_task = {
-                "context_id": f"variety-eval-{prompt[:10]}",
-                "input": {
-                    "parts": [{"text": narrative}]
-                },
-            }
+                assert green_task.artifacts is not None
+                evaluation_text = green_task.artifacts[0].parts[0].root.text  # type: ignore[attr-defined]
+                evaluation = json.loads(evaluation_text)
 
-            green_response = httpx.post(
-                f"{green_agent_url}/task/send",
-                json=green_task,
-                timeout=10.0,
-            )
+                risk_scores.append(evaluation["risk_score"])
 
-            evaluation_text = green_response.json()["artifacts"][0]["parts"][0]["text"]
-            evaluation = json.loads(evaluation_text)
+            return risk_scores
 
-            risk_scores.append(evaluation["risk_score"])
+        risk_scores = anyio.run(run_test)
 
         # Should have variation in risk scores
         assert len(set(risk_scores)) > 1  # Not all the same
