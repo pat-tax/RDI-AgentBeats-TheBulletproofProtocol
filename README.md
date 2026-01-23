@@ -1,6 +1,6 @@
 # RDI-AgentBeats-TheBulletproofProtocol
 
-A recursive adversarial agent system where a "Virtual IRS Auditor" ruthlessly critiques and trains a "Generator Agent" to write audit-proof R> What a time to be aliveD tax credit claims.
+**The Bulletproof Protocol** is an agentified benchmark for evaluating IRS Section 41 R&D tax credit narratives. This project submits to the AgentBeats Legal Track, providing a green agent (benchmark) that objectively evaluates R&D narratives against IRS compliance standards.
 
 ![Version](https://img.shields.io/badge/version-0.0.0-58f4c2.svg)
 [![License](https://img.shields.io/badge/license-BSD3Clause-58f4c2.svg)](LICENSE.md)
@@ -178,6 +178,91 @@ agentbeats_id = "agent_abc789def012"  # Your registered purple agent ID
 ```
 
 For local testing, use `docker-compose.yml` instead.
+
+## Phase 1 Submission Checklist
+
+This section tracks AgentBeats Legal Track Phase 1 deliverables (deadline: January 31, 2026).
+
+### Pre-Submission Verification
+
+Before submitting, ensure all deliverables are complete:
+
+- [x] **Green Agent Implementation**: IRS Section 41 benchmark evaluator
+  - A2A-compatible server with AgentCard discovery
+  - Rule-based evaluation engine (routine engineering, vagueness, experimentation)
+  - Weighted risk scoring (0-100) with component breakdown
+  - Docker image: `Dockerfile.green` (linux/amd64)
+
+- [x] **Purple Agent Implementation**: Reference baseline narrative generator
+  - A2A-compatible server with AgentCard discovery
+  - Template-based R&D narrative generation
+  - Docker image: `Dockerfile.purple` (linux/amd64)
+
+- [x] **Infrastructure & Deployment**
+  - `docker-compose.yml` for local testing
+  - `scenario.toml` with agent configurations
+  - GHCR deployment scripts (`scripts/build.sh`, `scripts/push.sh`)
+  - GitHub Actions workflow (`.github/workflows/docker-publish.yml`)
+
+- [x] **Testing & Validation**
+  - Ground truth dataset (20 labeled narratives in `data/ground_truth.json`)
+  - Benchmark validation script (`scripts/validate_benchmark.py`)
+  - Integration tests (`tests/integration/`)
+  - All tests passing: `make validate`
+
+- [x] **Documentation**
+  - `Abstract.md` (≤500 words describing benchmark methodology)
+  - `README.md` (this file) with usage instructions
+  - `docs/AGENTBEATS_REGISTRATION.md` (registration guide)
+  - `docs/PRD.md` (product requirements)
+
+- [ ] **AgentBeats Platform Registration**
+  - [ ] Sign up at [agentbeats.dev](https://agentbeats.dev)
+  - [ ] Register green agent → obtain `agentbeats_id`
+  - [ ] Register purple agent → obtain `agentbeats_id`
+  - [ ] Update `scenario.toml` with production agent IDs
+  - [ ] Verify agents are publicly accessible on GHCR
+
+- [ ] **Final Submission**
+  - [ ] All Docker images pushed to GHCR and set to public
+  - [ ] Leaderboard repo forked and updated with `scenario.toml`
+  - [ ] GitHub Action runs successfully in leaderboard repo
+  - [ ] Submit via [Phase 1 Submission Form](https://forms.gle/1C5d8KXny2JBpZhz7)
+
+### Validation Commands
+
+Run these commands to verify everything works:
+
+```bash
+# 1. Local testing
+docker-compose up -d
+curl http://localhost:8001/.well-known/agent-card.json  # Green agent
+curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
+
+# 2. Run integration tests
+make test
+
+# 3. Validate benchmark metrics
+python scripts/validate_benchmark.py
+
+# 4. Build and push to GHCR
+bash scripts/build.sh
+bash scripts/push.sh
+
+# 5. Verify images are public
+docker pull ghcr.io/YOUR_USERNAME/bulletproof-green:latest
+docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
+```
+
+### Resources
+
+- **Competition Platform**: [agentbeats.dev](https://agentbeats.dev)
+- **Documentation**: [docs.agentbeats.dev/tutorial](https://docs.agentbeats.dev/tutorial/)
+- **Discord Support**: [discord.gg/uqZUta3MYa](https://discord.gg/uqZUta3MYa)
+- **Phase 1 Submission**: [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7)
+- **Registration Guide**: [docs/AGENTBEATS_REGISTRATION.md](docs/AGENTBEATS_REGISTRATION.md)
+- **Abstract**: [Abstract.md](Abstract.md)
+- **PRD**: [docs/PRD.md](docs/PRD.md)
 
 ## Contributing
 
