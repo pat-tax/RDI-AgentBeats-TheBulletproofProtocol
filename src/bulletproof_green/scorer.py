@@ -46,14 +46,17 @@ class RiskScorer:
         Returns:
             Risk result with risk_score (0-100), classification, and component_scores
         """
+        # Define expected component keys
+        components = [
+            "routine_engineering",
+            "vagueness",
+            "business_risk",
+            "experimentation",
+            "specificity",
+        ]
+
         # Sum all component scores (already weighted by their max values)
-        risk_score = (
-            component_scores.get("routine_engineering", 0)
-            + component_scores.get("vagueness", 0)
-            + component_scores.get("business_risk", 0)
-            + component_scores.get("experimentation", 0)
-            + component_scores.get("specificity", 0)
-        )
+        risk_score = sum(component_scores.get(key, 0) for key in components)
 
         # Ensure risk_score is an integer
         risk_score = int(risk_score)
