@@ -39,6 +39,7 @@ dev = [
     "httpx>=0.27.0",  # Required by TestClient
     "a2a-sdk[http-server]>=0.3.0",  # Required for testing both agents
     "uvicorn>=0.30.0",
+    "scikit-learn>=1.5.0",  # Required for benchmark validation metrics
 ]
 
 [tool.ruff]
