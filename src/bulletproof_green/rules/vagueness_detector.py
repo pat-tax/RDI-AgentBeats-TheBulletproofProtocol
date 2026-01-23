@@ -31,13 +31,25 @@ class VaguenessDetector:
 
     # Vague phrases that require numeric substantiation
     VAGUE_PHRASES: dict[str, str] = {
-        "optimize": "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)",
-        "improve": "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)",
-        "enhance": "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)",
-        "upgrade": "Vague claim lacks numeric substantiation (e.g., version numbers, specific changes)",
-        "better": "Vague comparison lacks numeric substantiation (e.g., measurements, benchmarks)",
-        "faster": "Vague performance claim lacks numeric substantiation (e.g., ms, throughput)",
-        "user experience": "Vague UX claim lacks numeric substantiation (e.g., user metrics, A/B test results)",
+        "optimize": (
+            "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)"
+        ),
+        "improve": (
+            "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)"
+        ),
+        "enhance": (
+            "Vague claim lacks numeric substantiation (e.g., % improvement, specific metrics)"
+        ),
+        "upgrade": (
+            "Vague claim lacks numeric substantiation (e.g., version numbers, specific changes)"
+        ),
+        "better": (
+            "Vague comparison lacks numeric substantiation (e.g., measurements, benchmarks)"
+        ),
+        "faster": ("Vague performance claim lacks numeric substantiation (e.g., ms, throughput)"),
+        "user experience": (
+            "Vague UX claim lacks numeric substantiation (e.g., user metrics, A/B test results)"
+        ),
         "significantly": "Vague amplifier lacks numeric substantiation",
         "greatly": "Vague amplifier lacks numeric substantiation",
         "substantially": "Vague amplifier lacks numeric substantiation",
@@ -48,13 +60,13 @@ class VaguenessDetector:
 
     # Patterns that indicate numeric substantiation
     NUMERIC_PATTERNS = [
-        r'\d+%',  # Percentages: 25%, 40%
-        r'\d+\s*(ms|milliseconds|seconds|s|minutes|min)',  # Time: 40ms, 2 seconds
-        r'\d+\s*(kb|mb|gb|bytes)',  # Size: 500kb, 2mb
-        r'\d+\s*(req/s|requests per second|qps)',  # Throughput: 1000 req/s
-        r'from\s+\d+\s+to\s+\d+',  # Range: from 100 to 150
-        r'\d+x',  # Multiplier: 2x faster
-        r'\d+\.\d+',  # Decimals: 1.5, 2.3
+        r"\d+%",  # Percentages: 25%, 40%
+        r"\d+\s*(ms|milliseconds|seconds|s|minutes|min)",  # Time: 40ms, 2 seconds
+        r"\d+\s*(kb|mb|gb|bytes)",  # Size: 500kb, 2mb
+        r"\d+\s*(req/s|requests per second|qps)",  # Throughput: 1000 req/s
+        r"from\s+\d+\s+to\s+\d+",  # Range: from 100 to 150
+        r"\d+x",  # Multiplier: 2x faster
+        r"\d+\.\d+",  # Decimals: 1.5, 2.3
     ]
 
     def analyze(self, narrative: str) -> AnalysisResult:
