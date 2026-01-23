@@ -301,11 +301,11 @@ The following documents provide detailed research and implementation guidance:
 
 | Document | Purpose |
 |----------|---------|
-| `docs/research/AgentBeats-Research.md` | Competition overview, timeline, Phase 1 requirements, judging criteria |
-| `docs/research/AgentBeats-Benchmark-Design-Principles.md` | AAA paradigm, task/outcome validity, benchmark quality checklist |
-| `docs/research/Green-Agent-Metrics-Specification.md` | Detailed metrics framework, validation plan, ground truth dataset spec |
-| `docs/research/Technical-Implementation-Guide.md` | 9-day implementation roadmap, IRS Section 41 rules, risk scoring algorithm |
-| `docs/research/Local-Testing-and-Deployment.md` | Docker setup, docker-compose, GHCR deployment, scenario.toml configuration |
+| `docs/AgentBeats/AgentBeats-Research.md` | Competition overview, timeline, Phase 1 requirements, judging criteria |
+| `docs/AgentBeats/AgentBeats-Benchmark-Design-Principles.md` | AAA paradigm, task/outcome validity, benchmark quality checklist |
+| `docs/AgentBeats/Green-Agent-Metrics-Specification.md` | Detailed metrics framework, validation plan, ground truth dataset spec |
+| `docs/AgentBeats/Technical-Implementation-Guide.md` | 9-day implementation roadmap, IRS Section 41 rules, risk scoring algorithm |
+| `docs/AgentBeats/Local-Testing-and-Deployment.md` | Docker setup, docker-compose, GHCR deployment, scenario.toml configuration |
 | `docs/UserStory.md` | User stories and acceptance criteria |
 
 ### Key External Resources

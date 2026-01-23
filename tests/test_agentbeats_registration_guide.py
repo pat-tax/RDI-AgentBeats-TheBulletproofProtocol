@@ -8,14 +8,14 @@ from pathlib import Path
 
 
 def test_registration_guide_exists() -> None:
-    """Test that docs/AGENTBEATS_REGISTRATION.md exists."""
-    guide_path = Path("docs/AGENTBEATS_REGISTRATION.md")
-    assert guide_path.exists(), "docs/AGENTBEATS_REGISTRATION.md must exist"
+    """Test that docs/AgentBeats/AGENTBEATS_REGISTRATION.md exists."""
+    guide_path = Path("docs/AgentBeats/AGENTBEATS_REGISTRATION.md")
+    assert guide_path.exists(), "docs/AgentBeats/AGENTBEATS_REGISTRATION.md must exist"
 
 
 def test_registration_guide_has_step_by_step_process() -> None:
     """Test that guide includes step-by-step registration process."""
-    guide_path = Path("docs/AGENTBEATS_REGISTRATION.md")
+    guide_path = Path("docs/AgentBeats/AGENTBEATS_REGISTRATION.md")
     content = guide_path.read_text()
 
     # Should have numbered steps or clear section headers
@@ -26,7 +26,7 @@ def test_registration_guide_has_step_by_step_process() -> None:
 
 def test_registration_guide_explains_agentbeats_id() -> None:
     """Test that guide shows how to copy agentbeats_id from platform."""
-    guide_path = Path("docs/AGENTBEATS_REGISTRATION.md")
+    guide_path = Path("docs/AgentBeats/AGENTBEATS_REGISTRATION.md")
     content = guide_path.read_text()
 
     assert "agentbeats_id" in content, "Must explain agentbeats_id"
@@ -35,7 +35,7 @@ def test_registration_guide_explains_agentbeats_id() -> None:
 
 def test_registration_guide_explains_ghcr_vs_agentbeats_id() -> None:
     """Test that guide explains difference between ghcr_url (local) vs agentbeats_id (production)."""
-    guide_path = Path("docs/AGENTBEATS_REGISTRATION.md")
+    guide_path = Path("docs/AgentBeats/AGENTBEATS_REGISTRATION.md")
     content = guide_path.read_text()
 
     assert "ghcr_url" in content or "ghcr" in content.lower(), "Must mention ghcr_url"
@@ -45,7 +45,7 @@ def test_registration_guide_explains_ghcr_vs_agentbeats_id() -> None:
 
 def test_registration_guide_includes_verification_steps() -> None:
     """Test that guide includes verification steps to confirm agents are registered correctly."""
-    guide_path = Path("docs/AGENTBEATS_REGISTRATION.md")
+    guide_path = Path("docs/AgentBeats/AGENTBEATS_REGISTRATION.md")
     content = guide_path.read_text()
 
     assert "verify" in content.lower() or "test" in content.lower() or "confirm" in content.lower(), \

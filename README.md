@@ -161,7 +161,7 @@ Your images will be available at:
 
 For production deployment, register your agents on the AgentBeats platform and update `scenario.toml` with your agent IDs.
 
-**See the complete registration guide**: [docs/AGENTBEATS_REGISTRATION.md](docs/AGENTBEATS_REGISTRATION.md)
+**See the complete registration guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
 
 Quick overview:
 1. Sign up at [agentbeats.dev](https://agentbeats.dev)
@@ -213,7 +213,7 @@ Before submitting, ensure all deliverables are complete:
 - [x] **Documentation**
   - `Abstract.md` (≤500 words describing benchmark methodology)
   - `README.md` (this file) with usage instructions
-  - `docs/AGENTBEATS_REGISTRATION.md` (registration guide)
+  - `docs/AgentBeats/AGENTBEATS_REGISTRATION.md` (registration guide)
   - `docs/PRD.md` (product requirements)
 
 - [ ] **AgentBeats Platform Registration**
@@ -260,7 +260,7 @@ docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
 - **Documentation**: [docs.agentbeats.dev/tutorial](https://docs.agentbeats.dev/tutorial/)
 - **Discord Support**: [discord.gg/uqZUta3MYa](https://discord.gg/uqZUta3MYa)
 - **Phase 1 Submission**: [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7)
-- **Registration Guide**: [docs/AGENTBEATS_REGISTRATION.md](docs/AGENTBEATS_REGISTRATION.md)
+- **Registration Guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
 - **Abstract**: [Abstract.md](Abstract.md)
 - **PRD**: [docs/PRD.md](docs/PRD.md)
 

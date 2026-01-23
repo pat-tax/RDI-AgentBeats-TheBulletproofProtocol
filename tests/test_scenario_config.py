@@ -65,7 +65,7 @@ def test_scenario_toml_has_config_section() -> None:
 def test_scenario_toml_matches_template_format() -> None:
     """Verify scenario.toml follows agentbeats-leaderboard-template format."""
     scenario_path = Path(__file__).parent.parent / "scenario.toml"
-    research_path = Path(__file__).parent.parent / "docs/research/scenario.toml"
+    research_path = Path(__file__).parent.parent / "docs/AgentBeats/scenario.toml"
 
     with open(scenario_path, "rb") as f:
         config = tomllib.load(f)

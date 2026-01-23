@@ -3,6 +3,11 @@
 
 set -e
 
+# Escape special characters for sed replacement strings
+escape_sed_replacement() {
+    printf '%s' "$1" | sed -e 's/[&/\|]/\\&/g'
+}
+
 # Display usage information
 show_help() {
 	cat <<EOF
@@ -143,24 +148,31 @@ echo "  Year: $YEAR"
 echo "  Python version: $PYTHON_VERSION (py$PYTHON_VERSION_SHORT)"
 echo ""
 
+# Escape special characters in replacement strings for sed
+GITHUB_REPO_ESC=$(escape_sed_replacement "$GITHUB_REPO")
+PROJECT_ESC=$(escape_sed_replacement "$PROJECT")
+DESCRIPTION_ESC=$(escape_sed_replacement "$DESCRIPTION")
+AUTHOR_ESC=$(escape_sed_replacement "$AUTHOR")
+APP_NAME_ESC=$(escape_sed_replacement "$APP_NAME")
+
 # Perform replacements
-sed -i "s|\\[GITHUB-REPO\\]|$GITHUB_REPO|g" README.md
-sed -i "s|Python Ralph-Loop Template|$PROJECT|g" README.md
-sed -i "s|> What a time to be alive|$DESCRIPTION|g" README.md
+sed -i "s|\\[GITHUB-REPO\\]|$GITHUB_REPO_ESC|g" README.md
+sed -i "s|Python Ralph-Loop Template|$PROJECT_ESC|g" README.md
+sed -i "s|> What a time to be alive|$DESCRIPTION_ESC|g" README.md
 sed -i "/Out-of-the-box Python project template using Ralph Loop autonomous development with Claude Code (plugins, skills, rules), TDD, uv, ruff, pyright, pytest. Also including interactive User Story and PRD generation./{N;d;}" README.md
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" pyproject.toml
-sed -i "s|\\[PROJECT-DESCRIPTION\\]|$DESCRIPTION|g" pyproject.toml
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT_ESC|g" pyproject.toml
+sed -i "s|\\[PROJECT-DESCRIPTION\\]|$DESCRIPTION_ESC|g" pyproject.toml
 sed -i "s|\\[PYTHON-VERSION\\]|$PYTHON_VERSION|g" pyproject.toml
 sed -i "s|\\[PYTHON-VERSION-SHORT\\]|$PYTHON_VERSION_SHORT|g" pyproject.toml
-sed -i "s|\\[APP-NAME\\]|$APP_NAME|g" pyproject.toml
+sed -i "s|\\[APP-NAME\\]|$APP_NAME_ESC|g" pyproject.toml
 sed -i "s|\\[YEAR\\]|$YEAR|g" LICENSE.md
-sed -i "s|\\[YOUR-NAME-OR-ORGANIZATION\\]|$AUTHOR|g" LICENSE.md
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/scripts/init.sh
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/docs/templates/progress.txt.template
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/docs/templates/prd.json.template
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" mkdocs.yaml
-sed -i "s|\\[PROJECT-DESCRIPTION\\]|$DESCRIPTION|g" mkdocs.yaml
-sed -i "s|\\[GITHUB-REPO\\]|$GITHUB_REPO|g" mkdocs.yaml
+sed -i "s|\\[YOUR-NAME-OR-ORGANIZATION\\]|$AUTHOR_ESC|g" LICENSE.md
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT_ESC|g" ralph/scripts/init.sh
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT_ESC|g" ralph/docs/templates/progress.txt.template
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT_ESC|g" ralph/docs/templates/prd.json.template
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT_ESC|g" mkdocs.yaml
+sed -i "s|\\[PROJECT-DESCRIPTION\\]|$DESCRIPTION_ESC|g" mkdocs.yaml
+sed -i "s|\\[GITHUB-REPO\\]|$GITHUB_REPO_ESC|g" mkdocs.yaml
 sed -i "s|devcontainers\/python|devcontainers\/python:$PYTHON_VERSION|g" .devcontainer/project/devcontainer.json
 
 # Rename source directory

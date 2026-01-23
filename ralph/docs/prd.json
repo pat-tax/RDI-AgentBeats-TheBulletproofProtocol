@@ -226,12 +226,12 @@
     {
       "id": "STORY-013",
       "title": "Create scenario.toml configuration",
-      "description": "AgentBeats scenario configuration for local testing and production deployment. Copy from docs/research/scenario.toml and adapt as needed.",
+      "description": "AgentBeats scenario configuration for local testing and production deployment. Copy from docs/AgentBeats/scenario.toml and adapt as needed.",
       "acceptance": [
         "scenario.toml includes [green_agent] section with agentbeats_id placeholder",
         "scenario.toml includes [[participants]] section for purple agent reference",
         "scenario.toml includes [config] section with difficulty and target_risk_score",
-        "File matches format from official leaderboard template (see docs/research/scenario.toml)",
+        "File matches format from official leaderboard template (see docs/AgentBeats/scenario.toml)",
         "File is valid TOML syntax"
       ],
       "files": [
@@ -346,7 +346,7 @@
       "title": "Create AgentBeats registration guide",
       "description": "Documentation for registering agents on agentbeats.dev and updating scenario.toml",
       "acceptance": [
-        "docs/AGENTBEATS_REGISTRATION.md explains registration process step-by-step",
+        "docs/AgentBeats/AGENTBEATS_REGISTRATION.md explains registration process step-by-step",
         "Guide includes screenshots or examples of agentbeats.dev UI",
         "Guide shows how to copy agentbeats_id from platform",
         "Guide explains difference between ghcr_url (local) vs agentbeats_id (production)",
@@ -354,7 +354,7 @@
         "README.md links to registration guide"
       ],
       "files": [
-        "docs/AGENTBEATS_REGISTRATION.md",
+        "docs/AgentBeats/AGENTBEATS_REGISTRATION.md",
         "README.md"
       ],
       "passes": true,
