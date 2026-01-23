@@ -99,7 +99,11 @@ class TestTaskExecution:
             "jsonrpc": "2.0",
             "method": "message/send",
             "params": {
-                "message": {"text": "Generate R&D narrative"}
+                "message": {
+                    "messageId": "msg-test-2",
+                    "role": "user",
+                    "parts": [{"text": "Generate R&D narrative"}]
+                }
             },
             "id": 2
         }

@@ -6,23 +6,30 @@ green agent benchmark.
 """
 
 import argparse
-from typing import Optional
+import uuid
 
 import uvicorn
 from a2a.server.apps import A2AFastAPIApplication
-from a2a.server.handlers import DefaultRequestHandler
-from a2a.server.request_handlers.request_handler_params import MessageSendParams
-from a2a.server.server_call_context import ServerCallContext
-from a2a.types import AgentCard, Message, Task
+from a2a.server.request_handlers.request_handler import RequestHandler
+from a2a.types import (
+    AgentCard,
+    AgentCapabilities,
+    Artifact,
+    Message,
+    MessageSendParams,
+    Task,
+    TaskStatus,
+    TextPart,
+)
 
 
-class PurpleAgentHandler(DefaultRequestHandler):
+class PurpleAgentHandler(RequestHandler):
     """Request handler for purple agent tasks."""
 
-    async def async_on_message_send(
+    async def on_message_send(
         self,
         params: MessageSendParams,
-        context: Optional[ServerCallContext] = None,
+        context=None,
     ) -> Task | Message:
         """Handle message/send requests for narrative generation.
 
@@ -36,7 +43,11 @@ class PurpleAgentHandler(DefaultRequestHandler):
             Task object with generated narrative artifact
         """
         # Extract message text from params
-        message_text = params.message.text if params.message else "Generate an R&D narrative"
+        message_text = ""
+        if params.message and hasattr(params.message, "parts"):
+            for part in params.message.parts:
+                if hasattr(part, "text"):
+                    message_text += part.text
 
         # Simple narrative generation for now (STORY-002 will implement full executor)
         narrative = (
@@ -48,15 +59,50 @@ class PurpleAgentHandler(DefaultRequestHandler):
 
         # Return a Task with the narrative as an artifact
         return Task(
-            id="task-" + str(hash(message_text)),
-            status="completed",
+            id=str(uuid.uuid4()),
+            contextId=params.message.context_id if params.message and params.message.context_id else str(uuid.uuid4()),
+            status=TaskStatus(state="completed"),
             artifacts=[
-                {
-                    "name": "narrative",
-                    "data": narrative,
-                }
+                Artifact(
+                    artifactId=str(uuid.uuid4()),
+                    name="narrative",
+                    parts=[TextPart(text=narrative)],
+                )
             ],
         )
+
+    # Stub implementations for other required abstract methods
+    async def on_cancel_task(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_delete_task_push_notification_config(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_get_task(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_get_task_push_notification_config(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_list_task_push_notification_config(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_message_send_stream(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_resubscribe_to_task(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
+
+    async def on_set_task_push_notification_config(self, params, context=None):
+        """Not implemented."""
+        raise NotImplementedError
 
 
 def create_app(card_url: str) -> A2AFastAPIApplication:
@@ -73,6 +119,10 @@ def create_app(card_url: str) -> A2AFastAPIApplication:
         description="R&D Tax Credit Narrative Generator - Reference Implementation for AgentBeats Legal Track",
         version="0.0.0",
         url=card_url,
+        capabilities=AgentCapabilities(),  # Use empty AgentCapabilities object
+        skills=[],  # No specific skills defined
+        defaultInputModes=["text"],  # Accepts text input
+        defaultOutputModes=["text"],  # Returns text output
     )
 
     handler = PurpleAgentHandler()

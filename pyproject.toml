@@ -10,6 +10,9 @@ license = { file = "LICENSE.md" }
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/bulletproof_purple", "src/bulletproof_green", "src/TheBulletproofProtocol"]
+
 dependencies = []
 
 [project.optional-dependencies]
@@ -17,6 +20,7 @@ dev = [
     "pytest>=8.0.0",
     "ruff>=0.8.0",
     "pyright>=1.1.0",
+    "httpx>=0.27.0",  # Required by TestClient
 ]
 purple = [
     "a2a-sdk[http-server]>=0.3.0",
@@ -32,6 +36,9 @@ dev-dependencies = [
     "pytest>=8.0.0",
     "ruff>=0.8.0",
     "pyright>=1.1.0",
+    "httpx>=0.27.0",  # Required by TestClient
+    "a2a-sdk[http-server]>=0.3.0",  # Required for testing both agents
+    "uvicorn>=0.30.0",
 ]
 
 [tool.ruff]
