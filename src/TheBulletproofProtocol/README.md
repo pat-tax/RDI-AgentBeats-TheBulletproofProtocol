@@ -43,6 +43,7 @@ tests/
 │   ├── test_purple_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_server.cpython-314-pytest-9.0.2.pyc
 │   ├── test_routine_engineering.cpython-314-pytest-9.0.2.pyc
+│   ├── test_scorer.cpython-314-pytest-9.0.2.pyc
 │   └── test_vagueness_detector.cpython-314-pytest-9.0.2.pyc
 ├── test_dockerfile_purple.py
 ├── test_experimentation_checker.py
@@ -51,6 +52,7 @@ tests/
 ├── test_purple_agent_executor.py
 ├── test_purple_agent_server.py
 ├── test_routine_engineering.py
+├── test_scorer.py
 └── test_vagueness_detector.py
 ```
 
