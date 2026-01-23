@@ -47,7 +47,7 @@ Bridges the gap between user-focused stories and implementation-ready requiremen
 
 ## Template
 
-See `docs/ralph/templates/prd.md.template` for structure and placeholders.
+See `ralph/docs/templates/prd.md.template` for structure and placeholders.
 
 ## Usage
 

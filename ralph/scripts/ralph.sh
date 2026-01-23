@@ -2,7 +2,7 @@
 #
 # Ralph Loop - Autonomous iteration script
 #
-# Usage: ./scripts/ralph/ralph.sh [MAX_ITERATIONS]
+# Usage: ./ralph/scripts/ralph.sh [MAX_ITERATIONS]
 #        make ralph_run [ITERATIONS=25]
 #
 # This script orchestrates autonomous task execution by:
@@ -29,9 +29,9 @@ source "$SCRIPT_DIR/lib/generate_app_docs.sh"
 
 # Configuration
 MAX_ITERATIONS=${1:-10}
-PRD_JSON="docs/ralph/prd.json"
-PROGRESS_FILE="docs/ralph/progress.txt"
-PROMPT_FILE="docs/ralph/templates/prompt.md"
+PRD_JSON="ralph/docs/prd.json"
+PROGRESS_FILE="ralph/docs/progress.txt"
+PROMPT_FILE="ralph/docs/templates/prompt.md"
 BRANCH_PREFIX="ralph/story-"
 MAX_RETRIES=3
 

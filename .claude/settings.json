@@ -12,8 +12,8 @@
   
   "permissions": {
     "allow": [
-      "Bash(bash:scripts/ralph/*.sh:*)",
-      "Bash(chmod:+x:scripts/ralph/*.sh)",
+      "Bash(bash:ralph/scripts/*.sh:*)",
+      "Bash(chmod:+x:ralph/scripts/*.sh)",
       "Bash(date:*)",
       "Bash(git:diff:*)",
       "Bash(git:log:*)",
@@ -29,8 +29,8 @@
       "Edit(AGENT_LEARNINGS.md)",
       "Edit(AGENT_REQUESTS.md)",
       "Edit(docs/**/*.md)",
-      "Edit(docs/ralph/*.json)",
-      "Edit(docs/ralph/*.txt)",
+      "Edit(ralph/docs/*.json)",
+      "Edit(ralph/docs/*.txt)",
       "Edit(src/**/*.py)",
       "Edit(src/**/*.json)",
       "Edit(tests/**/*.py)",

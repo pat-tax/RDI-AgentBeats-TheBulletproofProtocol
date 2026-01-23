@@ -319,7 +319,7 @@ The following documents provide detailed research and implementation guidance:
 
 ## Notes for Ralph Loop
 
-When using the `generating-prd` skill to convert this PRD to `docs/ralph/prd.json`:
+When using the `generating-prd` skill to convert this PRD to `ralph/docs/prd.json`:
 
 ### Story Structure Guidelines
 
@@ -330,7 +330,7 @@ When using the `generating-prd` skill to convert this PRD to `docs/ralph/prd.jso
    - Infrastructure → STORY-012: docker-compose, STORY-013: scenario.toml, STORY-014: GHCR scripts
    - Testing & Validation → STORY-015: Integration tests, STORY-016: Ground truth dataset, STORY-017: Benchmark validation
    - Deployment → STORY-018: GitHub Actions, STORY-019: Registration guide, STORY-020: Abstract, STORY-021: README
-3. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `docs/LEARNING.md` for lessons learned.
+3. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `ralph/docs/LEARNING.md` for lessons learned.
 4. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
 5. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
 6. **Dependencies**: Green agent depends on Purple agent for testing; STORY-010 depends on STORY-006, 007, 008, 009

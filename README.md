@@ -51,7 +51,7 @@ make ralph_clean
 make ralph_reorganize NEW_PRD=docs/PRD-v2.md [VERSION=2]
 ```
 
-For detailed setup and usage, see [docs/TEMPLATE_USAGE.md](docs/TEMPLATE_USAGE.md).
+For detailed setup and usage, see [ralph/docs/TEMPLATE_USAGE.md](ralph/docs/TEMPLATE_USAGE.md).
 
 ## ⚠️ Security Disclaimer
 
@@ -72,7 +72,7 @@ For detailed setup and usage, see [docs/TEMPLATE_USAGE.md](docs/TEMPLATE_USAGE.m
 - On repositories with sensitive data
 - On your main development machine without isolation
 
-See `scripts/ralph/ralph.sh:135` for implementation details.
+See `ralph/scripts/ralph.sh:135` for implementation details.
 
 ## Workflow
 

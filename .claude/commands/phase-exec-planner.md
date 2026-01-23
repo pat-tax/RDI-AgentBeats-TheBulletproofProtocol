@@ -11,7 +11,7 @@ Execute implementation phase planning with first-principles thinking.
 
 - Phase ID (e.g., "2I" or sprint section identifier)
 - Sprint plan path (e.g., `docs/sprints/YYYY-MM_Sprint#_Name.md`)
-- ralph (optional) - If provided, generate `docs/ralph/prd.json` for
+- ralph (optional) - If provided, generate `ralph/docs/prd.json` for
   autonomous execution
 
 **Planning approach:**
@@ -35,7 +35,7 @@ implementation plan.
 
 ## If "ralph" parameter provided
 
-Generate `docs/ralph/prd.json` for autonomous execution:
+Generate `ralph/docs/prd.json` for autonomous execution:
 
 1. Read {{arg2}} (sprint document) and extract phase {{arg1}} tasks
 2. Convert each task to story format:
@@ -46,7 +46,7 @@ Generate `docs/ralph/prd.json` for autonomous execution:
    - expected_files: Files to be modified/created
    - passes: false
    - completed_at: null
-3. Write JSON to `docs/ralph/prd.json`:
+3. Write JSON to `ralph/docs/prd.json`:
 
 ```json
 {
@@ -68,5 +68,5 @@ Generate `docs/ralph/prd.json` for autonomous execution:
 **Output:**
 
 - Without "ralph" parameter: Detailed implementation plan (manual execution)
-- With "ralph" parameter: Plan + `docs/ralph/prd.json` (autonomous execution
+- With "ralph" parameter: Plan + `ralph/docs/prd.json` (autonomous execution
   via `make ralph_run`)

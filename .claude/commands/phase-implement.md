@@ -11,7 +11,7 @@ Implement the plan following first-principles.
 **Plan input (auto-detect in order):**
 
 1. Latest plan file in `/home/vscode/.claude/plans/`
-2. `docs/ralph/prd.json` (for Ralph autonomous execution)
+2. `ralph/docs/prd.json` (for Ralph autonomous execution)
 3. Conversation context (from earlier `/phase-exec-planner` output)
 
 If none found, prompt user for plan source.
@@ -26,7 +26,7 @@ make validate
 
 **Ralph Loop (Autonomous Execution):**
 
-If `docs/ralph/prd.json` detected OR if "ralph" parameter provided run:
+If `ralph/docs/prd.json` detected OR if "ralph" parameter provided run:
 `make ralph_run ITERATIONS=N`
 
 See `/phase-exec-planner` with "ralph" parameter for prd.json generation.
@@ -34,4 +34,4 @@ See `/phase-exec-planner` with "ralph" parameter for prd.json generation.
 **Execute now:**
 
 - **Manual**: Read plan → Implement tasks → Run `make validate` after each
-- **Ralph**: Automatically runs if `docs/ralph/prd.json` detected
+- **Ralph**: Automatically runs if `ralph/docs/prd.json` detected

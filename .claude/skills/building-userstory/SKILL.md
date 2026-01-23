@@ -27,7 +27,7 @@ Guides users through creating a user story document that can be transformed into
    - Out of scope
 
 3. **Generate UserStory.md**
-   - Read template from `docs/ralph/templates/userstory.md.template`
+   - Read template from `ralph/docs/templates/userstory.md.template`
    - Replace placeholders with user responses
    - Write to `docs/UserStory.md`
 
@@ -35,7 +35,7 @@ Guides users through creating a user story document that can be transformed into
 
 ## Template
 
-See `docs/ralph/templates/userstory.md.template` for structure and placeholders.
+See `ralph/docs/templates/userstory.md.template` for structure and placeholders.
 
 ## Usage
 

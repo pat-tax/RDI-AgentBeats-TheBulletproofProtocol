@@ -155,9 +155,9 @@ sed -i "s|\\[PYTHON-VERSION-SHORT\\]|$PYTHON_VERSION_SHORT|g" pyproject.toml
 sed -i "s|\\[APP-NAME\\]|$APP_NAME|g" pyproject.toml
 sed -i "s|\\[YEAR\\]|$YEAR|g" LICENSE.md
 sed -i "s|\\[YOUR-NAME-OR-ORGANIZATION\\]|$AUTHOR|g" LICENSE.md
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" scripts/ralph/init.sh
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" docs/ralph/templates/progress.txt.template
-sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" docs/ralph/templates/prd.json.template
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/scripts/init.sh
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/docs/templates/progress.txt.template
+sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" ralph/docs/templates/prd.json.template
 sed -i "s|\\[PROJECT-NAME\\]|$PROJECT|g" mkdocs.yaml
 sed -i "s|\\[PROJECT-DESCRIPTION\\]|$DESCRIPTION|g" mkdocs.yaml
 sed -i "s|\\[GITHUB-REPO\\]|$GITHUB_REPO|g" mkdocs.yaml

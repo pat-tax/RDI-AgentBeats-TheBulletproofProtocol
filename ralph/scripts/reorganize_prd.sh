@@ -73,11 +73,11 @@ else
 fi
 
 echo "📦 Archiving ralph state to: $ARCHIVE_DIR"
-if [ -f "docs/ralph/prd.json" ]; then
-    mv docs/ralph/prd.json "$ARCHIVE_DIR/prd.json"
+if [ -f "ralph/docs/prd.json" ]; then
+    mv ralph/docs/prd.json "$ARCHIVE_DIR/prd.json"
 fi
-if [ -f "docs/ralph/progress.txt" ]; then
-    mv docs/ralph/progress.txt "$ARCHIVE_DIR/progress.txt"
+if [ -f "ralph/docs/progress.txt" ]; then
+    mv ralph/docs/progress.txt "$ARCHIVE_DIR/progress.txt"
 fi
 
 echo "📝 Activating new PRD: $NEW_PRD -> docs/PRD.md"
