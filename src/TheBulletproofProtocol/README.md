@@ -34,6 +34,16 @@ src/TheBulletproofProtocol
 └── README.md
 tests/
 ├── __init__.py
+├── integration
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-314.pyc
+│   │   ├── test_e2e_assessment.cpython-314-pytest-9.0.2.pyc
+│   │   ├── test_green_agent.cpython-314-pytest-9.0.2.pyc
+│   │   └── test_purple_agent.cpython-314-pytest-9.0.2.pyc
+│   ├── test_e2e_assessment.py
+│   ├── test_green_agent.py
+│   └── test_purple_agent.py
 ├── __pycache__
 │   ├── __init__.cpython-314.pyc
 │   ├── test_docker_compose.cpython-314-pytest-9.0.2.pyc

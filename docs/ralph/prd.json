@@ -281,8 +281,8 @@
         "tests/integration/__init__.py",
         "results/local_benchmark.json"
       ],
-      "passes": false,
-      "completed_at": null
+      "passes": true,
+      "completed_at": "2026-01-23T18:00:36Z"
     },
     {
       "id": "STORY-016",
