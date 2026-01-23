@@ -54,6 +54,7 @@ tests/
 │   ├── test_green_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_integration.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_server.cpython-314-pytest-9.0.2.pyc
+│   ├── test_ground_truth_dataset.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_server.cpython-314-pytest-9.0.2.pyc
 │   ├── test_routine_engineering.cpython-314-pytest-9.0.2.pyc
@@ -68,6 +69,7 @@ tests/
 ├── test_green_agent_executor.py
 ├── test_green_agent_integration.py
 ├── test_green_agent_server.py
+├── test_ground_truth_dataset.py
 ├── test_purple_agent_executor.py
 ├── test_purple_agent_server.py
 ├── test_routine_engineering.py
