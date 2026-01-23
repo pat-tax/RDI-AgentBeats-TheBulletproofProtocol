@@ -16,7 +16,12 @@ import json
 import sys
 from pathlib import Path
 
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score  # type: ignore[import-untyped]
+from sklearn.metrics import (  # type: ignore[import-untyped]
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 
 # Add src to path so we can import our modules
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))

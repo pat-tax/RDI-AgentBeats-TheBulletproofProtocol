@@ -308,7 +308,7 @@
       "title": "Validate benchmark metrics",
       "description": "Run green agent against ground truth dataset and measure classification accuracy, F1 score, precision, recall",
       "acceptance": [
-        "scripts/validate_benchmark.py evaluates all 20 ground truth cases",
+        "src/validate_benchmark.py evaluates all 20 ground truth cases",
         "Outputs classification accuracy >= 70% (target: beat IRS AI 61.2%)",
         "Outputs F1 score >= 0.72 (target: beat IRS AI 0.42)",
         "Outputs precision >= 75%, recall >= 70%",
@@ -316,7 +316,7 @@
         "Script documents metric calculations with sklearn.metrics"
       ],
       "files": [
-        "scripts/validate_benchmark.py",
+        "src/validate_benchmark.py",
         "tests/test_benchmark_validation.py"
       ],
       "passes": true,

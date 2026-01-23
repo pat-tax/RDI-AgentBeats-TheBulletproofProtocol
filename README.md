@@ -206,7 +206,7 @@ Before submitting, ensure all deliverables are complete:
 
 - [x] **Testing & Validation**
   - Ground truth dataset (20 labeled narratives in `data/ground_truth.json`)
-  - Benchmark validation script (`scripts/validate_benchmark.py`)
+  - Benchmark validation script (`src/validate_benchmark.py`)
   - Integration tests (`tests/integration/`)
   - All tests passing: `make validate`
 
@@ -243,7 +243,7 @@ curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
 make test
 
 # 3. Validate benchmark metrics
-python scripts/validate_benchmark.py
+python src/validate_benchmark.py
 
 # 4. Build and push to GHCR
 bash scripts/build.sh

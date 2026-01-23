@@ -79,7 +79,7 @@ This dataset is used to:
 2. **Calculate metrics** - Measure accuracy, precision, recall, and F1 score (target: beat IRS AI baseline of 61.2% accuracy)
 3. **Benchmark calibration** - Ensure evaluation criteria align with IRS Section 41 statutory requirements
 
-See `scripts/validate_benchmark.py` for automated validation against this dataset.
+See `src/validate_benchmark.py` for automated validation against this dataset.
 
 ## IRS Section 41 Reference
 

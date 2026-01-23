@@ -11,15 +11,15 @@ from pathlib import Path
 
 def test_validate_benchmark_script_exists():
     """Test that the validate_benchmark.py script exists."""
-    script_path = Path("scripts/validate_benchmark.py")
-    assert script_path.exists(), "scripts/validate_benchmark.py must exist"
-    assert script_path.is_file(), "scripts/validate_benchmark.py must be a file"
+    script_path = Path("src/validate_benchmark.py")
+    assert script_path.exists(), "src/validate_benchmark.py must exist"
+    assert script_path.is_file(), "src/validate_benchmark.py must be a file"
 
 
 def test_validate_benchmark_runs_successfully():
     """Test that the validation script runs without errors."""
     result = subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         text=True,
         timeout=60,
@@ -31,7 +31,7 @@ def test_validate_benchmark_creates_output_file():
     """Test that the validation script creates results/benchmark_validation.json."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -45,7 +45,7 @@ def test_benchmark_validation_output_structure():
     """Test that the output JSON has the required structure."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -75,7 +75,7 @@ def test_benchmark_processes_all_ground_truth_cases():
     """Test that all 20 ground truth cases are evaluated."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -92,7 +92,7 @@ def test_benchmark_meets_accuracy_threshold():
     """Test that classification accuracy >= 70% (beats IRS AI 61.2%)."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -109,7 +109,7 @@ def test_benchmark_meets_f1_threshold():
     """Test that F1 score >= 0.72 (beats IRS AI 0.42)."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -126,7 +126,7 @@ def test_benchmark_meets_precision_threshold():
     """Test that precision >= 75%."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -143,7 +143,7 @@ def test_benchmark_meets_recall_threshold():
     """Test that recall >= 70%."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
@@ -160,7 +160,7 @@ def test_prediction_output_structure():
     """Test that each prediction has the required fields."""
     # Run the script
     subprocess.run(
-        ["python", "scripts/validate_benchmark.py"],
+        ["python", "src/validate_benchmark.py"],
         capture_output=True,
         timeout=60,
     )
