@@ -65,9 +65,7 @@ class ExperimentationChecker:
 
         # Check for each experimentation element
         uncertainty_found = self._check_keywords(narrative_lower, self.UNCERTAINTY_KEYWORDS)
-        alternatives_found = self._check_keywords(
-            narrative_lower, self.ALTERNATIVES_KEYWORDS
-        )
+        alternatives_found = self._check_keywords(narrative_lower, self.ALTERNATIVES_KEYWORDS)
         failures_found = self._check_keywords(narrative_lower, self.FAILURES_KEYWORDS)
 
         # Calculate risk score based on missing elements
