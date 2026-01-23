@@ -8,7 +8,7 @@ This test module validates the acceptance criteria for STORY-002:
 - Includes at least 3 narrative templates (qualifying, non-qualifying, edge cases)
 """
 
-import pytest
+import anyio
 
 from bulletproof_purple.executor import PurpleAgentExecutor
 from bulletproof_purple.generator import NarrativeGenerator
@@ -18,33 +18,44 @@ from bulletproof_purple.templates import NarrativeTemplates
 class TestPurpleAgentExecutor:
     """Test executor accepts task and returns artifacts."""
 
-    @pytest.mark.asyncio
-    async def test_executor_accepts_task_with_prompt(self):
+    def test_executor_accepts_task_with_prompt(self):
         """Test that executor accepts task with prompt input."""
         executor = PurpleAgentExecutor()
-        task = await executor.execute(prompt="Generate qualifying R&D narrative")
+
+        async def run_test():
+            return await executor.execute(prompt="Generate qualifying R&D narrative")
+
+        task = anyio.run(run_test)
 
         assert task is not None
         assert hasattr(task, "artifacts")
 
-    @pytest.mark.asyncio
-    async def test_executor_returns_structured_artifact(self):
+    def test_executor_returns_structured_artifact(self):
         """Test that executor returns structured artifact with narrative text."""
         executor = PurpleAgentExecutor()
-        task = await executor.execute(prompt="Generate narrative")
+
+        async def run_test():
+            return await executor.execute(prompt="Generate narrative")
+
+        task = anyio.run(run_test)
 
         assert len(task.artifacts) > 0
         artifact = task.artifacts[0]
         assert hasattr(artifact, "parts")
         assert len(artifact.parts) > 0
-        assert hasattr(artifact.parts[0], "text")
+        # The part is wrapped - access the root TextPart
+        part = artifact.parts[0]
+        assert hasattr(part, "root") and hasattr(part.root, "text")
 
-    @pytest.mark.asyncio
-    async def test_executor_handles_async_execution(self):
+    def test_executor_handles_async_execution(self):
         """Test that executor handles async execution pattern."""
         executor = PurpleAgentExecutor()
+
+        async def run_test():
+            return await executor.execute(prompt="Test async")
+
         # This test verifies async/await works
-        task = await executor.execute(prompt="Test async")
+        task = anyio.run(run_test)
         assert task is not None
 
 
