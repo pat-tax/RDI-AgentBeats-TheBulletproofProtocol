@@ -36,6 +36,7 @@ tests/
 ├── __init__.py
 ├── __pycache__
 │   ├── __init__.cpython-314.pyc
+│   ├── test_dockerfile_green.cpython-314-pytest-9.0.2.pyc
 │   ├── test_dockerfile_purple.cpython-314-pytest-9.0.2.pyc
 │   ├── test_experimentation_checker.cpython-314-pytest-9.0.2.pyc
 │   ├── test_green_agent_executor.cpython-314-pytest-9.0.2.pyc
@@ -45,6 +46,7 @@ tests/
 │   ├── test_routine_engineering.cpython-314-pytest-9.0.2.pyc
 │   ├── test_scorer.cpython-314-pytest-9.0.2.pyc
 │   └── test_vagueness_detector.cpython-314-pytest-9.0.2.pyc
+├── test_dockerfile_green.py
 ├── test_dockerfile_purple.py
 ├── test_experimentation_checker.py
 ├── test_green_agent_executor.py
