@@ -61,6 +61,7 @@ tests/
 │   ├── test_ground_truth_dataset.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_executor.cpython-314-pytest-9.0.2.pyc
 │   ├── test_purple_agent_server.cpython-314-pytest-9.0.2.pyc
+│   ├── test_readme_submission_checklist.cpython-314-pytest-9.0.2.pyc
 │   ├── test_routine_engineering.cpython-314-pytest-9.0.2.pyc
 │   ├── test_scenario_config.cpython-314-pytest-9.0.2.pyc
 │   ├── test_scorer.cpython-314-pytest-9.0.2.pyc
@@ -80,6 +81,7 @@ tests/
 ├── test_ground_truth_dataset.py
 ├── test_purple_agent_executor.py
 ├── test_purple_agent_server.py
+├── test_readme_submission_checklist.py
 ├── test_routine_engineering.py
 ├── test_scenario_config.py
 ├── test_scorer.py
