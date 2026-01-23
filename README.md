@@ -96,6 +96,57 @@ Mandatory for Both:
   .gitmessage     - Commit message format
 ```
 
+## GHCR Deployment
+
+Deploy Docker images to GitHub Container Registry for AgentBeats production use.
+
+### Prerequisites
+
+1. **Create GitHub Personal Access Token (PAT)**:
+   - Go to https://github.com/settings/tokens
+   - Click "Generate new token (classic)"
+   - Select scopes: `write:packages`, `read:packages`, `delete:packages`
+   - Copy the generated token
+
+2. **Set Environment Variables**:
+   ```bash
+   export GITHUB_USERNAME=your-github-username
+   export CR_PAT=your-github-pat
+   ```
+
+### Build and Push
+
+```bash
+# Build Docker images for linux/amd64
+bash scripts/build.sh
+
+# Push images to GHCR
+bash scripts/push.sh
+```
+
+### Verify Deployment
+
+After pushing, verify your packages at:
+```
+https://github.com/YOUR_USERNAME?tab=packages
+```
+
+Your images will be available at:
+- `ghcr.io/YOUR_USERNAME/bulletproof-green:latest`
+- `ghcr.io/YOUR_USERNAME/bulletproof-purple:latest`
+
+### Update scenario.toml
+
+For production AgentBeats deployment, update `scenario.toml`:
+
+```toml
+[green_agent]
+ghcr_url = "ghcr.io/YOUR_USERNAME/bulletproof-green:latest"
+# Or use agentbeats_id after registration
+```
+
+For local testing, use `docker-compose.yml` instead.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow, core principles, and contribution guidelines.
