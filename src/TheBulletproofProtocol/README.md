@@ -46,6 +46,7 @@ tests/
 │   └── test_purple_agent.py
 ├── __pycache__
 │   ├── __init__.cpython-314.pyc
+│   ├── test_benchmark_validation.cpython-314-pytest-9.0.2.pyc
 │   ├── test_docker_compose.cpython-314-pytest-9.0.2.pyc
 │   ├── test_dockerfile_green.cpython-314-pytest-9.0.2.pyc
 │   ├── test_dockerfile_purple.cpython-314-pytest-9.0.2.pyc
@@ -61,6 +62,7 @@ tests/
 │   ├── test_scenario_config.cpython-314-pytest-9.0.2.pyc
 │   ├── test_scorer.cpython-314-pytest-9.0.2.pyc
 │   └── test_vagueness_detector.cpython-314-pytest-9.0.2.pyc
+├── test_benchmark_validation.py
 ├── test_docker_compose.py
 ├── test_dockerfile_green.py
 ├── test_dockerfile_purple.py
