@@ -1,0 +1,122 @@
+[
+  {
+    "id": "Q001",
+    "narrative": "Our team investigated novel approaches to distributed consensus in multi-region database architectures. The uncertainty centered on achieving sub-100ms latency while maintaining strong consistency guarantees. We hypothesized that a hybrid vector clock system could resolve this, but initial experiments revealed unexpected clock drift patterns. Through systematic testing, we discovered that network topology significantly impacted synchronization accuracy. After multiple failed attempts using traditional NTP-based approaches, we developed a custom time-sync protocol that reduced drift by 73% and achieved our latency targets.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Meets IRS Section 41(d)(1) technical uncertainty test: unclear if sub-100ms strong consistency was achievable. Demonstrates process of experimentation per Section 41(d)(1)(C) with documented hypothesis testing, failures, and systematic evaluation of alternatives."
+  },
+  {
+    "id": "Q002",
+    "narrative": "We researched methods to detect adversarial examples in production ML models without access to training data. The technical challenge was unknown: could we identify distribution shifts using only inference-time statistics? Our hypothesis involved monitoring activation patterns in intermediate layers. Early experiments failed when we tried statistical process control on final layer outputs. We then tested eigenvalue decomposition of activation covariances across batches. This approach was unsuccessful for transformer architectures. After evaluating five alternative methods, we discovered that tracking gradient magnitudes during inference provided a 94% detection rate for adversarial inputs.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Demonstrates qualified research per Section 41(d)(1): relied on principles of computer science to resolve uncertainty about adversarial detection. Process of experimentation documented with multiple failed approaches, alternative evaluations, and iterative discovery process per Section 41(d)(1)(C)."
+  },
+  {
+    "id": "Q003",
+    "narrative": "Our research focused on eliminating cache coherency bottlenecks in NUMA architectures for real-time trading systems. It was uncertain whether we could achieve deterministic microsecond-level response times under high contention. We hypothesized that lock-free data structures combined with careful memory placement could solve this. Initial experiments with standard lock-free queues failed due to cache-line bouncing. We tested alternative approaches including per-core memory pools and compared their latency distributions. After discovering that reader-writer separation was key, we achieved 99.99th percentile latency of 2.3 microseconds.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Satisfies Section 41(d)(1) technological uncertainty: unclear if deterministic microsecond latency was achievable in NUMA systems. Evidence of experimentation process per Section 41(d)(1)(C) with documented hypothesis, failed initial attempts, systematic comparison of alternatives, and measurable outcomes."
+  },
+  {
+    "id": "Q004",
+    "narrative": "We investigated whether quantum-inspired optimization algorithms could outperform classical methods for NP-hard scheduling problems. The fundamental uncertainty was whether quantum tunneling simulation on classical hardware could escape local minima efficiently. Our hypothesis centered on simulated quantum annealing with adaptive cooling schedules. Early tests failed when we tried linear cooling rates - the algorithm got trapped in suboptimal solutions. We experimented with exponential, logarithmic, and adaptive schedules. Through systematic evaluation, we discovered that a hybrid approach combining simulated annealing with genetic algorithms achieved 34% better solutions than state-of-the-art classical methods.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Meets Section 41(d)(1)(A) discovery of information requirement: unclear if quantum-inspired methods could outperform classical optimization. Process of experimentation per Section 41(d)(1)(C) demonstrated through failed linear cooling approach, systematic testing of alternatives, and documented discovery of hybrid solution."
+  },
+  {
+    "id": "Q005",
+    "narrative": "Our team explored novel cryptographic protocols for secure multi-party computation in untrusted cloud environments. The core uncertainty was whether we could achieve zero-knowledge proofs with practical performance for financial audit verification. We hypothesized that combining zk-SNARKs with homomorphic encryption could work, but initial implementations exceeded acceptable proof generation times by 40x. We tested alternative proof systems including zk-STARKs and Bulletproofs. Each approach had different trade-offs. After extensive experimentation, we discovered that batching multiple transactions into single proofs reduced overhead by 87% while maintaining security guarantees.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Qualifies under Section 41(d)(1): technical uncertainty about practical zero-knowledge proof performance. Section 41(d)(1)(C) experimentation process evident through hypothesis testing, failed initial approach (40x performance miss), systematic evaluation of alternative cryptographic protocols, and iterative discovery of batching optimization."
+  },
+  {
+    "id": "Q006",
+    "narrative": "We researched methods to enable real-time video transcoding at 4K resolution with sub-second latency on edge devices. It was uncertain whether hardware acceleration alone could achieve this without cloud offload. Our hypothesis involved novel GOP structure optimization combined with SIMD instruction tuning. Initial experiments with standard H.265 encoding failed to meet latency targets by 3x. We tested alternative codecs including AV1 and compared their computational complexity. Through systematic profiling, we discovered that preprocessing with AI-based scene detection reduced encoding time by 61%, enabling real-time edge transcoding.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Satisfies Section 41(d)(1) technological in nature requirement: resolving uncertainty about edge device transcoding capabilities required computer science principles. Process of experimentation per Section 41(d)(1)(C) shown through hypothesis testing, failed H.265 approach, codec alternatives evaluation, and discovery of AI preprocessing solution."
+  },
+  {
+    "id": "Q007",
+    "narrative": "Our investigation targeted eliminating race conditions in distributed transaction systems without sacrificing availability. The uncertainty was whether we could achieve serializable isolation without two-phase commit overhead. We hypothesized that optimistic concurrency control with vector clock validation could work. Early experiments revealed unexpected anomalies under partition scenarios. We tested alternative approaches including timestamp ordering and compared their failure modes. After multiple unsuccessful attempts with pure optimistic schemes, we discovered that hybrid validation combining timestamps with causal dependency tracking achieved both serializability and 99.95% availability.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Meets Section 41(d)(1) qualified research criteria: uncertainty about achieving serializability without 2PC overhead. Section 41(d)(1)(C) experimentation demonstrated through hypothesis formation, documented anomalies in initial approach, systematic testing of alternatives, and discovery of hybrid solution after multiple failures."
+  },
+  {
+    "id": "Q008",
+    "narrative": "We explored novel approaches to federated learning that could preserve privacy while detecting model poisoning attacks. The fundamental uncertainty was whether we could identify malicious gradients without accessing raw training data. Our hypothesis centered on using differential privacy mechanisms to detect statistical outliers. Initial experiments failed because DP noise masked the attack signatures. We tried secure aggregation protocols and compared their detection accuracy. Through systematic investigation, we discovered that combining gradient clipping with Byzantine-robust aggregation achieved 91% attack detection while maintaining privacy guarantees.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Qualifies under Section 41(d)(1): technical uncertainty about privacy-preserving poisoning detection. Process of experimentation per Section 41(d)(1)(C) evident through hypothesis testing, failed DP-based approach, evaluation of alternative secure protocols, and iterative discovery of gradient clipping solution."
+  },
+  {
+    "id": "Q009",
+    "narrative": "Our research focused on achieving deterministic replay for distributed microservices to enable reliable debugging. It was uncertain whether we could capture all non-determinism sources without prohibitive overhead. We hypothesized that selective instrumentation of I/O boundaries could work. Early experiments with full system call interception imposed 15x slowdown - completely impractical. We tested alternative approaches including user-space network proxies and compared their performance impact. After discovering that async event loop instrumentation was key, we reduced overhead to 8% while achieving full reproducibility.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Satisfies Section 41(d)(1) technological uncertainty test: unclear if deterministic replay was achievable with acceptable performance. Section 41(d)(1)(C) experimentation process shown through hypothesis formation, failed system call approach (15x overhead), systematic evaluation of alternatives, and discovery of event loop solution."
+  },
+  {
+    "id": "Q010",
+    "narrative": "We investigated whether graph neural networks could predict cascading failures in power grid networks before they occurred. The core uncertainty was whether GNN architectures could model the complex physics of power flow propagation. Our hypothesis involved encoding AC power flow equations as graph constraints. Initial experiments with standard GCN architectures failed to capture phase angle dynamics. We tested alternative approaches including message-passing networks with physics-informed losses and compared their prediction accuracy. Through extensive experimentation, we discovered that attention mechanisms over temporal sequences improved early warning accuracy from 62% to 89%.",
+    "label": "QUALIFYING",
+    "irs_rationale": "Meets Section 41(d)(1) discovery requirement: uncertainty about GNN capability to model power flow physics. Process of experimentation per Section 41(d)(1)(C) demonstrated through hypothesis testing, failed GCN approach, systematic evaluation of physics-informed alternatives, and documented improvement through attention mechanisms."
+  },
+  {
+    "id": "NQ001",
+    "narrative": "Our team fixed several production bugs in the payment processing module. We debugged an issue where transactions were failing intermittently due to race conditions in the database connection pool. After analyzing logs, we identified that the pool was being exhausted under high load. We upgraded the connection pool library to the latest version and increased the pool size from 50 to 100 connections. We also refactored the connection management code to improve error handling and added better monitoring. Performance testing showed the system could now handle 2x more transactions per second.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Fails Section 41(d)(3) routine engineering exclusion: debugging production issues and upgrading libraries are explicitly excluded. Work involved applying existing techniques (connection pooling, error handling) without technical uncertainty. No qualified research per Section 41(d)(1) - capability of connection pools was already known."
+  },
+  {
+    "id": "NQ002",
+    "narrative": "We improved the performance of our search service by optimizing database queries and adding caching. The system was experiencing slow response times, so we profiled the code and found several inefficient queries. We added indexes to frequently queried columns and implemented Redis caching for common search results. We also upgraded to the latest version of PostgreSQL and tuned configuration parameters. After optimization, average query time decreased from 450ms to 120ms. The changes improved overall user experience and reduced server costs.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Excluded under Section 41(d)(3) as routine engineering: database optimization using well-known techniques (indexing, caching, configuration tuning). Vague language ('improved performance', 'improved user experience') without documented technical uncertainty. Method of achieving performance improvement was known - standard database optimization practices."
+  },
+  {
+    "id": "NQ003",
+    "narrative": "Our development team enhanced the user interface to make it more intuitive and user-friendly. We upgraded the component library to the latest version and refactored the layout to be more responsive. The new design improved accessibility and provided better visual feedback. We also optimized the frontend build process to reduce bundle size and improve load times. User testing showed positive feedback on the new interface. The changes resulted in better engagement metrics and reduced bounce rates.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Fails qualification under Section 41(d)(3): routine UI enhancement work. Excessive vague language ('more intuitive', 'user-friendly', 'better visual feedback', 'improved accessibility') without numeric substantiation. No technical uncertainty - capability to improve UI with component upgrades was known. Not technological in nature per Section 41(d)(1)."
+  },
+  {
+    "id": "NQ004",
+    "narrative": "We migrated our monolithic application to a microservices architecture to improve scalability. The migration involved breaking down the codebase into smaller services and deploying them using Docker containers. We set up Kubernetes for orchestration and implemented API gateways for service communication. The new architecture allowed us to scale services independently and improved deployment flexibility. We also upgraded our CI/CD pipeline to support the new microservices workflow. The migration improved overall system reliability and made the codebase easier to maintain.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Excluded as routine engineering per Section 41(d)(3): migration to microservices using established patterns and tools. Vague claims ('improve scalability', 'improved deployment flexibility', 'improved overall system reliability') lack numeric evidence. No documented technical uncertainty - microservices architecture benefits were already known in industry."
+  },
+  {
+    "id": "NQ005",
+    "narrative": "Our team refactored the authentication module to improve security and code quality. We upgraded to the latest OAuth 2.0 library and implemented better token validation. The refactoring included cleaning up legacy code, adding comprehensive error handling, and improving logging. We also enhanced the password hashing algorithm and added rate limiting to prevent brute force attacks. Code reviews confirmed the changes followed best practices. The improved authentication system provided better protection against common security vulnerabilities.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Fails Section 41(d)(1) - no technical uncertainty. Routine engineering per Section 41(d)(3): applying well-known security practices (OAuth, rate limiting, password hashing). Vague language ('improve security', 'improve code quality', 'better protection') without quantification. Work involved maintenance, refactoring, and upgrades - explicitly excluded activities."
+  },
+  {
+    "id": "NQ006",
+    "narrative": "We optimized our ETL pipeline to process data faster and handle larger volumes. The pipeline was experiencing performance bottlenecks, so we parallelized several processing stages and upgraded to faster storage. We also implemented better error handling and retry logic to improve reliability. The optimized pipeline reduced processing time from 6 hours to 2 hours for our daily batch jobs. We added monitoring and alerting to quickly identify issues. The improvements enabled us to scale to 3x more data without infrastructure changes.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Excluded under Section 41(d)(3): routine data engineering optimization. Vague language ('optimized', 'process data faster', 'improve reliability') with limited technical detail. While numeric results provided (6h to 2h), method used standard parallelization techniques without documented uncertainty per Section 41(d)(1)(A)."
+  },
+  {
+    "id": "NQ007",
+    "narrative": "We enhanced our mobile application to provide a better user experience and faster performance. The upgrade included updating to the latest React Native version and optimizing image loading. We refactored several components to reduce re-renders and improved state management. The app now loads 40% faster and uses less memory. We also fixed various bugs reported by users and improved crash reporting. User ratings improved from 3.8 to 4.5 stars after the release.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Fails Section 41(d)(3) exclusion: routine mobile app enhancement. Vague language dominates ('better user experience', 'faster performance', 'enhanced', 'improved'). While 40% load time improvement cited, work involved standard optimization (library upgrades, component refactoring, bug fixes) without technical uncertainty. No qualified research per Section 41(d)(1)."
+  },
+  {
+    "id": "NQ008",
+    "narrative": "Our infrastructure team upgraded the deployment pipeline to improve reliability and reduce deployment time. We migrated from manual deployments to automated CI/CD using GitHub Actions. The new pipeline includes automated testing, security scanning, and canary deployments. We also improved rollback capabilities and added better monitoring of deployment health. Deployment time decreased from 45 minutes to 12 minutes. The automated pipeline reduced deployment errors and improved developer productivity.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Excluded as routine engineering per Section 41(d)(3): implementing standard DevOps practices (CI/CD, automated testing, canary deployments). Vague claims ('improve reliability', 'improved rollback capabilities', 'improved developer productivity') without technical uncertainty documentation. Migration to automation using established tools does not meet Section 41(d)(1) qualified research criteria."
+  },
+  {
+    "id": "NQ009",
+    "narrative": "We cleaned up technical debt in our codebase to improve maintainability and reduce bugs. The work involved refactoring legacy modules, updating deprecated dependencies, and standardizing coding patterns. We removed unused code, consolidated duplicate logic, and improved documentation. The refactoring made the codebase easier to understand and faster to modify. We also upgraded testing frameworks and increased test coverage from 65% to 85%. The improvements reduced the time needed for new feature development.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Fails qualification under Section 41(d)(3): routine maintenance and code cleanup explicitly excluded. Vague language throughout ('improve maintainability', 'reduce bugs', 'easier to understand', 'faster to modify'). Work described is refactoring and upgrading - no technical uncertainty per Section 41(d)(1). Not discovery-oriented research."
+  },
+  {
+    "id": "NQ010",
+    "narrative": "We upgraded our analytics platform to provide better insights and reporting capabilities. The upgrade involved migrating to a newer version of our BI tool and optimizing data models. We enhanced dashboards with more visualizations and improved query performance. Users can now generate reports faster and access more detailed metrics. We also improved data accuracy by fixing several calculation errors and adding validation rules. The enhanced analytics platform improved decision-making across the organization.",
+    "label": "NON_QUALIFYING",
+    "irs_rationale": "Excluded per Section 41(d)(3) as routine engineering: BI tool upgrades and dashboard enhancements using established methods. Excessive vague language ('better insights', 'improved query performance', 'improved decision-making') without quantification. No documented technical uncertainty per Section 41(d)(1)(A). Work involved applying known analytics and data modeling techniques."
+  }
+]

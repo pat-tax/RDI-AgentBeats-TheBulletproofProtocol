@@ -1,9 +1,9 @@
 # https://github.com/james-willett/mkdocs-material-youtube-tutorial
 # https://mkdocstrings.github.io/recipes/
 # site info set in workflow
-site_name: '[PROJECT-NAME]'
-site_description: '[PROJECT-DESCRIPTION]'
-repo_url: 'https://github.com/[GITHUB-REPO]'
+site_name: 'RDI-AgentBeats-TheBulletproofProtocol'
+site_description: 'A recursive adversarial agent system where a "Virtual IRS Auditor" ruthlessly critiques and trains a "Generator Agent" to write audit-proof R&D tax credit claims.'
+repo_url: 'https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol'
 edit_uri: edit/main
 theme:
   name: material

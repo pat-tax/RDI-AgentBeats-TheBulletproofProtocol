@@ -4,5 +4,5 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1": {}
   },
-  "postCreateCommand": "make setup_claude_code & make setup_markdownlint"
+  "postCreateCommand": "make setup_claude_code & make setup_markdownlint & make setup_sandbox"
 }

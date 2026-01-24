@@ -5,7 +5,6 @@ __pycache__/
 # environment
 .venv/
 *.env
-unset_env.sh
 
 # Distribution / packaging
 build/
@@ -21,12 +20,6 @@ dist/
 *.log
 logs/
 
-# Traces
-scalene-profiles
-profile.html
-profile.json
-.opik_install_reported
-
 # OS generated files
 .DS_Store
 Thumbs.db
@@ -39,8 +32,9 @@ Thumbs.db
 reference/
 site/
 
-# linting
+# sanity
 .ruff_cache/
-
-# type checking
 .mypy_cache/
+
+# project specific
+codebase-map.html

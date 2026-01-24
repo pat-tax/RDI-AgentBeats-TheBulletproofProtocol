@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_full_init ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -29,6 +29,18 @@ setup_markdownlint:  ## Setup markdownlint CLI, node.js and npm have to be prese
 	echo "Setting up markdownlint CLI ..."
 	npm install -gs markdownlint-cli
 	echo "markdownlint version: $$(markdownlint --version)"
+
+setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
+	echo "Installing sandbox dependencies ..."
+	if command -v apt-get > /dev/null; then \
+		sudo apt-get update -qq && sudo apt-get install -y bubblewrap socat; \
+	elif command -v dnf > /dev/null; then \
+		sudo dnf install -y bubblewrap socat; \
+	else \
+		echo "Unsupported package manager. Install bubblewrap and socat manually."; \
+		exit 1; \
+	fi
+	echo "Sandbox dependencies installed."
 
 setup_project:  ## Customize template with your project details. Run with help: bash scripts/setup_project.sh help
 	bash scripts/setup_project.sh || { echo ""; echo "ERROR: Project setup failed. Please check the error messages above."; exit 1; }
@@ -77,31 +89,35 @@ quick_validate:  ## Fast development cycle validation
 
 ralph_userstory:  ## [Optional] Create UserStory.md interactively. Usage: make ralph_userstory
 	echo "Creating UserStory.md through interactive Q&A ..."
-	claude /building-userstory
+	claude -p "/generating-interactive-userstory-md"
 
 ralph_prd:  ## [Optional] Generate PRD.md from UserStory.md
 	echo "Generating PRD.md from UserStory.md ..."
-	claude /generating-prd-from-userstory
+	claude -p "/generating-prd-md-from-userstory-md"
+
+ralph_prd_json:  ## [Optional] Generate PRD.json from PRD.md
+	echo "Generating PRD.json from PRD.md ..."
+	claude "/generating-prd-json-from-prd-md"
 
 ralph_init:  ## Initialize Ralph loop environment
 	echo "Initializing Ralph loop environment ..."
-	bash scripts/ralph/init.sh
+	bash ralph/scripts/init.sh
 
 ralph_run:  ## Run Ralph autonomous development loop (use ITERATIONS=N to set max iterations)
 	echo "Starting Ralph loop ..."
 	ITERATIONS=$${ITERATIONS:-25}
-	bash scripts/ralph/ralph.sh $$ITERATIONS
+	bash ralph/scripts/ralph.sh $$ITERATIONS
 
 ralph_status:  ## Show Ralph loop progress and status
 	echo "Ralph Loop Status"
 	echo "================="
-	if [ -f docs/ralph/prd.json ]; then
-		total=$$(jq '.stories | length' docs/ralph/prd.json)
-		passing=$$(jq '[.stories[] | select(.passes == true)] | length' docs/ralph/prd.json)
+	if [ -f ralph/docs/prd.json ]; then
+		total=$$(jq '.stories | length' ralph/docs/prd.json)
+		passing=$$(jq '[.stories[] | select(.passes == true)] | length' ralph/docs/prd.json)
 		echo "Stories: $$passing/$$total completed"
 		echo ""
 		echo "Incomplete stories:"
-		jq -r '.stories[] | select(.passes == false) | "  - [\(.id)] \(.title)"' docs/ralph/prd.json
+		jq -r '.stories[] | select(.passes == false) | "  - [\(.id)] \(.title)"' ralph/docs/prd.json
 	else
 		echo "prd.json not found. Run 'make ralph_init' first."
 	fi
@@ -110,7 +126,7 @@ ralph_clean:  ## Reset Ralph state (WARNING: removes prd.json and progress.txt)
 	echo "WARNING: This will reset Ralph loop state!"
 	echo "Press Ctrl+C to cancel, Enter to continue..."
 	read
-	rm -f docs/ralph/prd.json docs/ralph/progress.txt
+	rm -f ralph/docs/prd.json ralph/docs/progress.txt
 	echo "Ralph state cleaned. Run 'make ralph_init' to reinitialize."
 
 ralph_reorganize:  ## Archive current PRD and start new iteration. Usage: make ralph_reorganize NEW_PRD=path/to/new.md [VERSION=2]
@@ -123,7 +139,7 @@ ralph_reorganize:  ## Archive current PRD and start new iteration. Usage: make r
 	if [ -n "$(VERSION)" ]; then
 		VERSION_ARG="-v $(VERSION)"
 	fi
-	bash scripts/ralph/reorganize_prd.sh $$VERSION_ARG $(NEW_PRD)
+	bash ralph/scripts/reorganize_prd.sh $$VERSION_ARG $(NEW_PRD)
 
 
 # MARK: help

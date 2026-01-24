@@ -7,10 +7,6 @@ purpose: Define Agent Neutrality Requirements and task execution protocol
 
 # Agent Guidelines
 
-For general contribution guidelines (core principles, testing, validation), see `CONTRIBUTING.md`.
-
-## Agent-Specific Requirements
-
-When working on this project, agents must:
-
-1. **Use Ralph Loop skills** - Leverage specialized skills from `.claude/skills/` for phase planning, implementation, and review tasks
+1. For general contribution guidelines (core principles, testing, validation), see `CONTRIBUTING.md`.
+2. General agent rules are located in `./.claude/rules`
+3. On-demand agent skills are located in `./.claude/skills`

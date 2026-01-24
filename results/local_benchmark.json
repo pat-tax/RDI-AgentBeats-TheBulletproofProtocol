@@ -1,0 +1,13 @@
+{
+  "participant_id": "bulletproof-purple-local",
+  "pass_rate": 100.0,
+  "traffic_light_green_pct": 100.0,
+  "n_tasks": 5,
+  "risk_scores": [
+    6,
+    6,
+    6,
+    6,
+    6
+  ]
+}

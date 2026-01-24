@@ -1,0 +1,50 @@
+---
+name: compacting-context
+description: Compacts verbose context into structured summary. Use after pollution sources (searches, logs, JSON) or at phase milestones.
+context: fork
+agent: Explore
+---
+
+# Context Compaction (ACE-FCA)
+
+Distills verbose outputs into structured summaries following ACE-FCA principles.
+
+## When to Use
+
+Per `.claude/rules/context-management.md`:
+- After verbose tool output (logs, JSON, search results)
+- After completing a phase or milestone
+- Before starting new complex task
+
+## Workflow
+
+1. **Identify noise** - What pollution sources need compacting?
+2. **Extract signal** - Correct + Complete info only
+3. **Structure output** - Use template format below
+
+## Output Template
+
+```markdown
+# Compaction: {{name}}
+
+## Trajectory
+<!-- start → current → next step -->
+
+## Key Files
+<!-- files touched with purpose -->
+
+## Completed
+<!-- done items -->
+
+## Blockers
+<!-- blocking issues (empty if none) -->
+
+## Findings
+<!-- key discoveries, distilled outputs from logs/JSON/tests -->
+```
+
+## Quality Check
+
+- Correct > Complete > Minimal
+- No raw dumps, only structured summaries
+- Enough to continue, no more
