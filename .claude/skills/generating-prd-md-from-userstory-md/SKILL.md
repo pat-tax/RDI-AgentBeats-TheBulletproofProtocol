@@ -49,6 +49,18 @@ Bridges the gap between user-focused stories and implementation-ready requiremen
 
 See `ralph/docs/templates/prd.md.template` for structure and placeholders.
 
+## Parser Requirements
+
+The generated PRD.md must follow these exact patterns for `generate_prd_json.py` compatibility:
+
+1. **Feature headings**: `#### Feature N: Name` (exactly 4 #)
+2. **Acceptance criteria**: `- [ ] criterion` (checkbox format)
+3. **Files**: `- \`path/to/file.py\`` (backticks required)
+4. **Sub-features**: `##### N.N Name` (exactly 5 #)
+5. **Story breakdown**: `STORY-NNN: Title` format
+
+See template: `ralph/docs/templates/prd.md.template`
+
 ## Usage
 
 ```bash
