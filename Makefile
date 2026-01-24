@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -29,6 +29,18 @@ setup_markdownlint:  ## Setup markdownlint CLI, node.js and npm have to be prese
 	echo "Setting up markdownlint CLI ..."
 	npm install -gs markdownlint-cli
 	echo "markdownlint version: $$(markdownlint --version)"
+
+setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
+	echo "Installing sandbox dependencies ..."
+	if command -v apt-get > /dev/null; then \
+		sudo apt-get update -qq && sudo apt-get install -y bubblewrap socat; \
+	elif command -v dnf > /dev/null; then \
+		sudo dnf install -y bubblewrap socat; \
+	else \
+		echo "Unsupported package manager. Install bubblewrap and socat manually."; \
+		exit 1; \
+	fi
+	echo "Sandbox dependencies installed."
 
 setup_project:  ## Customize template with your project details. Run with help: bash scripts/setup_project.sh help
 	bash scripts/setup_project.sh || { echo ""; echo "ERROR: Project setup failed. Please check the error messages above."; exit 1; }

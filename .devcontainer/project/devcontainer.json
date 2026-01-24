@@ -8,5 +8,5 @@
         "moby": false
     }
   },
-  "postCreateCommand": "make setup_dev"
+  "postCreateCommand": "make setup_dev && make setup_sandbox"
 }
