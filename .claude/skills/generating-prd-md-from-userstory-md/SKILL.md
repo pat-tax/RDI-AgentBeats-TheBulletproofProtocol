@@ -51,7 +51,7 @@ See `ralph/docs/templates/prd.md.template` for structure and placeholders.
 
 ## Parser Requirements
 
-The generated PRD.md must follow these exact patterns for `generate_prd_json.py` compatibility:
+The generated PRD.md must follow these exact patterns for `ralph/scripts/generate_prd_json.py` compatibility:
 
 1. **Feature headings**: `#### Feature N: Name` (exactly 4 #)
 2. **Acceptance criteria**: `- [ ] criterion` (checkbox format)
