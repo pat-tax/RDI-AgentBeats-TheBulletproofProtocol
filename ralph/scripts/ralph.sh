@@ -276,9 +276,7 @@ main() {
                 git add "$PRD_JSON" "$PROGRESS_FILE"
                 [ -n "$app_readme" ] && git add "$app_readme"
                 [ -n "$app_example" ] && git add "$app_example"
-                git commit -m "chore: Update Ralph state after completing $story_id
-
-Co-Authored-By: Claude <noreply@anthropic.com>" || log_warn "No state changes to commit"
+                git commit -m "chore: Update Ralph state after completing $story_id" || log_warn "No state changes to commit"
             else
                 log_warn "Story completed but quality checks failed"
                 log_progress "$iteration" "$story_id" "FAIL" "Quality checks failed"
