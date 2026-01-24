@@ -1,108 +1,88 @@
 # Template Usage
 
-Python project template with Ralph Loop autonomous development.
+Quick setup guide for new projects using this template.
 
-## DevContainer
-
-- **`template/`** - Template dev (Alpine ~10MB)
-- **`project/`** - Project dev (Python + Node + Docker ~1GB+)
-
-See `.devcontainer/README.md`.
-
-## Setup Steps
-
-### 1. Setup Development Environment
+## Setup
 
 ```bash
-# Clone this template
-git clone <your-repo-url>
-cd <your-repo>
+# 1. Clone and customize
+git clone <your-repo-url> && cd <your-repo>
+make setup_project          # Customize template placeholders
 
-# Customize the template
-make setup_project
-
-# Install dependencies and tooling
-make setup_dev
+# 2. Install dependencies
+make setup_dev              # Python deps, tooling
+make setup_sandbox          # Sandbox deps (Linux/WSL2)
 ```
 
-### 2. Write Requirements
+## Workflow
 
-**Option A (Manual)**: Edit **`docs/PRD.md`** with your product requirements.
+### Option A: Manual PRD
 
-**Option B (Assisted)**: Use interactive workflow:
+1. Edit `docs/PRD.md` with your requirements
+2. Run Ralph:
+   ```bash
+   make ralph_init             # Creates prd.json
+   make ralph_run ITERATIONS=25
+   ```
+
+### Option B: Assisted PRD
 
 ```bash
-make ralph_userstory  # Create UserStory.md via Q&A
-make ralph_prd        # Generate PRD.md from UserStory.md
+make ralph_userstory        # Interactive Q&A → UserStory.md
+make ralph_prd              # UserStory.md → PRD.md
+make ralph_prd_json         # PRD.md → prd.json
+make ralph_run ITERATIONS=25
 ```
 
-### 3. Run Ralph Loop
+### Monitoring
 
 ```bash
-make ralph_init              # Initialize (creates prd.json)
-make ralph_run ITERATIONS=10 # Run autonomous development
-make ralph_status            # Check progress
+make ralph_status           # Show progress
+make validate               # Run linters + tests
 ```
 
-To generate prd.json: Run `claude -p` then use `generating-prd` skill.
-
-### Starting New Product Iteration
-
-When PRD.md changes significantly, reorganize and archive:
+### Reset / Iterate
 
 ```bash
-make ralph_reorganize NEW_PRD=docs/PRD-v2.md VERSION=2
+make ralph_clean            # Reset state (removes prd.json, progress.txt)
+make ralph_reorganize NEW_PRD=docs/PRD-v2.md VERSION=2  # Archive and iterate
 ```
 
-Archives current PRD, prd.json, and progress to `docs/ralph/archive/`, then activates new PRD.
+## Commands Reference
 
-## Optional: MCP Servers
+| Command | Description |
+|---------|-------------|
+| `make setup_project` | Customize template placeholders |
+| `make setup_dev` | Install Python deps and tooling |
+| `make setup_sandbox` | Install sandbox deps (Linux/WSL2) |
+| `make ralph_userstory` | Create UserStory.md interactively |
+| `make ralph_prd` | Generate PRD.md from UserStory.md |
+| `make ralph_prd_json` | Generate prd.json from PRD.md |
+| `make ralph_init` | Initialize Ralph environment |
+| `make ralph_run` | Run autonomous development |
+| `make ralph_status` | Show progress and status |
+| `make ralph_clean` | Reset Ralph state |
+| `make ralph_reorganize` | Archive and start new iteration |
+| `make validate` | Run all checks (ruff, pyright, pytest) |
+| `make help` | Show all available commands |
 
-Template includes `context7` and `exa` MCP servers. Remove from `.claude/settings.json` if not needed.
+## Project Structure
 
-## Directory Structure
-
-```
+```text
 your-project/
-├── .claude/              # Claude Code configuration
-├── .devcontainer/        # DevContainer configs (template/ & project/)
-├── docs/
-│   ├── PRD.md           # Product requirements (edit this!)
-│   ├── ralph/           # Ralph state (gitignored)
-│   └── archive/         # Previous iterations
-├── scripts/
-│   └── ralph/           # Ralph automation scripts
-├── src/                 # Your source code
-├── tests/               # Your tests
-├── Makefile             # Build automation
-└── pyproject.toml       # Python project config
-```
-
-## Common Commands
-
-```bash
-make setup_project     # Customize template
-make setup_dev         # Setup environment
-make validate          # Run all checks
-
-# Ralph (Optional assisted workflow)
-make ralph_userstory   # [Optional] Create UserStory.md interactively
-make ralph_prd         # [Optional] Generate PRD.md from UserStory.md
-
-# Ralph (Core workflow)
-make ralph_init        # Initialize Ralph (creates prd.json)
-make ralph_run         # Run autonomous dev
-make ralph_status      # Check progress
-make ralph_clean       # Reset state (removes prd.json, progress.txt)
-make ralph_reorganize  # Archive and start new iteration
-
-make help              # Show all commands
+├── .claude/              # Claude Code config (skills, rules, settings)
+├── .devcontainer/        # DevContainer configs
+├── docs/PRD.md           # Product requirements
+├── ralph/
+│   ├── docs/             # Ralph docs, prd.json, progress.txt
+│   └── scripts/          # Orchestration scripts
+├── src/                  # Source code
+├── tests/                # Tests
+└── Makefile              # Build automation
 ```
 
 ## Next Steps
 
-1. Delete `TEMPLATE_USAGE.md`
-2. Write requirements in `docs/PRD.md`
-3. Run `make ralph_run` for autonomous implementation
-
-See `.claude/skills/` for available skills and `make help` for all commands.
+1. Write requirements in `docs/PRD.md`
+2. Run `make ralph_init && make ralph_run`
+3. See [README.md](README.md) for methodology details

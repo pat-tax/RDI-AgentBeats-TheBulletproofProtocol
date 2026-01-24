@@ -790,7 +790,7 @@ When using the `generating-prd` skill to convert this PRD to `ralph/docs/prd.jso
    - **Feature 8 (Difficulty)** → STORY-034: Add difficulty tags, STORY-035: Report by difficulty
    - **Feature 9 (Anti-Gaming)** → STORY-036: Adversarial test narratives, STORY-037: LLM reward hacking tests
    - **Feature 10 (Tech Req)** → STORY-038: A2A task updates, STORY-039: Docker parameters, STORY-040: Task isolation
-4. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Similarly, STORY-033 integrates business_risk and specificity detectors. STORY-042 wires server to executor. Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `ralph/docs/LEARNING.md` for lessons learned.
+4. **Integration Stories**: STORY-010 is critical - it wires the detectors (STORY-006-009) into the evaluator (STORY-005). Similarly, STORY-033 integrates business_risk and specificity detectors. STORY-042 wires server to executor. Without explicit integration stories, components remain orphaned modules that pass unit tests but never get used. See `ralph/docs/LEARNINGS.md` for lessons learned.
 5. **Acceptance Criteria**: Each checkbox becomes testable acceptance criteria in prd.json
 6. **Files Implemented**: Actual files match prd.json (not PRD.md expectations)
 7. **Dependencies**: Green agent depends on Purple agent for testing; STORY-010 depends on STORY-006-009; STORY-033 depends on STORY-031-032; STORY-042 depends on STORY-041
