@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -45,6 +45,16 @@ setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
 setup_project:  ## Customize template with your project details. Run with help: bash scripts/setup_project.sh help
 	bash scripts/setup_project.sh || { echo ""; echo "ERROR: Project setup failed. Please check the error messages above."; exit 1; }
 
+setup_devc_project:  ## Devcontainer: Full project env (sandbox + Python/Node deps + project customization)
+	$(MAKE) -s setup_sandbox
+	$(MAKE) -s setup_dev
+	$(MAKE) -s setup_project
+
+setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Code + markdownlint)
+	$(MAKE) -s setup_sandbox
+	$(MAKE) -s setup_claude_code
+	$(MAKE) -s setup_markdownlint
+
 
 # MARK: run markdownlint
 
@@ -73,14 +83,14 @@ type_check:  ## Check for static typing errors
 validate:  ## Complete pre-commit validation sequence
 	echo "Running complete validation sequence ..."
 	$(MAKE) -s ruff
-	-$(MAKE) -s type_check
-	-$(MAKE) -s test_all
+	$(MAKE) -s type_check
+	$(MAKE) -s test_all
 	echo "Validation sequence completed (check output for any failures)"
 
 quick_validate:  ## Fast development cycle validation
 	echo "Running quick validation ..."
 	$(MAKE) -s ruff
-	-$(MAKE) -s type_check
+	$(MAKE) -s type_check
 	echo "Quick validation completed (check output for any failures)"
 
 
