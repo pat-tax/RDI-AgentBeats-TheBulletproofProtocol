@@ -2,7 +2,11 @@
 #
 # Ralph Loop - Autonomous iteration script
 #
-# Usage: ./ralph/scripts/ralph.sh [MAX_ITERATIONS]
+# Usage: ./ralph/scripts/ralph.sh
+#
+# Environment variables:
+#   RALPH_MODEL     - Claude model to use (default: sonnet)
+#   MAX_ITERATIONS  - Maximum loop iterations (default: 10)
 #
 # This script orchestrates autonomous task execution by:
 # 1. Reading prd.json for incomplete stories
