@@ -12,7 +12,6 @@ This test module validates the acceptance criteria for STORY-016:
 
 from __future__ import annotations
 
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -429,8 +428,6 @@ class TestLLMJudgeFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_timeout(self):
         """Test fallback when LLM call times out."""
-        from asyncio import TimeoutError
-
         from bulletproof_green.llm_judge import LLMJudge
 
         judge = LLMJudge(api_key="test-key")
