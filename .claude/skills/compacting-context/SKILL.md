@@ -28,7 +28,7 @@ Per `.claude/rules/context-management.md`:
 # Compaction: {{name}}
 
 ## Trajectory
-<!-- start → current → next step -->
+<!-- Research status → Planning status → Implementation status -->
 
 ## Key Files
 <!-- files touched with purpose -->
@@ -48,3 +48,4 @@ Per `.claude/rules/context-management.md`:
 - Correct > Complete > Minimal
 - No raw dumps, only structured summaries
 - Enough to continue, no more
+- Update working plan with compaction output (don't orphan it)
