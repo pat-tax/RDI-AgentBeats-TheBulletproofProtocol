@@ -64,7 +64,9 @@ class TestGreenAgentConfiguration:
         scenario = _load_scenario()
         green_agent = scenario.get("green_agent", {})
         agentbeats_id = green_agent.get("agentbeats_id", "")
-        assert agentbeats_id, "green_agent agentbeats_id must not be empty (register on agentbeats.dev)"
+        assert agentbeats_id, (
+            "green_agent agentbeats_id must not be empty (register on agentbeats.dev)"
+        )
 
     def test_green_agent_agentbeats_id_format(self) -> None:
         """Test green_agent agentbeats_id has valid format."""
@@ -119,7 +121,9 @@ class TestParticipantsConfiguration:
         assert len(participants) >= 1, "participants must have at least one entry"
         purple_participant = participants[0]
         agentbeats_id = purple_participant.get("agentbeats_id", "")
-        assert agentbeats_id, "participant agentbeats_id must not be empty (register on agentbeats.dev)"
+        assert agentbeats_id, (
+            "participant agentbeats_id must not be empty (register on agentbeats.dev)"
+        )
 
     def test_purple_participant_agentbeats_id_format(self) -> None:
         """Test purple participant agentbeats_id has valid format."""
