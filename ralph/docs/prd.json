@@ -1,14 +1,14 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-  "scope": "Phase 1 complete (STORY-001 to STORY-021). Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
+  "scope": "Phase 1 (STORY-001 to STORY-014): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 (STORY-015+): Arena mode, Hybrid evaluation, expanded dataset, Git/Jira integration.",
   "source": "docs/PRD.md",
-  "generated": "2026-01-25 17:40:47",
+  "generated": "2026-01-25 18:05:00",
   "stories": [
     {
       "id": "STORY-001",
-      "title": "Implement narrative generator",
-      "description": "Generate IRS Section 41 compliant Four-Part Test narratives from engineering signals. - Implement narrative generator",
+      "title": "Implement Purple Agent narrative generator",
+      "description": "Generate IRS Section 41 compliant Four-Part Test narratives from engineering signals.",
       "acceptance": [
         "Generates 500-word project summary focused on Process of Experimentation",
         "Follows Four-Part Test structure (Hypothesis, Test, Failure, Iteration)",
@@ -18,8 +18,7 @@
         "Python 3.13 compatible"
       ],
       "files": [
-        "src/bulletproof_purple/generator.py",
-        "src/bulletproof_purple/server.py"
+        "src/bulletproof_purple/generator.py"
       ],
       "passes": false,
       "completed_at": null,
@@ -28,18 +27,18 @@
     },
     {
       "id": "STORY-002",
-      "title": "Create Purple Agent server",
-      "description": "Generate IRS Section 41 compliant Four-Part Test narratives from engineering signals. - Create Purple Agent server",
+      "title": "Implement Purple Agent A2A server",
+      "description": "A2A-compatible server exposing narrative generation via JSON-RPC 2.0 protocol.",
       "acceptance": [
-        "Generates 500-word project summary focused on Process of Experimentation",
-        "Follows Four-Part Test structure (Hypothesis, Test, Failure, Iteration)",
-        "Filters business risk from technical risk",
-        "Outputs structured narrative with technical uncertainty evidence",
-        "Template-based generation (data ingestion out of scope)",
-        "Python 3.13 compatible"
+        "A2A server on port 8000",
+        "AgentCard at /.well-known/agent-card.json",
+        "Exposes tasks/send method for receiving critique",
+        "Returns narrative in DataPart format",
+        "Proper error handling (JSON-RPC codes -32600 to -32001)",
+        "Task timeout handling (default 300s)",
+        "Python 3.13, a2a-sdk>=0.3.20, uvicorn>=0.38.0"
       ],
       "files": [
-        "src/bulletproof_purple/generator.py",
         "src/bulletproof_purple/server.py"
       ],
       "passes": false,
@@ -52,7 +51,7 @@
     {
       "id": "STORY-003",
       "title": "Implement rule-based evaluator",
-      "description": "Evaluate narratives against IRS Section 41 audit standards using rule-based detection. - Implement rule-based evaluator",
+      "description": "Evaluate narratives against IRS Section 41 audit standards using rule-based detection.",
       "acceptance": [
         "Detects \"Routine Engineering\" patterns",
         "Applies \"Business Component\" test",
@@ -64,9 +63,7 @@
         "Returns structured evaluation per Green-Agent-Metrics-Specification.md"
       ],
       "files": [
-        "src/bulletproof_green/evaluator.py",
-        "src/bulletproof_green/scorer.py",
-        "src/bulletproof_green/server.py"
+        "src/bulletproof_green/evaluator.py"
       ],
       "passes": false,
       "completed_at": null,
@@ -75,45 +72,39 @@
     },
     {
       "id": "STORY-004",
-      "title": "Implement scorer",
-      "description": "Evaluate narratives against IRS Section 41 audit standards using rule-based detection. - Implement scorer",
+      "title": "Implement Green Agent scorer",
+      "description": "Convert rule-based evaluation results into AgentBeats compatible scores.",
       "acceptance": [
-        "Detects \"Routine Engineering\" patterns",
-        "Applies \"Business Component\" test",
-        "Flags vague language without specific metrics",
-        "Requires citation of specific failure events",
-        "Outputs Risk Score (0-100) and Redline Markup",
-        "Rejects claims until Risk Score < 20",
-        "Deterministic rule-based scoring",
-        "Returns structured evaluation per Green-Agent-Metrics-Specification.md"
+        "Computes overall_score = (100 - risk_score) / 100",
+        "Computes component scores: correctness, safety, specificity, experimentation",
+        "Returns scores in 0.0-1.0 scale",
+        "Integrates with evaluator output",
+        "Handles edge cases (division by zero, invalid inputs)"
       ],
       "files": [
-        "src/bulletproof_green/evaluator.py",
-        "src/bulletproof_green/scorer.py",
-        "src/bulletproof_green/server.py"
+        "src/bulletproof_green/scorer.py"
       ],
       "passes": false,
       "completed_at": null,
       "content_hash": "0bac22a69cf83d3c55e174920b9009726eebe552c2fc5207a9b2bf5a20cc54ea",
-      "depends_on": []
+      "depends_on": [
+        "STORY-003"
+      ]
     },
     {
       "id": "STORY-005",
-      "title": "Create Green Agent server",
-      "description": "Evaluate narratives against IRS Section 41 audit standards using rule-based detection. - Create Green Agent server",
+      "title": "Implement Green Agent A2A server",
+      "description": "A2A-compatible evaluation server exposing scoring via JSON-RPC 2.0 protocol.",
       "acceptance": [
-        "Detects \"Routine Engineering\" patterns",
-        "Applies \"Business Component\" test",
-        "Flags vague language without specific metrics",
-        "Requires citation of specific failure events",
-        "Outputs Risk Score (0-100) and Redline Markup",
-        "Rejects claims until Risk Score < 20",
-        "Deterministic rule-based scoring",
-        "Returns structured evaluation per Green-Agent-Metrics-Specification.md"
+        "A2A server on port 8000",
+        "AgentCard at /.well-known/agent-card.json",
+        "Exposes tasks/send method for receiving narratives",
+        "Returns score in DataPart format",
+        "Integrates evaluator and scorer",
+        "Proper error handling and timeout management",
+        "Python 3.13, a2a-sdk>=0.3.20, uvicorn>=0.38.0"
       ],
       "files": [
-        "src/bulletproof_green/evaluator.py",
-        "src/bulletproof_green/scorer.py",
         "src/bulletproof_green/server.py"
       ],
       "passes": false,
@@ -126,20 +117,18 @@
     },
     {
       "id": "STORY-006",
-      "title": "Create A2A messenger",
-      "description": "Multi-turn orchestration where Green Agent iteratively refines Purple Agent narratives via A2A protocol. - Create A2A messenger",
+      "title": "Implement A2A client for inter-agent calls",
+      "description": "A2A client enabling Green Agent to call Purple Agent for narrative generation.",
       "acceptance": [
-        "Green agent accepts `mode=arena` parameter",
-        "Calls Purple Agent via A2A protocol for each iteration",
-        "Loop terminates when risk_score < target OR max_iterations reached",
-        "Returns ArenaResult with full iteration history",
-        "Configurable max_iterations (default: 5) and target_risk_score (default: 20)",
-        "A2A protocol integration",
-        "Each iteration includes: narrative, evaluation, critique"
+        "A2A client module with task send/receive",
+        "Discovers Purple Agent via agent-card.json",
+        "Sends narrative requests with context",
+        "Receives narrative responses",
+        "Handles task lifecycle (pending -> running -> completed)",
+        "Timeout and error handling"
       ],
       "files": [
-        "src/bulletproof_green/arena_executor.py",
-        "src/bulletproof_green/messenger.py"
+        "src/bulletproof_green/a2a_client.py"
       ],
       "passes": false,
       "completed_at": null,
@@ -151,44 +140,222 @@
     },
     {
       "id": "STORY-007",
-      "title": "Implement arena executor",
-      "description": "Multi-turn orchestration where Green Agent iteratively refines Purple Agent narratives via A2A protocol. - Implement arena executor",
+      "title": "Implement AgentCard discovery",
+      "description": "Enable agent-to-agent discovery via .well-known/agent-card.json endpoints.",
       "acceptance": [
-        "Green agent accepts `mode=arena` parameter",
-        "Calls Purple Agent via A2A protocol for each iteration",
-        "Loop terminates when risk_score < target OR max_iterations reached",
-        "Returns ArenaResult with full iteration history",
-        "Configurable max_iterations (default: 5) and target_risk_score (default: 20)",
-        "A2A protocol integration",
-        "Each iteration includes: narrative, evaluation, critique"
+        "Both agents expose /.well-known/agent-card.json",
+        "AgentCard contains capabilities, endpoints, name",
+        "Green Agent discovers Purple Agent AgentCard",
+        "JSON schema validation",
+        "Caching for performance"
       ],
       "files": [
-        "src/bulletproof_green/arena_executor.py",
-        "src/bulletproof_green/messenger.py"
+        "src/bulletproof_purple/agent_card.py",
+        "src/bulletproof_green/agent_card.py"
       ],
       "passes": false,
       "completed_at": null,
       "content_hash": "1d73f95de8a22b0c7db892019a46624d96967c1a6a83d34f394ad4b6e01c5fa5",
       "depends_on": [
-        "STORY-006"
+        "STORY-002",
+        "STORY-005"
       ]
     },
     {
       "id": "STORY-008",
-      "title": "Implement LLM judge",
-      "description": "Combine rule-based and LLM-based evaluation for reproducible scores with semantic understanding. - Implement LLM judge",
+      "title": "Create ground truth dataset",
+      "description": "Curate labeled dataset of narratives for benchmark validation.",
       "acceptance": [
-        "Rule-based evaluation remains deterministic",
-        "LLM-as-Judge provides semantic analysis with chain-of-thought reasoning",
-        "Combined scoring: final_score = alpha*rule_score + beta*llm_score",
+        "10+ labeled narratives (minimum for Phase 1)",
+        "Mix of qualifying (Risk Score < 20) and non-qualifying narratives",
+        "Covers failure patterns: vague language, business risk, routine engineering",
+        "Difficulty tiers: Easy (obvious), Medium (subtle), Hard (edge cases)",
+        "JSON format with human-readable annotations",
+        "Each entry: narrative, expected_score, classification, annotations",
+        "Anonymized to protect confidentiality"
+      ],
+      "files": [
+        "data/ground_truth.json"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "91bc778a0e16b7c00342e0ce1de170757502469bcf1833c6f07e51428dd6739e",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-009",
+      "title": "Implement benchmark validation script",
+      "description": "Validate ground truth dataset and measure benchmark performance.",
+      "acceptance": [
+        "Loads ground_truth.json",
+        "Runs Green Agent on each narrative",
+        "Compares actual vs expected scores",
+        "Computes accuracy metrics (precision, recall, F1)",
+        "Generates report with pass/fail per difficulty tier",
+        "Identifies gaps and improvement areas"
+      ],
+      "files": [
+        "src/validate_benchmark.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "877f8a91e687394b145b371b0324609a0f95c192d306dcc73e0d838879b94378",
+      "depends_on": [
+        "STORY-008"
+      ]
+    },
+    {
+      "id": "STORY-010",
+      "title": "Create Dockerfiles",
+      "description": "Package agents as Docker images for AgentBeats platform.",
+      "acceptance": [
+        "Platform: linux/amd64",
+        "Base: Python 3.13-slim",
+        "Exposes port 8000",
+        "ENTRYPOINT with --host, --port arguments",
+        "No hardcoded secrets (env vars only)",
+        "Multi-stage build for smaller images",
+        "uv for fast dependency management",
+        "Both bulletproof-purple and bulletproof-green images"
+      ],
+      "files": [
+        "Dockerfile.purple",
+        "Dockerfile.green"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "49a98b8db95314c6a337207316ee6eaffbe439504289ae035ecbe93ddf86c562",
+      "depends_on": [
+        "STORY-002",
+        "STORY-005"
+      ]
+    },
+    {
+      "id": "STORY-011",
+      "title": "Create docker-compose.yml",
+      "description": "Orchestrate local testing of both agents in Docker network.",
+      "acceptance": [
+        "Defines both purple and green services",
+        "Agents can reach each other via service name",
+        "Port mapping: 8001 (purple), 8002 (green) to host",
+        "Environment variables for configuration",
+        "Passes docker-compose up local test",
+        "Clean state on each run"
+      ],
+      "files": [
+        "docker-compose.yml"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "abc123def456",
+      "depends_on": [
+        "STORY-010"
+      ]
+    },
+    {
+      "id": "STORY-012",
+      "title": "Create GHCR workflow",
+      "description": "Publish Docker images to GitHub Container Registry.",
+      "acceptance": [
+        "GitHub Actions workflow on push/tag",
+        "Builds: ghcr.io/<org>/bulletproof-green:latest",
+        "Builds: ghcr.io/<org>/bulletproof-purple:latest",
+        "Semantic version tags (v1.0.0, v1.0.1, etc)",
+        "Package visibility: public",
+        "GITHUB_TOKEN with packages:write scope",
+        "docker/build-push-action@v5"
+      ],
+      "files": [
+        ".github/workflows/docker-build-push.yml"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "264990d4e650f0da94d8566738ba9b5c2faa1e245c1b46d28d5c4bda84696228",
+      "depends_on": [
+        "STORY-010"
+      ]
+    },
+    {
+      "id": "STORY-013",
+      "title": "Register agents on agentbeats.dev",
+      "description": "Register both agents on the AgentBeats platform.",
+      "acceptance": [
+        "Green agent registered -> agentbeats_id obtained",
+        "Purple agent registered -> agentbeats_id obtained",
+        "scenario.toml configured with production IDs",
+        "Platform validates AgentCard endpoints",
+        "Platform can pull and run Docker images from GHCR"
+      ],
+      "files": [
+        "scenario.toml"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "691a24fa549aaac36105b43078e102466b561aae5b422318eabe180bed7a60e0",
+      "depends_on": [
+        "STORY-012"
+      ]
+    },
+    {
+      "id": "STORY-014",
+      "title": "Write abstract and demo video",
+      "description": "Prepare submission materials for AgentBeats competition.",
+      "acceptance": [
+        "Abstract (300 words) in ABSTRACT.md",
+        "Explains problem: IRS Section 41 evaluation complexity",
+        "Describes solution: adversarial agent benchmark",
+        "Highlights innovation: legal domain gap, practical use",
+        "3-minute demo video showcasing agents in action",
+        "Video demonstrates: narrative generation, evaluation, scoring"
+      ],
+      "files": [
+        "ABSTRACT.md"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "def789ghi012",
+      "depends_on": [
+        "STORY-013"
+      ]
+    },
+    {
+      "id": "STORY-015",
+      "title": "Implement Arena Mode orchestration",
+      "description": "Multi-turn adversarial loop for iterative narrative improvement.",
+      "acceptance": [
+        "Green agent accepts mode=arena parameter",
+        "Calls Purple agent via A2A tasks/send for each iteration",
+        "Purple agent receives critique and regenerates",
+        "Loop terminates when risk_score < target OR max_iterations reached",
+        "Returns ArenaResult with full iteration history",
+        "Configurable: max_iterations (default: 5), target_risk_score (default: 20)",
+        "Task state tracking per iteration"
+      ],
+      "files": [
+        "src/bulletproof_green/arena_executor.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "ee9480906340e30919e3bcbbac2b902a1d0a917df6458d0eb34115c7fcec395b",
+      "depends_on": [
+        "STORY-006"
+      ]
+    },
+    {
+      "id": "STORY-016",
+      "title": "Implement LLM-as-Judge",
+      "description": "Combine rule-based and LLM evaluation for semantic understanding.",
+      "acceptance": [
+        "Rule-based evaluation remains deterministic (primary)",
+        "LLM-as-Judge provides semantic analysis (secondary)",
+        "Combined: final_score = α*rule_score + β*llm_score",
         "Fallback to rule-only if LLM unavailable",
         "LLM uses temperature=0 for consistency",
-        "OpenAI GPT-4 for LLM judge",
+        "OpenAI GPT-4 or equivalent",
         "Graceful degradation when LLM unavailable"
       ],
       "files": [
-        "src/bulletproof_green/llm_judge.py",
-        "src/bulletproof_green/evaluator.py"
+        "src/bulletproof_green/llm_judge.py"
       ],
       "passes": false,
       "completed_at": null,
@@ -198,47 +365,25 @@
       ]
     },
     {
-      "id": "STORY-009",
-      "title": "Create ground truth dataset",
-      "description": "Labeled dataset of narratives for benchmark validation and training. - Create ground truth dataset",
+      "id": "STORY-017",
+      "title": "Expand ground truth dataset to 20+",
+      "description": "Scale ground truth with more diverse narratives and difficulty tiers.",
       "acceptance": [
-        "20+ labeled narratives with expected scores",
-        "Mix of passing (Risk Score < 20) and failing narratives",
-        "Covers common failure patterns (vague language, business risk, routine engineering)",
-        "Anonymized to protect client confidentiality",
-        "JSON format for machine readability",
-        "Human-readable annotations"
+        "20+ labeled narratives (Phase 2 target)",
+        "Even distribution across difficulty tiers",
+        "Additional edge cases and pattern variations",
+        "Updated JSON schema with new fields",
+        "Covers Phase 2 evaluation scenarios",
+        "Anonymized and reviewed for accuracy"
       ],
       "files": [
-        "data/ground_truth.json",
-        "src/validate_benchmark.py"
+        "data/ground_truth.json"
       ],
       "passes": false,
       "completed_at": null,
-      "content_hash": "91bc778a0e16b7c00342e0ce1de170757502469bcf1833c6f07e51428dd6739e",
-      "depends_on": []
-    },
-    {
-      "id": "STORY-010",
-      "title": "Implement benchmark validator",
-      "description": "Labeled dataset of narratives for benchmark validation and training. - Implement benchmark validator",
-      "acceptance": [
-        "20+ labeled narratives with expected scores",
-        "Mix of passing (Risk Score < 20) and failing narratives",
-        "Covers common failure patterns (vague language, business risk, routine engineering)",
-        "Anonymized to protect client confidentiality",
-        "JSON format for machine readability",
-        "Human-readable annotations"
-      ],
-      "files": [
-        "data/ground_truth.json",
-        "src/validate_benchmark.py"
-      ],
-      "passes": false,
-      "completed_at": null,
-      "content_hash": "877f8a91e687394b145b371b0324609a0f95c192d306dcc73e0d838879b94378",
+      "content_hash": "28e7ffe3e1a513aee7d330c695ddc9d91a72d9d8a30c7442aea024e4d285e34b",
       "depends_on": [
-        "STORY-009"
+        "STORY-008"
       ]
     }
   ]
