@@ -25,7 +25,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source libraries
-source "$SCRIPT_DIR/lib/generate_app_docs.sh"
+source "$SCRIPT_DIR/lib/common.sh"
 
 # Configuration
 MAX_ITERATIONS=${1:-10}
@@ -34,17 +34,6 @@ PROGRESS_FILE="ralph/docs/progress.txt"
 PROMPT_FILE="ralph/docs/templates/prompt.md"
 BRANCH_PREFIX="ralph/story-"
 MAX_RETRIES=3
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Logging functions
-log_info() { echo -e "${GREEN}[INFO]${NC} $1" >&2; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1" >&2; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
 
 # Validate environment
 validate_environment() {
@@ -162,7 +151,8 @@ run_quality_checks() {
     fi
 }
 
-# Check that TDD commits were made during story execution# Verifies: at least 2 commits, [RED] and [GREEN] markers, correct order
+# Check that TDD commits were made during story execution
+# Verifies: at least 2 commits, [RED] and [GREEN] markers, correct order
 check_tdd_commits() {
     local story_id="$1"
     local commits_before="$2"
@@ -267,15 +257,9 @@ main() {
                 log_progress "$iteration" "$story_id" "PASS" "Completed successfully with TDD commits"
                 log_info "Story $story_id marked as PASSING"
 
-                # Generate/update application documentation
-                local app_readme=$(generate_app_readme)
-                local app_example=$(generate_app_example)
-
-                # Commit state files (prd.json, progress.txt, README.md, example.py)
+                # Commit state files
                 log_info "Committing state files..."
                 git add "$PRD_JSON" "$PROGRESS_FILE"
-                [ -n "$app_readme" ] && git add "$app_readme"
-                [ -n "$app_example" ] && git add "$app_example"
                 git commit -m "chore: Update Ralph state after completing $story_id" || log_warn "No state changes to commit"
             else
                 log_warn "Story completed but quality checks failed"

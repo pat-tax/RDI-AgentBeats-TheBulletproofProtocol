@@ -106,30 +106,24 @@ def parse_features(prd_content: str) -> dict[int, Feature]:
             "files": files,
         }
 
-        # Special handling for Feature 5 sub-features (##### headings)
-        if feature_num == 5:
-            sub_features = parse_feature5_subfeatures(feature_content)
+        # Parse sub-features for features with ##### headings
+        if feature_num in (5, 10):
+            sub_features = parse_subfeatures(feature_content)
             if sub_features:
-                features[5]["sub_features"] = sub_features
-
-        # Special handling for Feature 10 sub-features (##### headings)
-        if feature_num == 10:
-            sub_features = parse_feature10_subfeatures(feature_content)
-            if sub_features:
-                features[10]["sub_features"] = sub_features
+                features[feature_num]["sub_features"] = sub_features
 
     return features
 
 
-def parse_feature5_subfeatures(feature_content: str) -> dict[str, dict]:
+def parse_subfeatures(feature_content: str) -> dict[str, dict]:
     """
-    Parse sub-features from Feature 5 (e.g., 5.1, 5.2, 5.3, 5.4).
+    Parse sub-features from feature content (e.g., 5.1, 5.2, 10.1, 10.2).
 
-    Returns dict mapping sub-feature name → {acceptance, files}
+    Returns dict mapping sub-feature name → {number, acceptance, files}
     """
     sub_features = {}
 
-    # Pattern for ##### 5.N Sub-feature Name
+    # Pattern for ##### N.N Sub-feature Name
     sub_feature_pattern = r"##### (\d+\.\d+) ([^\n]+)\s*\n(.*?)(?=\n#####|\Z)"
 
     for match in re.finditer(sub_feature_pattern, feature_content, re.DOTALL):
@@ -157,7 +151,7 @@ def parse_feature5_subfeatures(feature_content: str) -> dict[str, dict]:
                 file_match = re.search(r"`([^`]+)`", line)
                 if file_match:
                     file_path = file_match.group(1).split(" - ")[0].strip()
-                    # Remove " (extend)" suffix
+                    # Remove suffixes like "(extend)", "(verify/extend)", "(CREATE)"
                     file_path = re.sub(r"\s*\([^)]+\)\s*$", "", file_path)
                     files.append(file_path)
 
@@ -166,108 +160,40 @@ def parse_feature5_subfeatures(feature_content: str) -> dict[str, dict]:
     return sub_features
 
 
-def parse_feature10_subfeatures(feature_content: str) -> dict[str, dict]:
-    """
-    Parse sub-features from Feature 10 (10.1, 10.2, 10.3).
-
-    Returns dict mapping sub-feature name → {acceptance, files}
-    """
-    sub_features = {}
-
-    # Pattern for ##### 10.N Sub-feature Name
-    sub_feature_pattern = r"##### (\d+\.\d+) ([^\n]+)\s*\n(.*?)(?=\n#####|\Z)"
-
-    for match in re.finditer(sub_feature_pattern, feature_content, re.DOTALL):
-        sub_num = match.group(1)
-        sub_name = match.group(2).strip()
-        sub_content = match.group(3)
-
-        # Extract acceptance criteria
-        acceptance = []
-        acceptance_match = re.search(
-            r"\*\*Acceptance Criteria\*\*:\s*\n((?:- \[[x ]\][^\n]+\n)+)", sub_content, re.DOTALL
-        )
-        if acceptance_match:
-            for line in acceptance_match.group(1).split("\n"):
-                if line.strip().startswith("- ["):
-                    criterion = re.sub(r"^- \[[x ]\]\s*", "", line.strip())
-                    if criterion:
-                        acceptance.append(criterion)
-
-        # Extract files
-        files = []
-        files_match = re.search(r"\*\*Files\*\*:\s*\n((?:- `[^`]+`[^\n]*\n)+)", sub_content)
-        if files_match:
-            for line in files_match.group(1).split("\n"):
-                file_match = re.search(r"`([^`]+)`", line)
-                if file_match:
-                    file_path = file_match.group(1).split(" - ")[0].strip()
-                    # Remove comments like "(verify/extend)" or "(CREATE)"
-                    file_path = re.sub(r"\s*\([^)]+\)\s*$", "", file_path)
-                    files.append(file_path)
-
-        sub_features[sub_name] = {"number": sub_num, "acceptance": acceptance, "files": files}
-
-    return sub_features
+# Keyword mappings for matching story titles to sub-features
+SUBFEATURE_KEYWORDS: dict[int, list[tuple[list[str], str]]] = {
+    # Feature 5: (story_keywords, sub_feature_keyword)
+    5: [
+        (["trivial"], "trivial"),
+        (["statistical"], "statistical"),
+        (["held-out", "test set"], "contamination"),
+        (["limitations"], "flaw"),
+    ],
+    # Feature 10: (story_keywords, sub_feature_keyword)
+    10: [
+        (["a2a", "task"], "a2a"),
+        (["docker", "parameter"], "docker"),
+        (["task isolation"], "isolation"),
+    ],
+}
 
 
-def match_feature5_story_to_subfeature(
-    story_title: str, sub_features: dict[str, dict]
+def match_story_to_subfeature(
+    story_title: str, sub_features: dict[str, dict], feature_num: int
 ) -> dict | None:
-    """
-    Match a Feature 5 story title to its corresponding sub-feature.
+    """Match a story title to its corresponding sub-feature using keyword mapping."""
+    if feature_num not in SUBFEATURE_KEYWORDS:
+        return None
 
-    Mapping:
-    - "Trivial agent baseline" → "Trivial Agent Baseline (ABC R.13)"
-    - "Statistical rigor" → "Statistical Rigor (ABC R.10)"
-    - "Held-out test set" → "Data Contamination Prevention (ABC R.3)"
-    - "Limitations doc" → "Flaw Documentation (ABC R.7-9)"
-    """
     title_lower = story_title.lower()
 
-    # Match keywords from story title to sub-feature names
     for sub_name, sub_data in sub_features.items():
         sub_name_lower = sub_name.lower()
 
-        # Check for specific keyword matches (both title AND sub-name must match)
-        if "trivial" in title_lower and "trivial" in sub_name_lower:
-            return sub_data
-        elif "statistical" in title_lower and "statistical" in sub_name_lower:
-            return sub_data
-        elif (
-            "held-out" in title_lower or "test set" in title_lower
-        ) and "contamination" in sub_name_lower:
-            return sub_data
-        elif "limitations" in title_lower and "flaw" in sub_name_lower:
-            return sub_data
-
-    return None
-
-
-def match_feature10_story_to_subfeature(
-    story_title: str, sub_features: dict[str, dict]
-) -> dict | None:
-    """
-    Match a Feature 10 story title to its corresponding sub-feature.
-
-    Mapping:
-    - "A2A task updates" → "A2A Task Updates (Streaming Logs)"
-    - "Docker parameters" → "Docker ENTRYPOINT Parameters"
-    - "Task isolation" → "Task Isolation (Namespacing)"
-    """
-    title_lower = story_title.lower()
-
-    # Match keywords from story title to sub-feature names
-    for sub_name, sub_data in sub_features.items():
-        sub_name_lower = sub_name.lower()
-
-        # Check for specific keyword matches
-        if "a2a" in title_lower and "task" in title_lower and "a2a" in sub_name_lower:
-            return sub_data
-        elif "docker" in title_lower and "parameter" in title_lower and "docker" in sub_name_lower:
-            return sub_data
-        elif "task isolation" in title_lower and "isolation" in sub_name_lower:
-            return sub_data
+        for story_keywords, sub_keyword in SUBFEATURE_KEYWORDS[feature_num]:
+            # Check if all story keywords match title AND sub_keyword matches sub_name
+            if all(kw in title_lower for kw in story_keywords) and sub_keyword in sub_name_lower:
+                return sub_data
 
     return None
 
@@ -345,37 +271,19 @@ def apply_story_breakdown(
         if feature_num in breakdown:
             # Use explicit breakdown
             for spec in breakdown[feature_num]:
-                # Special handling for Feature 5 - match stories to sub-features
-                if feature_num == 5 and "sub_features" in feature:
-                    sub_feature = match_feature5_story_to_subfeature(
-                        spec["title"], feature["sub_features"]
+                # Try to match story to sub-feature if available
+                sub_feature = None
+                if "sub_features" in feature:
+                    sub_feature = match_story_to_subfeature(
+                        spec["title"], feature["sub_features"], feature_num
                     )
-                    if sub_feature:
-                        acceptance = sub_feature["acceptance"]
-                        files = sub_feature["files"]
-                    else:
-                        # Fallback to feature-level acceptance/files
-                        acceptance = feature["acceptance"]
-                        files = spec.get("files", []) or feature["files"]
-                # Special handling for Feature 10 - match stories to sub-features
-                elif feature_num == 10 and "sub_features" in feature:
-                    sub_feature = match_feature10_story_to_subfeature(
-                        spec["title"], feature["sub_features"]
-                    )
-                    if sub_feature:
-                        acceptance = sub_feature["acceptance"]
-                        files = sub_feature["files"]
-                    else:
-                        # Fallback to feature-level acceptance/files
-                        acceptance = feature["acceptance"]
-                        files = spec.get("files", []) or feature["files"]
-                else:
-                    # Smart acceptance filtering:
-                    # - If title mentions specific component, filter for that
-                    # - Otherwise use all acceptance criteria
-                    acceptance = feature["acceptance"]
 
-                    # Filter files if spec has specific files, otherwise use feature files
+                if sub_feature:
+                    acceptance = sub_feature["acceptance"]
+                    files = sub_feature["files"]
+                else:
+                    # Fallback to feature-level acceptance/files
+                    acceptance = feature["acceptance"]
                     files = spec.get("files", []) or feature["files"]
 
                 content_hash = compute_hash(spec["title"], feature["description"], acceptance)
@@ -609,12 +517,11 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
 
 
 def main():
-    # Paths
-    prd_path = Path("/workspaces/RDI-AgentBeats-TheBulletproofProtocol/docs/PRD.md")
-    existing_prd_json_path = Path(
-        "/workspaces/RDI-AgentBeats-TheBulletproofProtocol/ralph/docs/prd.json"
-    )
-    output_path = Path("/workspaces/RDI-AgentBeats-TheBulletproofProtocol/ralph/docs/prd.json")
+    # Paths (relative to project root)
+    project_root = Path(__file__).parent.parent.parent
+    prd_path = project_root / "docs" / "PRD.md"
+    existing_prd_json_path = project_root / "ralph" / "docs" / "prd.json"
+    output_path = project_root / "ralph" / "docs" / "prd.json"
 
     # Check PRD.md exists
     if not prd_path.exists():
