@@ -289,8 +289,8 @@
       "files": [
         "scenario.toml"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-25T19:10:00Z",
       "content_hash": "691a24fa549aaac36105b43078e102466b561aae5b422318eabe180bed7a60e0",
       "depends_on": [
         "STORY-012"
