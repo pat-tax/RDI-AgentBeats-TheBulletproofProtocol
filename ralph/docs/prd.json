@@ -379,8 +379,8 @@
       "files": [
         "data/ground_truth.json"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-25T19:28:24Z",
       "content_hash": "28e7ffe3e1a513aee7d330c695ddc9d91a72d9d8a30c7442aea024e4d285e34b",
       "depends_on": [
         "STORY-008"
