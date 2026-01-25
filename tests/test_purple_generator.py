@@ -9,9 +9,8 @@ This test module validates the acceptance criteria for STORY-001:
 - Python 3.13 compatible
 """
 
-import pytest
 
-from bulletproof_purple.generator import NarrativeGenerator, Narrative
+from bulletproof_purple.generator import Narrative, NarrativeGenerator
 
 
 class TestNarrativeWordCount:
@@ -56,8 +55,7 @@ class TestFourPartTestStructure:
 
         text_lower = narrative.text.lower()
         assert any(
-            term in text_lower
-            for term in ["experiment", "test", "evaluate", "trial", "prototype"]
+            term in text_lower for term in ["experiment", "test", "evaluate", "trial", "prototype"]
         ), "Narrative should include experimentation activities"
 
     def test_includes_failure_section(self):

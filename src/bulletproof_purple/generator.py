@@ -161,7 +161,14 @@ and provides a foundation for future development efforts in this area.""",
         template = self.TEMPLATES.get(template_type, self.TEMPLATES["qualifying"])
 
         sections = []
-        for key in ["intro", "hypothesis", "experimentation", "failures", "iteration", "conclusion"]:
+        for key in [
+            "intro",
+            "hypothesis",
+            "experimentation",
+            "failures",
+            "iteration",
+            "conclusion",
+        ]:
             section_text = template[key].format(**effective_signals)
             sections.append(section_text)
 
@@ -202,26 +209,30 @@ identify remaining uncertainties requiring resolution.
 """
         return padding_template.format(**signals).strip()
 
-    def _extract_technical_uncertainties(
-        self, signals: dict, template_type: str
-    ) -> list[str]:
+    def _extract_technical_uncertainties(self, signals: dict, template_type: str) -> list[str]:
         """Extract technical uncertainty evidence from signals and template type."""
         uncertainties = []
 
         if template_type == "qualifying":
-            uncertainties.extend([
-                f"Uncertainty in {signals['technology']} performance characteristics",
-                f"Unknown solution approach for {signals['challenge']}",
-                "Unpredictable interaction between system components",
-            ])
+            uncertainties.extend(
+                [
+                    f"Uncertainty in {signals['technology']} performance characteristics",
+                    f"Unknown solution approach for {signals['challenge']}",
+                    "Unpredictable interaction between system components",
+                ]
+            )
         elif template_type == "non_qualifying":
-            uncertainties.extend([
-                "Standard implementation with predictable outcomes",
-            ])
+            uncertainties.extend(
+                [
+                    "Standard implementation with predictable outcomes",
+                ]
+            )
         else:  # edge_case
-            uncertainties.extend([
-                f"Partial uncertainty in {signals['technology']} adaptation",
-                "Integration challenges with existing systems",
-            ])
+            uncertainties.extend(
+                [
+                    f"Partial uncertainty in {signals['technology']} adaptation",
+                    "Integration challenges with existing systems",
+                ]
+            )
 
         return uncertainties
