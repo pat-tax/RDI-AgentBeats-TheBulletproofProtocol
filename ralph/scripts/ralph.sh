@@ -3,7 +3,6 @@
 # Ralph Loop - Autonomous iteration script
 #
 # Usage: ./ralph/scripts/ralph.sh [MAX_ITERATIONS]
-#        make ralph_run [ITERATIONS=25]
 #
 # This script orchestrates autonomous task execution by:
 # 1. Reading prd.json for incomplete stories
@@ -28,7 +27,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.sh"
 
 # Configuration
-MAX_ITERATIONS=${1:-10}
+RALPH_MODEL=${RALPH_MODEL:-"sonnet"}  # Model: sonnet, opus, haiku
+MAX_ITERATIONS=${MAX_ITERATIONS:-10}
 PRD_JSON="ralph/docs/prd.json"
 PROGRESS_FILE="ralph/docs/progress.txt"
 PROMPT_FILE="ralph/docs/templates/prompt.md"
@@ -137,7 +137,7 @@ execute_story() {
 
     # Execute via Claude Code
     log_info "Running Claude Code with story context..."
-    if cat "$iteration_prompt" | claude -p --dangerously-skip-permissions; then
+    if cat "$iteration_prompt" | claude -p --dangerously-skip-permissions --model "$RALPH_MODEL"; then
         rm "$iteration_prompt"
         return 0
     else
@@ -201,7 +201,7 @@ check_tdd_commits() {
 
 # Main loop
 main() {
-    log_info "Starting Ralph Loop (max iterations: $MAX_ITERATIONS)"
+    log_info "Starting Ralph Loop (max iterations: $MAX_ITERATIONS, model: $RALPH_MODEL)"
 
     validate_environment
 

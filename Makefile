@@ -113,10 +113,9 @@ ralph_init:  ## Initialize Ralph loop environment
 	echo "Initializing Ralph loop environment ..."
 	bash ralph/scripts/init.sh
 
-ralph_run:  ## Run Ralph autonomous development loop (use ITERATIONS=N to set max iterations)
+ralph_run:  ## Run Ralph autonomous development loop (MAX_ITERATIONS=N, MODEL=sonnet|opus|haiku)
 	echo "Starting Ralph loop ..."
-	ITERATIONS=$${ITERATIONS:-25}
-	bash ralph/scripts/ralph.sh $$ITERATIONS
+	RALPH_MODEL=$(MODEL) MAX_ITERATIONS=$(MAX_ITERATIONS) bash ralph/scripts/ralph.sh
 
 ralph_status:  ## Show Ralph loop progress and status
 	echo "Ralph Loop Status"
