@@ -1,5 +1,5 @@
 ---
-name: commit-with-message
+name: commit-staged-with-message
 description: Generate commit message for staged changes, pause for approval, then commit. Stage files first with `git add`, then run this skill.
 model: haiku
 argument-hint: (no arguments needed)
@@ -7,7 +7,7 @@ disable-model-invocation: true
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
-# Commit with Generated Message
+# Commit staged with Generated Message
 
 ## Git Context
 
