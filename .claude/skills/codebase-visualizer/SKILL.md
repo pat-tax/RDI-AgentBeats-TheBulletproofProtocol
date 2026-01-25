@@ -1,6 +1,8 @@
 ---
 name: codebase-visualizer
 description: Generate an interactive collapsible tree visualization of your codebase. Use when exploring a new repo, understanding project structure, or identifying large files.
+model: haiku
+disable-model-invocation: true
 allowed-tools: Bash(python:*)
 ---
 
@@ -13,7 +15,7 @@ Generate an interactive HTML tree view that shows your project's file structure 
 Run the visualization script from your project root:
 
 ```bash
-python .claude/scripts/visualize_codebase_to_html.py .
+python .claude/skills/codebase-visualizer/scripts/visualize.py .
 ```
 
 This creates `codebase-map.html` in the current directory.

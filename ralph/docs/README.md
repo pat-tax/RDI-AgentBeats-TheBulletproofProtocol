@@ -70,9 +70,25 @@ Source: [ACE-FCA](https://github.com/humanlayer/advanced-context-engineering-for
 
 OS-level isolation for safer autonomous execution.
 
+**Why:** Reduces approval fatigue and enables autonomy. Instead of approving every bash command, sandboxing creates defined boundaries where Claude can work freely.
+
+**How:** Uses OS primitives (bubblewrap on Linux/WSL2, Seatbelt on macOS) for:
+
+- **Filesystem isolation** - Write access limited to working directory; system files protected
+- **Network isolation** - Only approved domains accessible; blocks data exfiltration
+
+**What it protects against:**
+
+- Prompt injection attacks
+- Malicious dependencies (npm packages with harmful code)
+- Compromised build scripts
+- Unauthorized API calls or data exfiltration
+
 ```bash
 make setup_sandbox  # Install bubblewrap + socat (Linux/WSL2)
 ```
+
+Enable via `/sandbox` command in Claude Code. Configure in `settings.json`.
 
 Source: [Claude Code Sandboxing](https://code.claude.com/docs/en/sandboxing)
 
@@ -80,6 +96,42 @@ Source: [Claude Code Sandboxing](https://code.claude.com/docs/en/sandboxing)
 
 - `.claude/skills/` - Agent capabilities (generating-prd, researching-codebase)
 - `.claude/rules/` - Behavioral guidelines (core-principles, context-management)
+
+**Skills vs Commands:** Custom slash commands have been merged into skills. A file at `.claude/commands/review.md` and a skill at `.claude/skills/review/SKILL.md` both create `/review` and work the same way. Existing `.claude/commands/` files keep working. Skills add optional features:
+
+- Directory for supporting files (templates, examples, scripts)
+- Frontmatter to control invocation (`disable-model-invocation`, `user-invocable`)
+- Ability for Claude to auto-load when relevant
+- `context: fork` for subagent execution
+
+### Advanced Skill Patterns
+
+Skills support dynamic context injection via shell command preprocessing:
+
+```yaml
+---
+name: pr-summary
+context: fork
+agent: Explore
+---
+## Context
+- PR diff: !`gh pr diff`
+- Changed files: !`gh pr diff --name-only`
+
+Summarize this pull request...
+```
+
+**Dynamic content:** The `!`command`` syntax executes before Claude receives the prompt, replacing placeholders with live output. Useful for injecting git status, test results, or API responses.
+
+**Subagent execution:** Use `context: fork` to run skills in isolated subagent context. Available built-in agents:
+
+| Agent | Model | Tools | Use Case |
+|-------|-------|-------|----------|
+| `Explore` | Haiku (fast) | Read-only | Codebase search, file discovery |
+| `Plan` | Inherited | Read-only | Research for planning |
+| `general-purpose` | Inherited | All | Complex multi-step tasks |
+
+Source: [Claude Code Skills](https://code.claude.com/docs/en/skills#advanced-patterns), [Subagents](https://code.claude.com/docs/en/sub-agents#built-in-subagents)
 
 ---
 
@@ -92,6 +144,10 @@ See [TEMPLATE_USAGE.md](TEMPLATE_USAGE.md) for setup and commands reference.
 **Ralph runs with `--dangerously-skip-permissions`** - all operations execute without approval.
 
 **Only use in:** Isolated environments (DevContainers, VMs).
+
+### Devcontainer Firewall (Optional)
+
+For enhanced network security, adopt Claude Code's [reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer) which includes an iptables firewall with default-deny policy. Requires custom Dockerfile with `NET_ADMIN`/`NET_RAW` capabilities. See [devcontainer docs](https://code.claude.com/docs/en/devcontainer).
 
 ## Workflow
 
@@ -113,3 +169,11 @@ ralph/
     ├── ralph.sh            # Orchestration script
     └── generate_prd_json.py
 ```
+
+---
+
+## TODO
+
+- [ ] Adopt devcontainer firewall from Claude Code reference implementation
+- [ ] Document sandbox usage patterns for Ralph execution
+- [ ] Use `!` dynamic content in skills for live context injection (git status, test results)
