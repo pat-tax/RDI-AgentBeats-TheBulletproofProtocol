@@ -211,15 +211,15 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
         ]
     }
     """
-    # Find the "Story Breakdown - Phase 2" section
+    # Find the "Story Breakdown" section (any phase)
     breakdown_match = re.search(
-        r"Story Breakdown - Phase 2.*?\((\d+) stories.*?\):\s*\n(.*?)(?=\d+\.|###|##|\Z)",
+        r"Story Breakdown[^\n]*\((\d+) stories[^\n]*\):\s*\n(.*?)(?=\d+\.|###|##|\Z)",
         prd_content,
         re.DOTALL,
     )
 
     if not breakdown_match:
-        print("Warning: Could not find 'Story Breakdown - Phase 2' section")
+        print("Warning: Could not find 'Story Breakdown' section")
         return {}
 
     breakdown_text = breakdown_match.group(2)
