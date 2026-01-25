@@ -40,7 +40,7 @@ make validate
 python src/validate_benchmark.py
 ```
 
-For Ralph Loop autonomous development, see [ralph/docs/README.md](ralph/docs/README.md).
+For Ralph Loop autonomous development, see [ralph/README.md](ralph/README.md).
 
 ## GHCR Deployment
 
@@ -160,7 +160,7 @@ Before submitting, ensure all deliverables are complete:
   - `docs/Abstract.md` (≤500 words describing benchmark methodology)
   - `README.md` (this file) with usage instructions
   - `docs/AgentBeats/AGENTBEATS_REGISTRATION.md` (registration guide)
-  - `ralph/docs/README.md` (Ralph Loop documentation)
+  - `ralph/README.md` (Ralph Loop documentation)
 
 - [ ] **AgentBeats Platform Registration**
   - [ ] Sign up at [agentbeats.dev](https://agentbeats.dev)
@@ -208,7 +208,7 @@ docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
 - **Phase 1 Submission**: [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7)
 - **Registration Guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
 - **Abstract**: [docs/Abstract.md](docs/Abstract.md)
-- **Ralph Loop**: [ralph/docs/README.md](ralph/docs/README.md)
+- **Ralph Loop**: [ralph/README.md](ralph/README.md)
 
 ## Contributing
 
