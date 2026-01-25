@@ -17,3 +17,45 @@ Validation against a 20-case ground truth dataset demonstrates 100% accuracy and
 A 3-minute demo video showcases the complete workflow: narrative generation by the purple agent, evaluation and scoring by the green agent, and the adversarial improvement loop. The video demonstrates agent discovery, task execution, and risk score computation.
 
 Docker images are publicly available on GitHub Container Registry for reproducible deployment.
+
+---
+
+## Demo Video Recording Guide
+
+A 3-minute demo video is required for submission. Record the following workflow:
+
+### Setup (30 seconds)
+
+```bash
+docker-compose up -d
+curl http://localhost:8001/.well-known/agent-card.json  # Green agent
+curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
+```
+
+### Narrative Generation (60 seconds)
+
+Show the purple agent generating an R&D narrative:
+- Explain Four-Part Test structure (Hypothesis, Test, Failure, Iteration)
+- Show technical uncertainty documentation
+- Display structured narrative output
+
+### Evaluation and Scoring (60 seconds)
+
+Demonstrate green agent evaluation:
+- Rule-based detection (routine engineering, vagueness, business risk)
+- Component scoring breakdown (correctness, safety, specificity, experimentation)
+- Risk Score computation (0-100 scale)
+- Binary classification (QUALIFYING/NON_QUALIFYING)
+
+### Agent Communication (30 seconds)
+
+Show A2A protocol interaction:
+- AgentCard discovery
+- JSON-RPC 2.0 task execution
+- Reproducible, deterministic scoring
+
+### Recommended Tools
+
+- Screen recording: OBS Studio, Loom, or macOS built-in
+- Terminal: Use clear, readable font (14pt+)
+- Resolution: 1080p minimum

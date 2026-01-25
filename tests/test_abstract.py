@@ -22,15 +22,21 @@ def test_abstract_exists():
 
 
 def test_abstract_word_count():
-    """Test that ABSTRACT.md is approximately 300 words (250-350 range)."""
+    """Test that abstract section is approximately 300 words (250-350 range)."""
     content = ABSTRACT_PATH.read_text()
 
+    # Extract only the Abstract section (before any "---" separator or other sections)
+    # The abstract section ends at first horizontal rule or Demo Video Guide
+    abstract_section = content
+    if "---" in content:
+        abstract_section = content.split("---")[0]
+
     # Count words (split on whitespace)
-    words = content.split()
+    words = abstract_section.split()
     word_count = len(words)
 
     assert 250 <= word_count <= 350, (
-        f"Abstract must be ~300 words (250-350 range), found {word_count}"
+        f"Abstract section must be ~300 words (250-350 range), found {word_count}"
     )
 
 
