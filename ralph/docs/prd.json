@@ -245,9 +245,9 @@
       "files": [
         "docker-compose.yml"
       ],
-      "passes": false,
-      "completed_at": null,
-      "content_hash": "abc123def456",
+      "passes": true,
+      "completed_at": "2026-01-25T19:02:36Z",
+      "content_hash": "c708fc85ee418f8e959afc46566d7bc479d67fa388e520e240d53fdc4f97beec",
       "depends_on": [
         "STORY-010"
       ]
