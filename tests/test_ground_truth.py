@@ -46,7 +46,7 @@ class TestGroundTruthDataset:
         )
 
     def test_required_fields(self, ground_truth_data: list[dict]) -> None:
-        """Each entry must have required fields: narrative, expected_score, classification, annotations."""
+        """Each entry must have required fields."""
         required_fields = {"id", "narrative", "expected_score", "classification", "annotations"}
         for i, entry in enumerate(ground_truth_data):
             missing = required_fields - set(entry.keys())
@@ -107,9 +107,15 @@ class TestGroundTruthMixture:
 
     def test_qualifying_and_non_qualifying_mix(self, ground_truth_data: list[dict]) -> None:
         """Dataset must have both qualifying and non-qualifying narratives."""
-        qualifying = [e for e in ground_truth_data if e.get("classification") == "QUALIFYING"]
-        non_qualifying = [e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"]
-        assert len(qualifying) >= 3, f"Need at least 3 qualifying narratives, found {len(qualifying)}"
+        qualifying = [
+            e for e in ground_truth_data if e.get("classification") == "QUALIFYING"
+        ]
+        non_qualifying = [
+            e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"
+        ]
+        assert len(qualifying) >= 3, (
+            f"Need at least 3 qualifying narratives, found {len(qualifying)}"
+        )
         assert len(non_qualifying) >= 3, (
             f"Need at least 3 non-qualifying narratives, found {len(non_qualifying)}"
         )
@@ -350,8 +356,12 @@ class TestPhase2EvaluationScenarios:
 
     def test_balanced_qualifying_non_qualifying(self, ground_truth_data: list[dict]) -> None:
         """Phase 2 requires balanced mix of qualifying and non-qualifying."""
-        qualifying = [e for e in ground_truth_data if e.get("classification") == "QUALIFYING"]
-        non_qualifying = [e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"]
+        qualifying = [
+            e for e in ground_truth_data if e.get("classification") == "QUALIFYING"
+        ]
+        non_qualifying = [
+            e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"
+        ]
 
         # Both categories should have at least 8 entries
         assert len(qualifying) >= 8, (
