@@ -1,9 +1,6 @@
 {
   "name": "Template DevEnv",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {}
-  },
   "customizations": {
     "vscode": {
       "extensions": [
