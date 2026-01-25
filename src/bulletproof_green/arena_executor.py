@@ -6,7 +6,7 @@ and provides critique for iterative refinement until quality threshold is reache
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from bulletproof_green.a2a_client import A2AClient, NarrativeRequest
