@@ -8,6 +8,14 @@ Verifies STORY-008 acceptance criteria:
 - JSON format with human-readable annotations
 - Each entry: narrative, expected_score, classification, annotations
 - Anonymized to protect confidentiality
+
+Verifies STORY-017 acceptance criteria (Phase 2):
+- 20+ labeled narratives (Phase 2 target)
+- Even distribution across difficulty tiers
+- Additional edge cases and pattern variations
+- Updated JSON schema with new fields
+- Covers Phase 2 evaluation scenarios
+- Anonymized and reviewed for accuracy
 """
 
 import json
@@ -216,3 +224,139 @@ class TestAnonymization:
                 assert not re.search(pattern, narrative), (
                     f"Entry {entry.get('id')}: contains company name '{company}'"
                 )
+
+
+# =============================================================================
+# STORY-017: Phase 2 Tests - Expanded Ground Truth Dataset
+# =============================================================================
+
+
+class TestPhase2DatasetSize:
+    """Tests for Phase 2 requirement: 20+ labeled narratives."""
+
+    def test_phase2_minimum_entries(self, ground_truth_data: list[dict]) -> None:
+        """Phase 2: Dataset must have at least 20 labeled narratives."""
+        assert len(ground_truth_data) >= 20, (
+            f"Phase 2 requires at least 20 narratives, found {len(ground_truth_data)}"
+        )
+
+
+class TestPhase2DifficultyDistribution:
+    """Tests for Phase 2 requirement: even distribution across difficulty tiers."""
+
+    def test_even_distribution_across_tiers(self, ground_truth_data: list[dict]) -> None:
+        """Each difficulty tier should have at least 6 entries for even distribution."""
+        tier_counts = {"easy": 0, "medium": 0, "hard": 0}
+        for entry in ground_truth_data:
+            tier = entry.get("difficulty", "unknown")
+            if tier in tier_counts:
+                tier_counts[tier] += 1
+
+        min_per_tier = 6
+        for tier, count in tier_counts.items():
+            assert count >= min_per_tier, (
+                f"Tier '{tier}' needs at least {min_per_tier} entries for even distribution, "
+                f"found {count}"
+            )
+
+    def test_both_classifications_per_tier(self, ground_truth_data: list[dict]) -> None:
+        """Each difficulty tier should have both QUALIFYING and NON_QUALIFYING entries."""
+        tier_classifications: dict[str, set[str]] = {"easy": set(), "medium": set(), "hard": set()}
+        for entry in ground_truth_data:
+            tier = entry.get("difficulty", "unknown")
+            classification = entry.get("classification", "")
+            if tier in tier_classifications:
+                tier_classifications[tier].add(classification)
+
+        for tier, classifications in tier_classifications.items():
+            assert "QUALIFYING" in classifications, (
+                f"Tier '{tier}' missing QUALIFYING entries"
+            )
+            assert "NON_QUALIFYING" in classifications, (
+                f"Tier '{tier}' missing NON_QUALIFYING entries"
+            )
+
+
+class TestPhase2PatternVariations:
+    """Tests for Phase 2 requirement: additional edge cases and pattern variations."""
+
+    def test_multiple_failure_pattern_combinations(self, ground_truth_data: list[dict]) -> None:
+        """Dataset should include entries with multiple combined failure patterns."""
+        multi_pattern_count = 0
+        for entry in ground_truth_data:
+            annotations = entry.get("annotations", {})
+            patterns = annotations.get("failure_patterns", [])
+            if len(patterns) >= 2:
+                multi_pattern_count += 1
+
+        assert multi_pattern_count >= 3, (
+            f"Need at least 3 entries with multiple failure patterns, found {multi_pattern_count}"
+        )
+
+    def test_diverse_failure_patterns(self, ground_truth_data: list[dict]) -> None:
+        """Dataset should cover diverse failure pattern types."""
+        all_patterns: set[str] = set()
+        for entry in ground_truth_data:
+            annotations = entry.get("annotations", {})
+            patterns = annotations.get("failure_patterns", [])
+            all_patterns.update(patterns)
+
+        required_patterns = {"routine_engineering", "vague_language", "business_risk"}
+        missing = required_patterns - all_patterns
+        assert not missing, f"Missing required failure patterns: {missing}"
+
+    def test_diverse_positive_indicators(self, ground_truth_data: list[dict]) -> None:
+        """Qualifying entries should demonstrate diverse positive indicators."""
+        qualifying_entries = [
+            e for e in ground_truth_data if e.get("classification") == "QUALIFYING"
+        ]
+        all_indicators: set[str] = set()
+        for entry in qualifying_entries:
+            annotations = entry.get("annotations", {})
+            indicators = annotations.get("positive_indicators", [])
+            all_indicators.update(indicators)
+
+        # Should have a variety of positive indicators (at least 10 different ones)
+        assert len(all_indicators) >= 10, (
+            f"Need at least 10 different positive indicators, found {len(all_indicators)}"
+        )
+
+
+class TestPhase2EvaluationScenarios:
+    """Tests for Phase 2 requirement: covers Phase 2 evaluation scenarios."""
+
+    def test_edge_case_scores(self, ground_truth_data: list[dict]) -> None:
+        """Dataset should include edge cases near the 20-point threshold."""
+        # Count entries with scores near the threshold (15-25 range)
+        edge_case_count = sum(
+            1 for e in ground_truth_data
+            if 15 <= e.get("expected_score", 0) <= 25
+        )
+        assert edge_case_count >= 3, (
+            f"Need at least 3 edge cases near threshold (score 15-25), found {edge_case_count}"
+        )
+
+    def test_extreme_scores_represented(self, ground_truth_data: list[dict]) -> None:
+        """Dataset should include narratives with extreme scores."""
+        scores = [e.get("expected_score", 0) for e in ground_truth_data]
+
+        # Should have some very low scores (excellent qualifying)
+        low_scores = [s for s in scores if s <= 10]
+        assert len(low_scores) >= 2, "Need at least 2 entries with score <= 10"
+
+        # Should have some very high scores (clearly non-qualifying)
+        high_scores = [s for s in scores if s >= 60]
+        assert len(high_scores) >= 2, "Need at least 2 entries with score >= 60"
+
+    def test_balanced_qualifying_non_qualifying(self, ground_truth_data: list[dict]) -> None:
+        """Phase 2 requires balanced mix of qualifying and non-qualifying."""
+        qualifying = [e for e in ground_truth_data if e.get("classification") == "QUALIFYING"]
+        non_qualifying = [e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"]
+
+        # Both categories should have at least 8 entries
+        assert len(qualifying) >= 8, (
+            f"Need at least 8 qualifying entries, found {len(qualifying)}"
+        )
+        assert len(non_qualifying) >= 8, (
+            f"Need at least 8 non-qualifying entries, found {len(non_qualifying)}"
+        )
