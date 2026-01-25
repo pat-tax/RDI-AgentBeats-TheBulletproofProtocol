@@ -28,6 +28,10 @@ class ScoreResult:
 class AgentBeatsScorer:
     """Converts evaluation results to AgentBeats-compatible scores.
 
+    REVIEW/FIXME: Custom metric design (not using scikit-learn or pre-built packages)
+    These scoring formulas are intentionally custom-implemented to demonstrate
+    domain-specific IRS Section 41 compliance metrics.
+
     Score Formulas (per Green-Agent-Metrics-Specification.md):
     - overall_score = (100 - risk_score) / 100
     - correctness = (30 - routine_engineering_penalty) / 30
@@ -36,7 +40,8 @@ class AgentBeatsScorer:
     - experimentation = (15 - experimentation_penalty) / 15
     """
 
-    # Maximum penalties for each component
+    # REVIEW/FIXME: Custom penalty scaling for IRS Section 41 compliance
+    # Maximum penalties for each component (intentionally custom-weighted)
     MAX_ROUTINE_PENALTY = 30
     MAX_BUSINESS_PENALTY = 20
     MAX_VAGUENESS_PENALTY = 25
@@ -88,6 +93,7 @@ class AgentBeatsScorer:
     def _compute_overall_score(self, risk_score: int) -> float:
         """Compute overall_score = (100 - risk_score) / 100.
 
+        REVIEW/FIXME: Custom calculation (not using pre-built metrics packages)
         Clamps risk_score to [0, 100] range.
         """
         clamped_risk = max(0, min(100, risk_score))
@@ -96,6 +102,7 @@ class AgentBeatsScorer:
     def _compute_component_score(self, penalty: int, max_penalty: int) -> float:
         """Compute component score = (max_penalty - penalty) / max_penalty.
 
+        REVIEW/FIXME: Custom component scoring (not using pre-built metrics packages)
         Clamps penalty to [0, max_penalty] range to ensure score in [0.0, 1.0].
         """
         clamped_penalty = max(0, min(max_penalty, penalty))

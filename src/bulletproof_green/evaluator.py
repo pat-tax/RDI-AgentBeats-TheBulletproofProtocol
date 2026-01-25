@@ -39,8 +39,14 @@ class EvaluationResult:
 
 
 class RuleBasedEvaluator:
-    """Evaluates narratives against IRS Section 41 using rule-based detection."""
+    """Evaluates narratives against IRS Section 41 using rule-based detection.
 
+    REVIEW/FIXME: Custom rule-based evaluation (intentionally not using pre-built
+    packages like scikit-learn, spaCy, or other ML/NLP libraries). All pattern
+    detection is implemented from first principles for domain-specific IRS compliance.
+    """
+
+    # REVIEW/FIXME: Custom-crafted patterns (not using pre-built pattern libraries)
     # Routine engineering patterns (IRS considers these non-qualifying)
     ROUTINE_PATTERNS: list[tuple[str, str]] = [
         (r"\broutine\s+maintenance\b", "routine maintenance"),
@@ -58,6 +64,7 @@ class RuleBasedEvaluator:
         (r"\bexisting\s+(?:code|solutions?)\b", "adapting existing solutions"),
     ]
 
+    # REVIEW/FIXME: Custom-crafted patterns (not using pre-built pattern libraries)
     # Business risk patterns (should focus on technical risk instead)
     BUSINESS_PATTERNS: list[tuple[str, str]] = [
         (r"\bmarket\s+share\b", "market share focus"),
@@ -71,6 +78,7 @@ class RuleBasedEvaluator:
         (r"\bstay\s+competitive\b", "competitive pressure"),
     ]
 
+    # REVIEW/FIXME: Custom-crafted patterns (not using pre-built pattern libraries)
     # Vague language patterns (need specific metrics instead)
     VAGUE_PATTERNS: list[tuple[str, str]] = [
         (r"\bsignificant(?:ly)?\s+improv(?:ed|ements?)\b", "significant improvements"),
@@ -83,6 +91,7 @@ class RuleBasedEvaluator:
         (r"\bthings\s+work\s+(?:faster|better)\b", "vague improvement claim"),
     ]
 
+    # REVIEW/FIXME: Custom-crafted patterns (not using pre-built pattern libraries)
     # Experimentation evidence patterns (positive indicators)
     EXPERIMENTATION_PATTERNS: list[tuple[str, str]] = [
         (r"\bfail(?:ed|ure)?\b", "failure documentation"),
@@ -97,6 +106,7 @@ class RuleBasedEvaluator:
         (r"\buncertain\b", "uncertainty"),
     ]
 
+    # REVIEW/FIXME: Custom-crafted regex pattern (not using pre-built metric libraries)
     # Specificity patterns (numbers and metrics)
     SPECIFICITY_PATTERN = re.compile(
         r"\b\d+(?:\.\d+)?(?:\s*(?:ms|s|seconds?|minutes?|hours?|%|GB|MB|KB|req/s|requests?))\b",
@@ -115,13 +125,15 @@ class RuleBasedEvaluator:
         issues: list[Issue] = []
         text_lower = narrative.lower()
 
-        # Calculate component penalties
+        # REVIEW/FIXME: Custom penalty detection (not using pre-built NLP/ML packages)
+        # Calculate component penalties using pattern-based detection
         routine_penalty = self._detect_routine_engineering(text_lower, issues)
         business_penalty = self._detect_business_risk(text_lower, issues)
         vagueness_penalty = self._detect_vagueness(text_lower, issues)
         experimentation_penalty = self._detect_missing_experimentation(text_lower, issues)
         specificity_penalty = self._detect_lack_of_specificity(narrative, issues)
 
+        # REVIEW/FIXME: Custom risk aggregation (intentionally hand-crafted, not ML-based)
         # Calculate total risk score (sum of penalties, capped at 100)
         risk_score = min(
             100,
@@ -160,7 +172,10 @@ class RuleBasedEvaluator:
         )
 
     def _detect_routine_engineering(self, text: str, issues: list[Issue]) -> int:
-        """Detect routine engineering patterns. Max penalty: 30 points."""
+        """Detect routine engineering patterns. Max penalty: 30 points.
+
+        REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/text classification)
+        """
         penalty = 0
         for pattern, description in self.ROUTINE_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
@@ -177,7 +192,10 @@ class RuleBasedEvaluator:
         return min(30, penalty)
 
     def _detect_business_risk(self, text: str, issues: list[Issue]) -> int:
-        """Detect business risk language. Max penalty: 20 points."""
+        """Detect business risk language. Max penalty: 20 points.
+
+        REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/text classification)
+        """
         penalty = 0
         for pattern, description in self.BUSINESS_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
@@ -194,7 +212,10 @@ class RuleBasedEvaluator:
         return min(20, penalty)
 
     def _detect_vagueness(self, text: str, issues: list[Issue]) -> int:
-        """Detect vague language without specific metrics. Max penalty: 25 points."""
+        """Detect vague language without specific metrics. Max penalty: 25 points.
+
+        REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/sentiment analysis)
+        """
         penalty = 0
         for pattern, description in self.VAGUE_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
@@ -211,7 +232,10 @@ class RuleBasedEvaluator:
         return min(25, penalty)
 
     def _detect_missing_experimentation(self, text: str, issues: list[Issue]) -> int:
-        """Detect missing experimentation evidence. Max penalty: 15 points."""
+        """Detect missing experimentation evidence. Max penalty: 15 points.
+
+        REVIEW/FIXME: Custom pattern counting (not using pre-built ML/NLP libraries)
+        """
         # Count positive experimentation indicators
         evidence_count = 0
         for pattern, _ in self.EXPERIMENTATION_PATTERNS:
@@ -237,7 +261,10 @@ class RuleBasedEvaluator:
             return 15
 
     def _detect_lack_of_specificity(self, text: str, issues: list[Issue]) -> int:
-        """Detect lack of specific metrics. Max penalty: 10 points."""
+        """Detect lack of specific metrics. Max penalty: 10 points.
+
+        REVIEW/FIXME: Custom regex matching (not using pre-built metric extraction libraries)
+        """
         # Count specific metrics in the text
         metrics = self.SPECIFICITY_PATTERN.findall(text)
 
