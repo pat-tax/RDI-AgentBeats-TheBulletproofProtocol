@@ -11,9 +11,8 @@ This test module validates the acceptance criteria for STORY-010:
 - Both bulletproof-purple and bulletproof-green images
 """
 
-from pathlib import Path
 import re
-
+from pathlib import Path
 
 # Define paths to Dockerfiles
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -39,9 +38,9 @@ class TestDockerfilePurple:
     def test_uses_python_313_slim_base(self):
         """Test Dockerfile uses Python 3.13-slim base image."""
         content = DOCKERFILE_PURPLE.read_text()
-        # Should have a FROM with python:3.13-slim
+        # Should have a FROM with python:3.13-slim (may include --platform flag)
         assert re.search(
-            r"FROM\s+python:3\.13-slim", content
+            r"FROM\s+.*python:3\.13-slim", content
         ), "Must use python:3.13-slim base image"
 
     def test_exposes_port_8000(self):
@@ -87,7 +86,7 @@ class TestDockerfilePurple:
         """Test Dockerfile uses multi-stage build for smaller images."""
         content = DOCKERFILE_PURPLE.read_text()
         # Count FROM statements - multi-stage means more than one
-        from_count = len(re.findall(r"^FROM\s+", content, re.MULTILINE))
+        from_count = len(re.findall(r"^FROM\s", content, re.MULTILINE))
         assert from_count >= 2, "Must use multi-stage build (at least 2 FROM statements)"
 
     def test_uses_uv_package_manager(self):
@@ -126,8 +125,9 @@ class TestDockerfileGreen:
     def test_uses_python_313_slim_base(self):
         """Test Dockerfile uses Python 3.13-slim base image."""
         content = DOCKERFILE_GREEN.read_text()
+        # Should have a FROM with python:3.13-slim (may include --platform flag)
         assert re.search(
-            r"FROM\s+python:3\.13-slim", content
+            r"FROM\s+.*python:3\.13-slim", content
         ), "Must use python:3.13-slim base image"
 
     def test_exposes_port_8000(self):
@@ -169,7 +169,8 @@ class TestDockerfileGreen:
     def test_uses_multi_stage_build(self):
         """Test Dockerfile uses multi-stage build for smaller images."""
         content = DOCKERFILE_GREEN.read_text()
-        from_count = len(re.findall(r"^FROM\s+", content, re.MULTILINE))
+        # Count FROM statements - multi-stage means more than one
+        from_count = len(re.findall(r"^FROM\s", content, re.MULTILINE))
         assert from_count >= 2, "Must use multi-stage build (at least 2 FROM statements)"
 
     def test_uses_uv_package_manager(self):
