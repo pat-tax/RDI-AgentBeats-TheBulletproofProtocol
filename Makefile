@@ -24,6 +24,7 @@ setup_claude_code:  ## Setup claude code CLI
 	echo "Claude Code CLI version: $$(claude --version)"
 
 setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
+	# https://code.claude.com/docs/en/sandboxing
 	echo "Installing sandbox dependencies ..."
 	if command -v apt-get > /dev/null; then \
 		sudo apt-get update -qq && sudo apt-get install -y bubblewrap socat; \
@@ -131,12 +132,12 @@ ralph_clean:  ## Reset Ralph state (WARNING: removes prd.json and progress.txt)
 	echo "Ralph state cleaned. Run 'make ralph_init' to reinitialize."
 
 ralph_reorganize:  ## Archive current PRD and start new iteration. Usage: make ralph_reorganize NEW_PRD=path/to/new.md [VERSION=2]
-	@if [ -z "$(NEW_PRD)" ]; then
+	if [ -z "$(NEW_PRD)" ]; then
 		echo "Error: NEW_PRD parameter required"
 		echo "Usage: make ralph_reorganize NEW_PRD=docs/PRD-New.md [VERSION=2]"
 		exit 1
 	fi
-	@VERSION_ARG=""
+	VERSION_ARG=""
 	if [ -n "$(VERSION)" ]; then
 		VERSION_ARG="-v $(VERSION)"
 	fi
