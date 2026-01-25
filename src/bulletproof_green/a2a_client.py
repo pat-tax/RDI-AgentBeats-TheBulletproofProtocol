@@ -5,9 +5,8 @@ Enables Green Agent to call Purple Agent for narrative generation via A2A protoc
 
 from __future__ import annotations
 
-import asyncio
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import httpx
@@ -148,16 +147,14 @@ class A2AClient:
 
         try:
             response = await self._send_jsonrpc("message/send", params)
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             raise A2AClientError(f"Timeout sending request: {e}") from e
         except ConnectionError as e:
             raise A2AClientError(f"Connection error: {e}") from e
 
         return await self._parse_response(response)
 
-    async def _send_jsonrpc(
-        self, method: str, params: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _send_jsonrpc(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         """Send a JSON-RPC 2.0 request.
 
         Args:
@@ -186,7 +183,7 @@ class A2AClient:
                 )
                 return response.json()
         except httpx.TimeoutException as e:
-            raise asyncio.TimeoutError(str(e)) from e
+            raise TimeoutError(str(e)) from e
         except httpx.ConnectError as e:
             raise ConnectionError(str(e)) from e
 
@@ -241,9 +238,7 @@ class A2AClient:
         # In a real implementation, this would poll the task/get endpoint
         raise NotImplementedError("Task polling not implemented")
 
-    def _extract_narrative_from_result(
-        self, result: dict[str, Any]
-    ) -> NarrativeResponse:
+    def _extract_narrative_from_result(self, result: dict[str, Any]) -> NarrativeResponse:
         """Extract narrative from response result.
 
         Args:
