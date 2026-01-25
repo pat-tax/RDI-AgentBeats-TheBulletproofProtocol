@@ -3,8 +3,11 @@
 Exposes narrative generation via JSON-RPC 2.0 protocol following A2A specification.
 """
 
+from __future__ import annotations
+
 import asyncio
 from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any
 
 from a2a.server.apps import A2AFastAPIApplication
 from a2a.server.request_handlers import DefaultRequestHandler
@@ -20,10 +23,14 @@ from a2a.types import (
     Task,
     TaskState,
     TaskStatus,
+    TextPart,
 )
 from a2a.utils import new_agent_parts_message, new_task
 
 from bulletproof_purple.generator import NarrativeGenerator
+
+if TYPE_CHECKING:
+    from a2a.server.context import ServerCallContext
 
 DEFAULT_PORT = 8000
 DEFAULT_TIMEOUT = 300
@@ -38,15 +45,20 @@ def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
     Returns:
         Configured AgentCard with narrative generation capability.
     """
+    # Note: a2a-sdk uses camelCase for pydantic model field aliases but pyright
+    # doesn't recognize them, hence the type: ignore comments
     return AgentCard(
         name="Bulletproof Purple Agent",
         description="IRS Section 41 R&D tax credit narrative generator. "
         "Generates Four-Part Test compliant narratives from engineering signals.",
         url=base_url,
         version="1.0.0",
-        capabilities=AgentCapabilities(streaming=False, pushNotifications=False),
-        defaultInputModes=["text"],
-        defaultOutputModes=["text", "data"],
+        capabilities=AgentCapabilities(
+            streaming=False,
+            pushNotifications=False,  # type: ignore[call-arg]
+        ),
+        defaultInputModes=["text"],  # type: ignore[call-arg]
+        defaultOutputModes=["text", "data"],  # type: ignore[call-arg]
         skills=[
             AgentSkill(
                 id="generate_narrative",
@@ -70,6 +82,44 @@ class PurpleAgentExecutor:
         self.generator = NarrativeGenerator()
         self.timeout = timeout
 
+    def _extract_text_from_part(self, part: Any) -> str | None:
+        """Extract text content from a message part.
+
+        Args:
+            part: A message part (TextPart, DataPart, FilePart, or Part).
+
+        Returns:
+            The text content if available, None otherwise.
+        """
+        # Handle Part wrapper
+        part_data = part.root if hasattr(part, "root") else part
+
+        # Check for TextPart
+        if isinstance(part_data, TextPart):
+            return part_data.text
+        if hasattr(part_data, "text") and isinstance(part_data.text, str):
+            return part_data.text
+        return None
+
+    def _extract_data_from_part(self, part: Any) -> dict[str, Any] | None:
+        """Extract data content from a message part.
+
+        Args:
+            part: A message part (TextPart, DataPart, FilePart, or Part).
+
+        Returns:
+            The data dict if available, None otherwise.
+        """
+        # Handle Part wrapper
+        part_data = part.root if hasattr(part, "root") else part
+
+        # Check for DataPart
+        if isinstance(part_data, DataPart) and isinstance(part_data.data, dict):
+            return part_data.data
+        if hasattr(part_data, "data") and isinstance(part_data.data, dict):
+            return part_data.data
+        return None
+
     async def execute(
         self, params: MessageSendParams, task: Task
     ) -> AsyncGenerator[Message | Task]:
@@ -84,24 +134,26 @@ class PurpleAgentExecutor:
         """
         # Extract request from message parts
         template_type = "qualifying"
-        signals: dict | None = None
+        signals: dict[str, Any] | None = None
 
         if params.message and params.message.parts:
             for part in params.message.parts:
-                part_data = part.root if hasattr(part, "root") else part
-                if hasattr(part_data, "text"):
-                    text = part_data.text.lower()
-                    if "non-qualifying" in text or "non_qualifying" in text:
+                text = self._extract_text_from_part(part)
+                if text:
+                    text_lower = text.lower()
+                    if "non-qualifying" in text_lower or "non_qualifying" in text_lower:
                         template_type = "non_qualifying"
-                    elif "edge" in text:
+                    elif "edge" in text_lower:
                         template_type = "edge_case"
-                elif hasattr(part_data, "data") and isinstance(part_data.data, dict):
-                    if "template_type" in part_data.data:
-                        template_type = part_data.data["template_type"]
-                    if "signals" in part_data.data:
-                        signals = part_data.data["signals"]
 
-        # Update task to running
+                data = self._extract_data_from_part(part)
+                if data:
+                    if "template_type" in data:
+                        template_type = data["template_type"]
+                    if "signals" in data:
+                        signals = data["signals"]
+
+        # Update task to working
         task.status = TaskStatus(state=TaskState.working)
         yield task
 
@@ -128,10 +180,7 @@ class PurpleAgentExecutor:
             yield new_agent_parts_message(parts=[Part(root=data_part)])
 
         except TimeoutError:
-            task.status = TaskStatus(
-                state=TaskState.failed,
-                message={"role": "agent", "parts": [{"text": "Task timed out"}]},
-            )
+            task.status = TaskStatus(state=TaskState.failed)
             yield task
 
 
@@ -142,11 +191,13 @@ class PurpleRequestHandler(DefaultRequestHandler):
         self.task_store = InMemoryTaskStore()
         self.executor = PurpleAgentExecutor(timeout=timeout)
         super().__init__(
-            agent_executor=self.executor,
+            agent_executor=self.executor,  # type: ignore[arg-type]
             task_store=self.task_store,
         )
 
-    async def on_message_send(self, params: MessageSendParams, context=None) -> Message | Task:
+    async def on_message_send(
+        self, params: MessageSendParams, context: ServerCallContext | None = None
+    ) -> Message | Task:
         """Handle message/send requests.
 
         Args:
@@ -174,7 +225,7 @@ class PurpleRequestHandler(DefaultRequestHandler):
         return final_result
 
 
-def create_app(timeout: int = DEFAULT_TIMEOUT):
+def create_app(timeout: int = DEFAULT_TIMEOUT) -> Any:
     """Create the A2A FastAPI application.
 
     Args:
@@ -194,7 +245,7 @@ def create_app(timeout: int = DEFAULT_TIMEOUT):
     return a2a_app.build()
 
 
-def main():
+def main() -> None:
     """Run the Purple Agent A2A server."""
     import uvicorn
 

@@ -10,10 +10,39 @@ This test module validates the acceptance criteria for STORY-002:
 - Python 3.13, a2a-sdk>=0.3.20, uvicorn>=0.38.0
 """
 
+import uuid
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from bulletproof_purple.server import create_app, get_agent_card
+
+
+def make_message_send_request(
+    text: str, req_id: str = "test-1", message_id: str | None = None
+) -> dict:
+    """Create a properly formatted message/send JSON-RPC request.
+
+    Args:
+        text: The text content of the message.
+        req_id: The JSON-RPC request ID.
+        message_id: Optional message ID. Auto-generated if not provided.
+
+    Returns:
+        A valid message/send JSON-RPC request dict.
+    """
+    return {
+        "jsonrpc": "2.0",
+        "method": "message/send",
+        "id": req_id,
+        "params": {
+            "message": {
+                "messageId": message_id or str(uuid.uuid4()),
+                "role": "user",
+                "parts": [{"text": text}],
+            }
+        },
+    }
 
 
 class TestAgentCard:
@@ -100,15 +129,7 @@ class TestMessageSendEndpoint:
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
-            response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {"message": {"role": "user", "parts": [{"text": "test"}]}},
-                },
-            )
+            response = await client.post("/", json=make_message_send_request("test"))
             # Should not be 404
             assert response.status_code != 404
 
@@ -120,18 +141,7 @@ class TestMessageSendEndpoint:
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
             response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "Generate a narrative"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("Generate a narrative")
             )
             data = response.json()
             assert "jsonrpc" in data
@@ -146,18 +156,7 @@ class TestMessageSendEndpoint:
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
             response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "Generate a narrative"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("Generate a narrative")
             )
             data = response.json()
             # Must have either result or error
@@ -171,18 +170,7 @@ class TestMessageSendEndpoint:
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
             response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "Generate a qualifying narrative"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("Generate a qualifying narrative")
             )
             data = response.json()
             assert "result" in data
@@ -199,18 +187,7 @@ class TestDataPartResponse:
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
             response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "Generate narrative"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("Generate narrative")
             )
             data = response.json()
             if "result" in data:
@@ -226,18 +203,7 @@ class TestDataPartResponse:
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
             response = await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": "test-1",
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "Generate qualifying narrative"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("Generate qualifying narrative")
             )
             data = response.json()
             if "result" in data:
@@ -245,9 +211,7 @@ class TestDataPartResponse:
                 if "parts" in result:
                     parts = result["parts"]
                     # Should have at least one part with data
-                    has_data_or_text = any(
-                        "data" in p or "text" in p for p in parts
-                    )
+                    has_data_or_text = any("data" in p or "text" in p for p in parts)
                     assert has_data_or_text
 
 
@@ -369,18 +333,7 @@ class TestServerConfiguration:
 
         async def make_request(client: AsyncClient, req_id: str):
             return await client.post(
-                "/",
-                json={
-                    "jsonrpc": "2.0",
-                    "method": "message/send",
-                    "id": req_id,
-                    "params": {
-                        "message": {
-                            "role": "user",
-                            "parts": [{"text": "test"}],
-                        }
-                    },
-                },
+                "/", json=make_message_send_request("test", req_id=req_id)
             )
 
         async with AsyncClient(
