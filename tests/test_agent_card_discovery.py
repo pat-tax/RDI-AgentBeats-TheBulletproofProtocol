@@ -247,6 +247,7 @@ class TestAgentCardDiscovery:
     @pytest.mark.asyncio
     async def test_discover_agent_returns_agent_card(self):
         """Test discover_agent returns AgentCard dict."""
+        from unittest.mock import MagicMock
         from bulletproof_green.agent_card import discover_agent
 
         mock_card = {
@@ -255,13 +256,12 @@ class TestAgentCardDiscovery:
             "version": "1.0.0",
         }
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # httpx.Response methods are not async
             mock_response.status_code = 200
             mock_response.json.return_value = mock_card
-            mock_response.raise_for_status = AsyncMock()
             mock_client.get.return_value = mock_response
 
             card = await discover_agent("http://localhost:8001")
@@ -272,15 +272,18 @@ class TestAgentCardDiscovery:
     @pytest.mark.asyncio
     async def test_discover_agent_fetches_well_known_endpoint(self):
         """Test discover_agent fetches from /.well-known/agent-card.json."""
+        from unittest.mock import MagicMock
         from bulletproof_green.agent_card import discover_agent
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        # Must include required fields for validation to pass
+        mock_card = {"name": "Test", "url": "http://localhost:8001", "version": "1.0.0"}
+
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # httpx.Response methods are not async
             mock_response.status_code = 200
-            mock_response.json.return_value = {"name": "Test"}
-            mock_response.raise_for_status = AsyncMock()
+            mock_response.json.return_value = mock_card
             mock_client.get.return_value = mock_response
 
             await discover_agent("http://localhost:8001")
@@ -292,17 +295,17 @@ class TestAgentCardDiscovery:
     @pytest.mark.asyncio
     async def test_discover_agent_validates_response(self):
         """Test discover_agent validates the returned AgentCard."""
+        from unittest.mock import MagicMock
         from bulletproof_green.agent_card import discover_agent, AgentCardValidationError
 
         invalid_card = {"description": "Missing name and url"}
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # httpx.Response methods are not async
             mock_response.status_code = 200
             mock_response.json.return_value = invalid_card
-            mock_response.raise_for_status = AsyncMock()
             mock_client.get.return_value = mock_response
 
             with pytest.raises(AgentCardValidationError):
@@ -314,7 +317,7 @@ class TestAgentCardDiscovery:
         from bulletproof_green.agent_card import discover_agent, AgentCardDiscoveryError
         import httpx
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
             mock_client.get.side_effect = httpx.ConnectError("Connection refused")
@@ -329,7 +332,7 @@ class TestAgentCardDiscovery:
         from bulletproof_green.agent_card import discover_agent, AgentCardDiscoveryError
         import httpx
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
             mock_client.get.side_effect = httpx.TimeoutException("Timeout")
@@ -413,6 +416,7 @@ class TestAgentCardCache:
     @pytest.mark.asyncio
     async def test_discover_agent_uses_cache(self):
         """Test discover_agent uses cache for repeated calls."""
+        from unittest.mock import MagicMock
         from bulletproof_green.agent_card import discover_agent, AgentCardCache
 
         mock_card = {
@@ -423,13 +427,12 @@ class TestAgentCardCache:
 
         cache = AgentCardCache()
 
-        with patch("httpx.AsyncClient") as mock_client_class:
+        with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()  # httpx.Response methods are not async
             mock_response.status_code = 200
             mock_response.json.return_value = mock_card
-            mock_response.raise_for_status = AsyncMock()
             mock_client.get.return_value = mock_response
 
             # First call - fetches from network
