@@ -153,8 +153,8 @@
         "src/bulletproof_purple/agent_card.py",
         "src/bulletproof_green/agent_card.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-25T18:45:37Z",
       "content_hash": "1d73f95de8a22b0c7db892019a46624d96967c1a6a83d34f394ad4b6e01c5fa5",
       "depends_on": [
         "STORY-002",
