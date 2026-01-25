@@ -52,18 +52,29 @@ def _load_workflow() -> dict[str, Any]:
     return data
 
 
+def _get_on_config(workflow: dict[str, Any]) -> dict[str, Any]:
+    """Get the 'on' trigger config, handling YAML's 'on' -> True quirk."""
+    # YAML parses 'on' as boolean True, so check both
+    on_config = workflow.get("on") or workflow.get(True) or {}
+    if isinstance(on_config, dict):
+        return on_config
+    return {}
+
+
 class TestWorkflowTriggers:
     """Test workflow triggers on push/tag."""
 
     def test_on_key_exists(self) -> None:
         """Test 'on' key exists for workflow triggers."""
         workflow = _load_workflow()
-        assert "on" in workflow, "Workflow must have 'on' triggers"
+        # YAML parses 'on' as boolean True, so check both
+        has_on = "on" in workflow or True in workflow
+        assert has_on, "Workflow must have 'on' triggers"
 
     def test_triggers_on_push(self) -> None:
         """Test workflow triggers on push events."""
         workflow = _load_workflow()
-        on_config = workflow.get("on", {})
+        on_config = _get_on_config(workflow)
         # Can be a list, dict, or have push key
         if isinstance(on_config, list):
             assert "push" in on_config, "Workflow must trigger on push"
@@ -75,7 +86,7 @@ class TestWorkflowTriggers:
     def test_triggers_on_tags(self) -> None:
         """Test workflow triggers on tag push for semantic versioning."""
         workflow = _load_workflow()
-        on_config = workflow.get("on", {})
+        on_config = _get_on_config(workflow)
         if isinstance(on_config, dict):
             push_config = on_config.get("push", {})
             if isinstance(push_config, dict):
