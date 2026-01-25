@@ -205,11 +205,14 @@ class TestAnonymization:
 
     def test_no_specific_company_names(self, ground_truth_data: list[dict]) -> None:
         """Narratives should use generic references, not specific company names."""
-        # Check for common real company names that shouldn't appear
+        import re
+        # Check for common real company names that shouldn't appear (as whole words)
         prohibited = ["google", "amazon", "microsoft", "facebook", "apple", "netflix", "uber"]
         for entry in ground_truth_data:
             narrative = entry.get("narrative", "").lower()
             for company in prohibited:
-                assert company not in narrative, (
+                # Use word boundary to avoid false positives (e.g., "kubernetes" contains "uber")
+                pattern = rf"\b{company}\b"
+                assert not re.search(pattern, narrative), (
                     f"Entry {entry.get('id')}: contains company name '{company}'"
                 )
