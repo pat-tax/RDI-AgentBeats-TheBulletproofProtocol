@@ -61,9 +61,18 @@ validate_environment() {
     log_info "Environment validated successfully"
 }
 
-# Get next incomplete story from prd.json
+# Get next incomplete story from prd.json (respects depends_on)
 get_next_story() {
-    jq -r '.stories[] | select(.passes == false) | .id' "$PRD_JSON" | head -n 1
+    # Get all completed story IDs
+    local completed=$(jq -r '[.stories[] | select(.passes == true) | .id] | @json' "$PRD_JSON")
+
+    # Find first incomplete story where all depends_on are satisfied
+    jq -r --argjson done "$completed" '
+      .stories[]
+      | select(.passes == false)
+      | select((.depends_on // []) - $done | length == 0)
+      | .id
+    ' "$PRD_JSON" | head -n 1
 }
 
 # Get story details

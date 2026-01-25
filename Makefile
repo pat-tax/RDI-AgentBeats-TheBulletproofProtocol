@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -101,7 +101,7 @@ ralph_userstory:  ## [Optional] Create UserStory.md interactively. Usage: make r
 	echo "Creating UserStory.md through interactive Q&A ..."
 	claude -p "/generating-interactive-userstory-md"
 
-ralph_prd:  ## [Optional] Generate PRD.md from UserStory.md
+ralph_prd_md:  ## [Optional] Generate PRD.md from UserStory.md
 	echo "Generating PRD.md from UserStory.md ..."
 	claude -p "/generating-prd-md-from-userstory-md"
 

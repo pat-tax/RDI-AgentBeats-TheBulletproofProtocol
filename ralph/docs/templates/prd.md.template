@@ -61,6 +61,7 @@ version: 1.0
 ## Notes for Ralph Loop
 
 <!-- PARSER REQUIREMENT: Include story count in parentheses -->
+<!-- PARSER REQUIREMENT: Use (depends: STORY-XXX, STORY-YYY) for dependencies -->
 Story Breakdown - Phase 1 ({{STORY_COUNT}} stories total):
 - **Feature 1 ({{FEATURE_NAME}})** → STORY-001: {{STORY_TITLE}}
-- **Feature 2 ({{FEATURE_NAME}})** → STORY-002: {{STORY_TITLE}}, STORY-003: {{STORY_TITLE}}
+- **Feature 2 ({{FEATURE_NAME}})** → STORY-002: {{STORY_TITLE}}, STORY-003: {{STORY_TITLE}} (depends: STORY-002)

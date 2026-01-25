@@ -23,6 +23,7 @@ class Story(TypedDict):
     passes: bool
     completed_at: str | None
     content_hash: str
+    depends_on: list[str]  # Story IDs that must complete first
 
 
 class Feature(TypedDict):
@@ -233,13 +234,22 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
         feature_num = int(match.group(1))
         stories_text = match.group(2).strip()
 
-        # Parse individual stories: STORY-XXX: Title
-        story_pattern = r"STORY-(\d+):\s*([^,\n]+)"
+        # Parse individual stories: STORY-XXX: Title (depends: STORY-YYY, STORY-ZZZ)
+        # Pattern captures: story_num, title, optional depends clause
+        story_pattern = r"STORY-(\d+):\s*([^,(]+?)(?:\s*\(depends:\s*([^)]+)\))?(?=,|\n|\Z)"
 
         story_specs = []
         for story_match in re.finditer(story_pattern, stories_text):
             story_num = story_match.group(1)
             story_title = story_match.group(2).strip()
+            depends_str = story_match.group(3)
+
+            # Parse depends_on list
+            depends_on = []
+            if depends_str:
+                # Extract STORY-XXX patterns from depends string
+                for dep_match in re.finditer(r"STORY-\d+", depends_str):
+                    depends_on.append(dep_match.group(0))
 
             story_specs.append(
                 {
@@ -247,6 +257,7 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
                     "title": story_title,
                     "acceptance_filter": [],  # Will filter from feature acceptance
                     "files": [],  # Will use feature files or empty
+                    "depends_on": depends_on,
                 }
             )
 
@@ -297,6 +308,7 @@ def apply_story_breakdown(
                     "passes": False,
                     "completed_at": None,
                     "content_hash": content_hash,
+                    "depends_on": spec.get("depends_on", []),
                 }
                 stories.append(story)
         else:
@@ -320,6 +332,7 @@ def apply_story_breakdown(
                 "passes": False,
                 "completed_at": None,
                 "content_hash": content_hash,
+                "depends_on": [],
             }
             stories.append(story)
 
@@ -563,12 +576,14 @@ def main():
     # Phase 1 stories (STORY-001 to STORY-021) - preserve status
     phase1_stories = [s for s in existing_stories if int(s["id"].split("-")[1]) <= 21]
 
-    # Add content_hash to Phase 1 stories if missing
+    # Add content_hash and depends_on to Phase 1 stories if missing
     for story in phase1_stories:
         if "content_hash" not in story:
             story["content_hash"] = compute_hash(
                 story["title"], story["description"], story["acceptance"]
             )
+        if "depends_on" not in story:
+            story["depends_on"] = []
 
     # Combine Phase 1 + Phase 2
     all_stories = phase1_stories + phase2_stories

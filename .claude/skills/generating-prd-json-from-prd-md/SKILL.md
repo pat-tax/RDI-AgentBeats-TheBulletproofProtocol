@@ -7,97 +7,72 @@ allowed-tools: Read, Write, Bash
 
 # PRD to JSON Conversion
 
-Converts `docs/PRD.md` into `ralph/docs/prd.json` for Ralph loop task tracking.
+Hybrid approach: Python script parses, AI validates and corrects.
 
-## Purpose
+## Workflow
 
-**Initial generation**: Extracts features from PRD.md → creates prd.json stories
-**Incremental updates**: Preserves completion status, detects content changes via SHA-256 hash
-**Content changes**: Resets story status when title/description/acceptance modified (triggers re-testing)
+1. **Run parser** (Bash tool)
+   ```bash
+   python ralph/scripts/generate_prd_json.py
+   ```
+   Script handles: PRD.md parsing, `(depends: ...)` extraction, content hashing, state preservation.
 
-## PRD.md Required Structure
+2. **Validate** (Read tool)
+   - Read `ralph/docs/prd.json` (script output)
+   - Read `docs/PRD.md` (cross-reference)
+   - Check against Validation Checklist
 
-```markdown
-## Functional Requirements
+3. **Correct errors** (Write tool, if needed)
+   - Fix issues found
+   - Recompute `content_hash` if title/description/acceptance changed
+   - Write corrected `ralph/docs/prd.json`
 
-#### Feature N: [Name]
+4. **Report**
+   - Story count and status
+   - Corrections made
+   - Suggest: `make ralph_run`
 
-**Description**: [What this feature does]
+## Validation Checklist
 
-**Acceptance Criteria**:
-- [ ] Criterion 1
-- [ ] Criterion 2
+For each story, verify:
 
-**Files Implemented**:
-- path/to/file.py
-```
+- [ ] `id` follows STORY-XXX format
+- [ ] `title` is 3-7 words, matches PRD.md feature
+- [ ] `description` is non-empty
+- [ ] `acceptance` array is non-empty
+- [ ] `files` array contains valid paths (if specified in PRD.md)
+- [ ] `content_hash` is 64-char hex string
+- [ ] `depends_on` references valid STORY-XXX IDs (no circular deps, no self-refs)
 
-**Extraction**: Parse `#### Feature N:` headings top-to-bottom, extract description, acceptance, files.
+Cross-reference with PRD.md:
 
-**Edge cases**: Missing acceptance → extract from description; Missing files → empty array; No features → ABORT
+- [ ] All `#### Feature N:` headings have corresponding stories
+- [ ] Story order matches PRD.md feature order
+- [ ] `(depends: STORY-XXX)` syntax correctly parsed
 
-## Story ID Assignment
+## Common Issues to Correct
 
-**Sequential, append-only**: STORY-001, STORY-002, etc. in PRD.md order
-
-**CRITICAL**: Always append new features to END of PRD.md (reordering breaks status preservation)
+| Issue | Correction |
+|-------|------------|
+| Empty acceptance | Extract from description or PRD.md feature |
+| Invalid depends_on reference | Remove non-existent story IDs |
+| Circular dependency | Remove one direction |
+| Missing content_hash | Recompute from title+description+acceptance |
+| Duplicate story IDs | Renumber sequentially |
 
 ## prd.json Schema
 
-Template: `ralph/docs/templates/prd.json.template` (read for structure, populate from PRD.md)
-
-**Required fields**:
-- `project`, `description`, `source`, `generated`, `stories[]`
-
-**Each story**:
-- `id`: STORY-XXX (sequential)
-- `title`: 3-7 words
-- `description`: 1-2 sentences
-- `acceptance`: Array of criteria
-- `files`: Array of paths
-- `passes`: Boolean (false initially)
-- `completed_at`: ISO timestamp (null initially)
-- `content_hash`: SHA-256 hex of `title + "|" + description + "|" + json.dumps(acceptance, sort_keys=True)` (use Python `hashlib.sha256().hexdigest()`, not OS tools)
-
-## State Preservation (Incremental Mode)
-
-When `ralph/docs/prd.json` exists:
-
-1. Read existing status: `{story_id: {passes, completed_at, content_hash}}`
-2. Generate new stories from PRD.md
-3. For each story:
-   - **ID exists + hash matches** → preserve `passes` and `completed_at`
-   - **ID exists + hash differs** → reset to `passes: false`, log "STORY-XXX content changed, re-test needed"
-   - **New ID** → set `passes: false`
-4. Write merged result
-
-**Dependency note**: Content changes require re-running integration tests with dependent stories (manual tracking)
-
-## Error Handling
-
-**ABORT** (don't write prd.json):
-- PRD.md not found at `docs/PRD.md`
-- No `#### Feature` headings found
-- Existing prd.json corrupted (invalid JSON)
-- Parsing failure (malformed PRD.md)
-
-**WARN** (write prd.json, log warning):
-- Missing acceptance criteria
-- Missing files list
-- Non-standard heading format
+See `ralph/docs/templates/prd.json.template` for structure and fields.
 
 ## Usage
 
 ```bash
-/generating-prd
+make ralph_prd_json
 ```
 
-**Output**: `ralph/docs/prd.json`
+## Next Steps
 
-**Verify**:
 ```bash
-jq '.stories | length' ralph/docs/prd.json
-jq '.stories[] | select(.passes == false)' ralph/docs/prd.json
+make ralph_init    # Validate environment
+make ralph_run     # Start Ralph loop
 ```
-
-**Next**: `make ralph_run`

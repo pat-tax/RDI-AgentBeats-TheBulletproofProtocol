@@ -33,7 +33,7 @@ Guides users through creating a user story document that can be transformed into
    - Replace placeholders with user responses
    - Write to `docs/UserStory.md`
 
-4. **Suggest next step**: `make ralph_prd` to generate PRD.md
+4. **Suggest next step**: `make ralph_prd_md` to generate PRD.md
 
 ## Template
 

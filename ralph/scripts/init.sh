@@ -68,7 +68,7 @@ check_project_structure() {
         "CONTRIBUTING.md"
         "docs/PRD.md"
         "Makefile"
-        ".claude/skills/generating-prd/SKILL.md"
+        ".claude/skills/generating-prd-json-from-prd-md/SKILL.md"
         "ralph/scripts/ralph.sh"
         "ralph/docs/templates/prompt.md"
     )
@@ -134,8 +134,7 @@ check_prd_json() {
 
         log_info ""
         log_info "To populate prd.json with real stories, run:"
-        log_info "  claude -p"
-        log_info "  Then ask: 'Use generating-prd skill to create prd.json from PRD.md'"
+        log_info "  make ralph_prd_json"
         log_info ""
         return 1
     else
