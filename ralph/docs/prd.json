@@ -222,8 +222,8 @@
         "Dockerfile.purple",
         "Dockerfile.green"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-25T19:00:03Z",
       "content_hash": "49a98b8db95314c6a337207316ee6eaffbe439504289ae035ecbe93ddf86c562",
       "depends_on": [
         "STORY-002",
