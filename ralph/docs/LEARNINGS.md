@@ -31,3 +31,53 @@
 ```
 
 Adding `depends_on`/`blocks` to prd.json prevents this category of errors at the source.
+
+---
+
+## Learning 2: Platform Integration Gap
+
+**Root Cause**: Implementation works in isolation but doesn't match target platform's integration contract.
+
+**Pattern**: All unit tests pass, local testing works, but deployment/submission fails due to interface mismatch.
+
+### Why This Happens
+
+1. **Assumed equivalence**: "It works locally" ≠ "It works on platform"
+2. **Late template analysis**: Reference implementations studied after building, not before
+3. **Wrong test target**: Tested against own assumptions, not platform tooling
+
+### Patterns to Apply
+
+1. **Template-first development**: Study platform's reference implementation BEFORE coding
+2. **Contract extraction**: Document exact interface requirements (CLI args, ports, endpoints, response format)
+3. **Platform integration story**: Add explicit story to verify against platform's actual tooling
+4. **Shadow testing**: Run platform's orchestration tools locally before submission
+
+### Checklist (Platform Integration)
+
+- [ ] Reference/template implementation analyzed before design
+- [ ] CLI interface matches platform expectations exactly
+- [ ] Default configuration (ports, timeouts) matches platform defaults
+- [ ] Entry point pattern matches platform's invocation method
+- [ ] Health/discovery endpoints match platform's probes
+- [ ] Tested with platform's actual orchestration tooling (not just local equivalents)
+
+### PRD Enhancement
+
+For any platform-targeted project, add to PRD:
+
+```markdown
+**Platform Compatibility**:
+- [ ] CLI interface: [exact args expected by platform]
+- [ ] Entry point: [exact invocation pattern]
+- [ ] Defaults: [ports, timeouts matching platform]
+- [ ] Endpoints: [discovery/health endpoints platform probes]
+- [ ] Validated against: [platform's tooling/scripts]
+```
+
+### Anti-Pattern
+
+```
+BAD:  "Works on my machine" → Ship
+GOOD: "Works with platform tooling" → Ship
+```

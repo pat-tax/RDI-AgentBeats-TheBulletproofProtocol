@@ -16,16 +16,16 @@ echo "Building Docker Images for GHCR"
 echo "==============================="
 echo ""
 
-# Get the GitHub username for image naming
-GITHUB_USERNAME="${GITHUB_USERNAME:-}"
+# Get the GitHub username for image naming (use GH_USERNAME for consistency)
+GH_USERNAME="${GH_USERNAME:-}"
 
-if [ -z "$GITHUB_USERNAME" ]; then
-  echo "GITHUB_USERNAME not set, using 'local' as default"
-  GITHUB_USERNAME="local"
+if [ -z "$GH_USERNAME" ]; then
+  echo "GH_USERNAME not set, using 'local' as default"
+  GH_USERNAME="local"
 fi
 
 echo -e "${BLUE}Building for platform:${NC} linux/amd64"
-echo -e "${BLUE}GitHub username:${NC} $GITHUB_USERNAME"
+echo -e "${BLUE}GitHub username:${NC} $GH_USERNAME"
 echo ""
 
 # Build Green Agent
@@ -33,7 +33,7 @@ echo -e "${GREEN}[1/2] Building Bulletproof Green Agent...${NC}"
 docker build \
   --platform linux/amd64 \
   -f Dockerfile.green \
-  -t ghcr.io/${GITHUB_USERNAME}/bulletproof-green:latest \
+  -t ghcr.io/${GH_USERNAME}/bulletproof-green:latest \
   .
 
 echo -e "${GREEN}✓ Green agent built successfully${NC}"
@@ -44,7 +44,7 @@ echo -e "${GREEN}[2/2] Building Bulletproof Purple Agent...${NC}"
 docker build \
   --platform linux/amd64 \
   -f Dockerfile.purple \
-  -t ghcr.io/${GITHUB_USERNAME}/bulletproof-purple:latest \
+  -t ghcr.io/${GH_USERNAME}/bulletproof-purple:latest \
   .
 
 echo -e "${GREEN}✓ Purple agent built successfully${NC}"
@@ -54,8 +54,8 @@ echo ""
 echo -e "${GREEN}Build Complete!${NC}"
 echo ""
 echo "Images built:"
-echo "  - ghcr.io/${GITHUB_USERNAME}/bulletproof-green:latest"
-echo "  - ghcr.io/${GITHUB_USERNAME}/bulletproof-purple:latest"
+echo "  - ghcr.io/${GH_USERNAME}/bulletproof-green:latest"
+echo "  - ghcr.io/${GH_USERNAME}/bulletproof-purple:latest"
 echo ""
 echo "Next step: Run scripts/push.sh to push images to GHCR"
 echo ""

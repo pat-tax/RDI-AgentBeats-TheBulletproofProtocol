@@ -28,16 +28,14 @@
 ```bash
 # 1. Setup development environment
 make setup_dev
-make setup_sandbox  # Install sandbox deps (Linux/WSL2)
 
 # 2. Local testing with docker-compose
 docker-compose up -d
-curl http://localhost:8001/.well-known/agent-card.json  # Green agent
-curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
+curl http://localhost:8001/.well-known/agent-card.json  # Purple agent
+curl http://localhost:8002/.well-known/agent-card.json  # Green agent
 
-# 3. Run validation
-make validate
-python src/validate_benchmark.py
+# 3. Run E2E tests
+bash scripts/test_e2e.sh
 ```
 
 For Ralph Loop autonomous development, see [ralph/README.md](ralph/README.md).
@@ -145,18 +143,19 @@ Before submitting, ensure all deliverables are complete:
   - Docker image: `Dockerfile.purple` (linux/amd64)
 
 - [x] **Infrastructure & Deployment**
-  - `docker-compose.yml` for local testing
-  - `scenario.toml` with agent configurations
-  - GHCR deployment scripts (`scripts/build.sh`, `scripts/push.sh`)
-  - GitHub Actions workflow (`.github/workflows/docker-publish.yml`)
+  - [x] `docker-compose.yml` for local testing
+  - [x] `scenario.toml` with agent configurations
+  - [x] GHCR deployment scripts (`scripts/build.sh`, `scripts/push.sh`)
+  - [x] GitHub Actions workflow (`.github/workflows/docker-publish.yml`)
 
 - [x] **Testing & Validation**
-  - Ground truth dataset (20 labeled narratives in `data/ground_truth.json`)
-  - Benchmark validation script (`src/validate_benchmark.py`)
-  - Integration tests (`tests/integration/`)
-  - All tests passing: `make validate`
+  - [x] Ground truth dataset (30 labeled narratives in `data/ground_truth.json`)
+  - [x] Comprehensive E2E test script (`scripts/test_comprehensive.sh`) - 90% classification accuracy
+  - [x] Benchmark validation script (`src/validate_benchmark.py`)
+  - [ ] Integration tests (`tests/integration/`)
+  - [ ] All tests passing: `make validate`
 
-- [x] **Documentation**
+- [ ] **Documentation**
   - `docs/Abstract.md` (≤500 words describing benchmark methodology)
   - `README.md` (this file) with usage instructions
   - `docs/AgentBeats/AGENTBEATS_REGISTRATION.md` (registration guide)
@@ -177,27 +176,20 @@ Before submitting, ensure all deliverables are complete:
 
 ### Validation Commands
 
-Run these commands to verify everything works:
-
 ```bash
-# 1. Local testing
-docker-compose up -d
-curl http://localhost:8001/.well-known/agent-card.json  # Green agent
-curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
+# Quick E2E test (basic validation)
+bash scripts/test_e2e.sh
 
-# 2. Run integration tests
+# Comprehensive E2E test with full ground truth dataset (30 narratives)
+bash scripts/test_comprehensive.sh
+
+# Unit tests
 make test
 
-# 3. Validate benchmark metrics
-python src/validate_benchmark.py
-
-# 4. Build and push to GHCR
-bash scripts/build.sh
-bash scripts/push.sh
-
-# 5. Verify images are public
-docker pull ghcr.io/YOUR_USERNAME/bulletproof-green:latest
-docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
+# Build and push to GHCR
+export GH_USERNAME=your-username
+export GHCR_PAT=your-token
+bash scripts/build.sh && bash scripts/push.sh
 ```
 
 ### Resources
