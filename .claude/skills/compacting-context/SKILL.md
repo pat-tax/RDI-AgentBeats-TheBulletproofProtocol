@@ -1,8 +1,10 @@
 ---
 name: compacting-context
 description: Compacts verbose context into structured summary. Use after pollution sources (searches, logs, JSON) or at phase milestones.
+argument-hint: [compaction-name]
 context: fork
 agent: Explore
+allowed-tools: Read, Grep, Glob
 ---
 
 # Context Compaction (ACE-FCA)

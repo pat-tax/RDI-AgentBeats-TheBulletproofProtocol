@@ -1,9 +1,20 @@
 ---
 name: designing-backend
 description: Designs concise, streamlined backend systems matching exact task requirements. Use when planning APIs, data models, system architecture, or when the user requests backend design work.
+argument-hint: [component-name]
+context: fork
+agent: Explore
+allowed-tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 
+## Git Context
+
+- Recent changes: !`git log --oneline -3`
+- Current branch: !`git branch --show-current`
+
 # Backend Architecture
+
+**Target**: $ARGUMENTS
 
 Creates **focused, streamlined** backend system designs matching stated
 requirements exactly. No over-engineering.

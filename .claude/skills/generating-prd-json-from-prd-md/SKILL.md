@@ -1,6 +1,8 @@
 ---
 name: generating-prd-json-from-prd-md
 description: Generates prd.json task tracking file from PRD.md requirements document. Use when initializing Ralph loop or when the user asks to convert PRD to JSON format for autonomous execution.
+model: haiku
+allowed-tools: Read, Write, Bash
 ---
 
 # PRD to JSON Conversion

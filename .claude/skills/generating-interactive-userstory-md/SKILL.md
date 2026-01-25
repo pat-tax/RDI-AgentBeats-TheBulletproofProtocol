@@ -1,6 +1,8 @@
 ---
 name: generating-interactive-userstory-md
 description: Interactive Q&A to build UserStory.md from user input. Use when the user wants to create a user story document or start the assisted workflow.
+disable-model-invocation: true
+allowed-tools: AskUserQuestion, Read, Write, WebFetch, WebSearch
 ---
 
 # User Story Builder

@@ -1,11 +1,15 @@
 ---
 name: researching-codebase
 description: Investigates codebase before planning. Use before any non-trivial implementation task to gather context in isolation.
+argument-hint: [topic-or-question]
 context: fork
 agent: Explore
+allowed-tools: Read, Grep, Glob
 ---
 
 # Codebase Research (ACE-FCA)
+
+**Query**: $ARGUMENTS
 
 Gathers codebase context **in isolation** before planning. Prevents search
 artifacts from polluting main context.
