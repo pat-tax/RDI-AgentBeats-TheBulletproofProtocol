@@ -631,7 +631,7 @@ docker-compose exec bulletproof-green ping bulletproof-purple
 
 ## Key Resources
 
-- **AgentBeats Leaderboard Template**: [github.com/RDI-Foundation/agentbeats-leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template)
+**Platform & Repos**: See [RESOURCES.md](RESOURCES.md)
+
 - **GitHub Container Registry Docs**: [docs.github.com/packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - **Docker Compose Documentation**: [docs.docker.com/compose](https://docs.docker.com/compose/)
-- **AgentBeats Tutorial**: [github.com/RDI-Foundation/agentbeats-tutorial](https://github.com/RDI-Foundation/agentbeats-tutorial)

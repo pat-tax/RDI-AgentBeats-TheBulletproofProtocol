@@ -130,7 +130,7 @@
 ### AAA Implementation Challenges
 
 1. **Complexity**: A2A protocol, Docker, assessment flow
-   - **Mitigation**: Use official a2a-sdk, follow agentbeats-tutorial examples
+   - **Mitigation**: Use official a2a-sdk, follow green-agent-template examples
 
 2. **Observability**: Agents are black boxes, hard to debug
    - **Mitigation**: Emit detailed task updates, log evaluation steps

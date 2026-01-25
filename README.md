@@ -30,7 +30,7 @@
 make setup_dev
 make setup_sandbox  # Install sandbox deps (Linux/WSL2)
 
-# 2. Local testing with Docker
+# 2. Local testing with docker-compose
 docker-compose up -d
 curl http://localhost:8001/.well-known/agent-card.json  # Green agent
 curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
@@ -202,10 +202,17 @@ docker pull ghcr.io/YOUR_USERNAME/bulletproof-purple:latest
 
 ### Resources
 
+**AgentBeats Platform**:
+
 - **Competition Platform**: [agentbeats.dev](https://agentbeats.dev)
 - **Documentation**: [docs.agentbeats.dev/tutorial](https://docs.agentbeats.dev/tutorial/)
 - **Discord Support**: [discord.gg/uqZUta3MYa](https://discord.gg/uqZUta3MYa)
 - **Phase 1 Submission**: [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7)
+
+**Official Competition Repos**: See [docs/AgentBeats/RESOURCES.md](docs/AgentBeats/RESOURCES.md)
+
+**Project Documentation**:
+
 - **Registration Guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
 - **Abstract**: [docs/Abstract.md](docs/Abstract.md)
 - **Ralph Loop**: [ralph/README.md](ralph/README.md)

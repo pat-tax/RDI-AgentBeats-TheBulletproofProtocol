@@ -82,6 +82,180 @@ Compete on public leaderboard for top 3 Phase 1 benchmarks.
 
 ---
 
+## Local Development
+
+### Running a Single Agent
+
+**Start agent server directly** ([green-agent-template](https://github.com/RDI-Foundation/green-agent-template)):
+
+```bash
+# Install dependencies
+uv sync
+
+# Run the agent server (default port 9009)
+uv run src/server.py
+
+# With custom port
+uv run src/server.py --port 8001
+
+# With custom host
+uv run src/server.py --host 0.0.0.0 --port 9009
+```
+
+**Verify agent is running**:
+
+```bash
+curl http://localhost:9009/.well-known/agent-card.json
+```
+
+### Running Full Assessments Locally
+
+**Using docker-compose** (recommended for local testing):
+
+```bash
+# Start all agents
+docker-compose up -d
+
+# Verify agents are running
+curl http://localhost:8001/.well-known/agent-card.json  # Green agent
+curl http://localhost:8002/.well-known/agent-card.json  # Purple agent
+
+# View logs
+docker-compose logs -f
+```
+
+**Running agents separately**:
+
+```bash
+# Terminal 1: Green agent
+cd green-agent && uv run src/server.py --port 8001
+
+# Terminal 2: Purple agent
+cd purple-agent && uv run src/server.py --port 8002
+```
+
+### Leaderboard Submissions
+
+For actual competition submissions, use the [agentbeats-leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template):
+
+1. Fork the leaderboard repo
+2. Fill in `scenario.toml` with your agent details
+3. Push changes → GitHub Actions runs assessment automatically
+4. Submit PR with results
+
+### A2A Conformance Testing
+
+```bash
+# Install test dependencies
+uv sync --extra test
+
+# Run conformance tests against running agent
+uv run pytest --agent-url http://localhost:9009
+```
+
+---
+
+## Assessment Patterns
+
+AgentBeats supports four official assessment patterns:
+
+### 1. Artifact Submission
+
+Purple agent produces output; green agent evaluates the artifact.
+
+- **Use case**: Code generation, document creation, report generation
+- **Flow**: Purple → Artifact → Green evaluates
+
+### 2. Traced Environments
+
+Green agent provides an environment that observes purple agent actions via MCP, SSH, or hosted systems.
+
+- **Use case**: Tool use evaluation, workflow assessment
+- **Flow**: Green provisions environment → Purple operates → Green observes and scores
+
+### 3. Message-Based
+
+Simple Q&A or reasoning exchanges between agents.
+
+- **Use case**: Knowledge evaluation, reasoning assessment, dialogue quality
+- **Flow**: Green sends prompts → Purple responds → Green evaluates responses
+
+### 4. Multi-Agent Games
+
+Green agent orchestrates interactions between multiple purple agents (security, negotiation, etc.).
+
+- **Use case**: Adversarial scenarios, collaboration assessment, competitive evaluation
+- **Flow**: Green coordinates → Multiple purples interact → Green scores outcomes
+
+**Bulletproof Protocol Mode**: Artifact submission + Message-based (Agent A generates narrative → Agent B evaluates)
+
+---
+
+## Reproducibility Requirements
+
+**Critical**: Each assessment must start from a fresh, clean state.
+
+### Key Principles
+
+1. **Fresh state for EACH assessment** - No carryover from previous runs
+2. **Use `task_id` for namespace isolation** - Separate state per task
+3. **Reset all state between runs** - Memory, files, databases
+4. **NO carryover of memory or files** - Each run is independent
+
+### Implementation
+
+```python
+async def execute(self, task_id: str, input_data: dict):
+    # Use task_id to namespace all state
+    workspace = f"/tmp/assessments/{task_id}"
+    os.makedirs(workspace, exist_ok=True)
+
+    # Clean workspace on completion
+    try:
+        result = await self._run_assessment(workspace, input_data)
+    finally:
+        shutil.rmtree(workspace, ignore_errors=True)
+
+    return result
+```
+
+---
+
+## Observability Best Practices
+
+Make agent behavior visible for debugging and scoring.
+
+### Emit A2A Task Updates
+
+```python
+# Emit progress updates during execution
+await task.update_status("processing", message="Evaluating narrative...")
+await task.update_status("processing", message="Applying IRS Section 41 rules...")
+```
+
+### Generate Artifacts
+
+```python
+# Generate artifacts for outputs (code, reports, logs)
+artifact = {
+    "type": "evaluation_report",
+    "content": {
+        "risk_score": 45,
+        "issues": [...],
+        "summary": "..."
+    }
+}
+await task.add_artifact(artifact)
+```
+
+### Visible Reasoning
+
+- Log intermediate decisions for debugging
+- Include reasoning traces in evaluation results
+- Make scoring component breakdown transparent
+
+---
+
 ## Technical Requirements
 
 ### 1. A2A Protocol (Agent-to-Agent)
@@ -201,9 +375,10 @@ bulletproof-protocol/
 
 **Reference Examples**:
 
-- [agentbeats-tutorial](https://github.com/RDI-Foundation/agentbeats-tutorial) - Concepts, debate scenario
-- [agentbeats-leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template) - Leaderboard setup
-- [agentify-example-tau-bench](https://github.com/agentbeats/agentify-example-tau-bench) - Agentifying existing benchmark
+- [green-agent-template](https://github.com/RDI-Foundation/green-agent-template) - Benchmark agent scaffold
+- [agent-template](https://github.com/RDI-Foundation/agent-template) - General agent scaffold
+- [agentbeats-leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template) - Leaderboard submission
+- [agentbeats-debate-leaderboard](https://github.com/RDI-Foundation/agentbeats-debate-leaderboard) - Reference implementation
 
 ---
 
@@ -278,19 +453,7 @@ summary = watcher.get_summary(details)
 
 ## Key Resources
 
-### AgentBeats
-
-- **Platform**: [agentbeats.dev](https://agentbeats.dev)
-- **Tutorial**: [docs.agentbeats.dev](https://docs.agentbeats.dev/tutorial/)
-- **Discord**: [discord.gg/uqZUta3MYa](https://discord.gg/uqZUta3MYa)
-- **Signup**: [forms.gle/NHE8wYVgS6iJLwRj8](https://forms.gle/NHE8wYVgS6iJLwRj8)
-- **Phase 1 Submission**: [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7)
-
-### Protocols
-
-- **A2A Protocol**: [a2a-protocol.org](https://a2a-protocol.org/latest/)
-- **Google ADK**: [google.github.io/adk-docs](https://google.github.io/adk-docs/a2a/intro/)
-- **A2A GitHub**: [github.com/a2aproject/A2A](https://github.com/a2aproject/A2A)
+**Platform, Repos & A2A Protocol**: See [RESOURCES.md](RESOURCES.md)
 
 ### Benchmark Research
 
@@ -311,19 +474,46 @@ summary = watcher.get_summary(details)
 
 ## Cost Management
 
-**BYOK Model** (Bring Your Own Key):
+### BYOK Model (Bring Your Own Key)
 
-- Set spending limits on API keys
-- Recommended: $10 limit with $5 alert for single agent
-- Use smaller models (Qwen 2.5 7B) for development
-- Reserve larger models for final demo
+Agents use environment variables for API keys, allowing participants to control costs.
+
+**Recommended Limits**:
+
+- Set $10 spending limit with $5 alert per agent
+- Monitor usage during development
+- Reserve higher limits for final demo
+
+**Environment Variable Pattern**:
+
+```toml
+# scenario.toml
+[[participants]]
+agentbeats_id = "agent_123"
+env = { OPENAI_API_KEY = "${OPENAI_API_KEY}" }
+```
+
+### Cost-Effective Alternatives
+
+| Provider | Tier | Notes |
+|----------|------|-------|
+| **Google Gemini** | Free tier | Good for development |
+| **OpenRouter** | Free credits | Multiple model access |
+| **Ollama** | Local (free) | No API costs, requires GPU |
+| **Qwen 2.5 7B** | Local | Smaller model for iteration |
+
+### Development Workflow
+
+1. **Development**: Use free tiers (Gemini, OpenRouter) or local models (Ollama)
+2. **Testing**: Use small models with strict limits
+3. **Final Demo**: Use production models with appropriate budget
 
 ---
 
 ## Next Actions
 
 1. **Register for competition**: [forms.gle/NHE8wYVgS6iJLwRj8](https://forms.gle/NHE8wYVgS6iJLwRj8)
-2. **Clone reference repos**: agentbeats-tutorial, agentbeats-leaderboard-template
+2. **Clone reference repos**: green-agent-template, agent-template, agentbeats-leaderboard-template
 3. **Study A2A protocol**: Implement minimal A2A server in Python
 4. **Define IRS Section 41 rubric**: Document evaluation criteria for Agent B
 5. **Create Docker scaffolding**: Dockerfiles for green/purple agents

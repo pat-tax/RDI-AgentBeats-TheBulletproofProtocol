@@ -281,4 +281,4 @@ If you encounter issues:
 1. Check this guide's [Common Issues](#common-issues) section
 2. Review [AgentBeats Tutorial](https://docs.agentbeats.dev/tutorial/)
 3. Ask on [Discord](https://discord.gg/uqZUta3MYa) in #support or #legal-domain
-4. Check GitHub Issues in [reference repositories](https://github.com/RDI-Foundation/agentbeats-tutorial)
+4. Check GitHub Issues in reference repositories ([green-agent-template](https://github.com/RDI-Foundation/green-agent-template), [leaderboard-template](https://github.com/RDI-Foundation/agentbeats-leaderboard-template))
