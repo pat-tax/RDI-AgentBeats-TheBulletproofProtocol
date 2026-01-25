@@ -5,30 +5,23 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_markdownlint setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
 # MARK: setup
 
 
-setup_dev:  ## Install uv and deps, Download and start Ollama 
+setup_dev:  ## Install uv and all dependencies (Python, dev tools, Claude Code)
 	echo "Setting up dev environment ..."
 	pip install uv -q
 	uv sync --all-groups
-	echo "npm version: $$(npm --version)"
 	$(MAKE) -s setup_claude_code
-	$(MAKE) -s setup_markdownlint
 
-setup_claude_code:  ## Setup claude code CLI, node.js and npm have to be present
+setup_claude_code:  ## Setup claude code CLI
 	echo "Setting up Claude Code CLI ..."
 	curl -fsSL https://claude.ai/install.sh | bash
 	echo "Claude Code CLI version: $$(claude --version)"
-
-setup_markdownlint:  ## Setup markdownlint CLI, node.js and npm have to be present
-	echo "Setting up markdownlint CLI ..."
-	npm install -gs markdownlint-cli
-	echo "markdownlint version: $$(markdownlint --version)"
 
 setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
 	echo "Installing sandbox dependencies ..."
@@ -50,10 +43,9 @@ setup_devc_project:  ## Devcontainer: Full project env (sandbox + Python/Node de
 	$(MAKE) -s setup_dev
 	$(MAKE) -s setup_project
 
-setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Code + markdownlint)
+setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Code)
 	$(MAKE) -s setup_sandbox
 	$(MAKE) -s setup_claude_code
-	$(MAKE) -s setup_markdownlint
 
 
 # MARK: run markdownlint
@@ -64,7 +56,7 @@ run_markdownlint:  ## Lint markdown files. Usage from root dir: make run_markdow
 		echo "Error: No input files specified. Use INPUT_FILES=\"docs/**/*.md\""
 		exit 1
 	fi
-	markdownlint $(INPUT_FILES) --fix
+	uv run pymarkdown fix $(INPUT_FILES)
 
 
 # MARK: Sanity
