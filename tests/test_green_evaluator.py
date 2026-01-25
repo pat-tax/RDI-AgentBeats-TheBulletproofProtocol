@@ -11,8 +11,6 @@ This test module validates the acceptance criteria for STORY-003:
 - Returns structured evaluation per Green-Agent-Metrics-Specification.md
 """
 
-import pytest
-
 from bulletproof_green.evaluator import (
     EvaluationResult,
     Issue,
@@ -268,12 +266,20 @@ class TestComplianceClassification:
         """Test that risk score < 20 results in QUALIFYING."""
         evaluator = RuleBasedEvaluator()
 
-        # Test threshold behavior
-        class MockResult:
-            risk_score = 19  # Below threshold
+        # A narrative designed to get exactly borderline score
+        # Test that the evaluator uses 20 as the threshold
+        low_risk_narrative = """
+        The project faced significant technical uncertainty. Experiments failed
+        initially with 500ms latency. After iterations, achieved 45ms. Metrics:
+        throughput 50,000 req/s, memory 1.2GB.
+        """
+        result = evaluator.evaluate(low_risk_narrative)
 
-        # Classification is determined by risk_score < 20
-        assert 19 < 20  # QUALIFYING threshold check
+        # Verify threshold: risk_score < 20 = QUALIFYING
+        if result.risk_score < 20:
+            assert result.classification == "QUALIFYING"
+        else:
+            assert result.classification == "NON_QUALIFYING"
 
 
 class TestDeterministicScoring:
