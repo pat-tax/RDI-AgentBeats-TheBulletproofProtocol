@@ -164,9 +164,7 @@ class LLMJudge:
             llm_score = llm_result.score
 
             # Compute hybrid score: final = α*rule + β*llm
-            final_score = (
-                self.config.alpha * rule_score + self.config.beta * llm_score
-            )
+            final_score = self.config.alpha * rule_score + self.config.beta * llm_score
 
             return HybridScoreResult(
                 final_score=final_score,
