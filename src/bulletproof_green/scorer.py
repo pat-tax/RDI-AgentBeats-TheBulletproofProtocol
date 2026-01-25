@@ -54,7 +54,9 @@ class AgentBeatsScorer:
         overall_score = self._compute_overall_score(eval_result.risk_score)
 
         correctness = self._compute_component_score(
-            eval_result.component_scores.get("routine_engineering_penalty", self.MAX_ROUTINE_PENALTY),
+            eval_result.component_scores.get(
+                "routine_engineering_penalty", self.MAX_ROUTINE_PENALTY
+            ),
             self.MAX_ROUTINE_PENALTY,
         )
 
@@ -69,7 +71,9 @@ class AgentBeatsScorer:
         )
 
         experimentation = self._compute_component_score(
-            eval_result.component_scores.get("experimentation_penalty", self.MAX_EXPERIMENTATION_PENALTY),
+            eval_result.component_scores.get(
+                "experimentation_penalty", self.MAX_EXPERIMENTATION_PENALTY
+            ),
             self.MAX_EXPERIMENTATION_PENALTY,
         )
 
