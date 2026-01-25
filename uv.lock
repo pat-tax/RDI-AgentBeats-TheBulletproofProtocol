@@ -502,58 +502,35 @@ wheels = [
 name = "rdi-agentbeats-thebulletproofprotocol"
 version = "0.0.0"
 source = { editable = "." }
-
-[package.optional-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "pyright" },
-    { name = "pytest" },
-    { name = "ruff" },
-]
-green = [
+dependencies = [
     { name = "a2a-sdk", extra = ["http-server"] },
-    { name = "uvicorn" },
-]
-purple = [
-    { name = "a2a-sdk", extra = ["http-server"] },
+    { name = "scikit-learn" },
     { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "a2a-sdk", extra = ["http-server"] },
     { name = "httpx" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "ruff" },
-    { name = "scikit-learn" },
-    { name = "uvicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "a2a-sdk", extras = ["http-server"], marker = "extra == 'green'", specifier = ">=0.3.0" },
-    { name = "a2a-sdk", extras = ["http-server"], marker = "extra == 'purple'", specifier = ">=0.3.0" },
-    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
-    { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" },
-    { name = "uvicorn", marker = "extra == 'green'", specifier = ">=0.30.0" },
-    { name = "uvicorn", marker = "extra == 'purple'", specifier = ">=0.30.0" },
+    { name = "a2a-sdk", extras = ["http-server"], specifier = ">=0.3.0" },
+    { name = "scikit-learn", specifier = ">=1.5.0" },
+    { name = "uvicorn", specifier = ">=0.30.0" },
 ]
-provides-extras = ["dev", "purple", "green"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "a2a-sdk", extras = ["http-server"], specifier = ">=0.3.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "pyright", specifier = ">=1.1.0" },
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", specifier = ">=0.24.0" },
     { name = "ruff", specifier = ">=0.8.0" },
-    { name = "scikit-learn", specifier = ">=1.5.0" },
-    { name = "uvicorn", specifier = ">=0.30.0" },
 ]
 
 [[package]]

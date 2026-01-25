@@ -22,7 +22,7 @@ setup_dev:  ## Install uv and deps, Download and start Ollama
 
 setup_claude_code:  ## Setup claude code CLI, node.js and npm have to be present
 	echo "Setting up Claude Code CLI ..."
-	npm install -gs @anthropic-ai/claude-code
+	curl -fsSL https://claude.ai/install.sh | bash
 	echo "Claude Code CLI version: $$(claude --version)"
 
 setup_markdownlint:  ## Setup markdownlint CLI, node.js and npm have to be present
