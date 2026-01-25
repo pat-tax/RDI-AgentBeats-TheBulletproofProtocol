@@ -166,5 +166,197 @@
       "failure_patterns": [],
       "positive_indicators": ["uncertainty", "hypothesized", "experiments", "anomalies", "unsuccessful attempts", "alternative approaches", "99.95%"]
     }
+  },
+  {
+    "id": "Q008",
+    "narrative": "We investigated methods to achieve sub-millisecond garbage collection pauses in high-throughput event processing systems. The uncertainty was whether region-based memory allocation could eliminate stop-the-world pauses without compromising throughput. We hypothesized that combining escape analysis with incremental collection could work. Initial experiments with generational GC failed to meet latency requirements, with P99 pauses exceeding 50ms. We tested alternative strategies including reference counting hybrids and concurrent marking. After systematic benchmarking, we discovered that arena allocation with deferred cleanup during idle periods reduced P99 pauses to 0.3ms while maintaining 2.1M events/second throughput.",
+    "expected_score": 8,
+    "classification": "QUALIFYING",
+    "difficulty": "easy",
+    "annotations": {
+      "irs_rationale": "Meets Section 41(d)(1) technical uncertainty criteria: unclear if sub-millisecond GC pauses were achievable in high-throughput systems. Process of experimentation per Section 41(d)(1)(C) demonstrated through hypothesis testing, failed generational GC approach, systematic evaluation of alternatives, and measurable discovery.",
+      "failure_patterns": [],
+      "positive_indicators": ["investigated", "uncertainty", "hypothesized", "experiments", "failed", "alternative", "systematic", "0.3ms"]
+    }
+  },
+  {
+    "id": "Q009",
+    "narrative": "Our research focused on developing privacy-preserving federated learning that could train models on distributed healthcare data without data centralization. It was uncertain whether differential privacy guarantees could be maintained while achieving acceptable model accuracy. We hypothesized that secure aggregation combined with local differential privacy could solve this. Early experiments with standard federated averaging showed unacceptable privacy leakage in gradient updates. We tested alternative aggregation protocols and evaluated their privacy-utility tradeoffs. After extensive experimentation, we discovered that adding calibrated noise at both local and global levels with adaptive clipping achieved epsilon=0.5 differential privacy while retaining 94% of centralized model accuracy.",
+    "expected_score": 10,
+    "classification": "QUALIFYING",
+    "difficulty": "medium",
+    "annotations": {
+      "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about maintaining differential privacy with acceptable accuracy. Section 41(d)(1)(C) process of experimentation shown through hypothesis, failed initial approach, systematic evaluation of alternatives, and quantifiable discovery.",
+      "failure_patterns": [],
+      "positive_indicators": ["research", "uncertain", "hypothesized", "experiments", "unacceptable", "alternative", "extensive experimentation", "epsilon=0.5", "94%"]
+    }
+  },
+  {
+    "id": "Q010",
+    "narrative": "We explored methods to achieve deterministic replay of distributed system executions for debugging production failures. The fundamental uncertainty was whether we could capture sufficient causality information without prohibitive performance overhead. Our hypothesis centered on vector clock compression combined with selective logging. Initial attempts with full message logging failed due to 40% throughput reduction. We experimented with sampling strategies and compared their replay fidelity. Through systematic analysis, we discovered that logging only external non-determinism plus thread scheduling decisions enabled perfect replay with only 3% overhead, resolving a critical debugging gap in our distributed infrastructure.",
+    "expected_score": 11,
+    "classification": "QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Meets Section 41(d)(1)(A): uncertainty about capturing causality without prohibitive overhead. Section 41(d)(1)(C) experimentation evident through hypothesis formation, failed full logging approach, systematic comparison of alternatives, and discovery of selective logging solution.",
+      "failure_patterns": [],
+      "positive_indicators": ["explored", "fundamental uncertainty", "hypothesis", "failed", "experimented", "systematic analysis", "3% overhead"]
+    }
+  },
+  {
+    "id": "Q011",
+    "narrative": "Our team researched methods to detect and mitigate data drift in real-time ML prediction pipelines without manual intervention. The technical uncertainty was whether statistical divergence measures could reliably distinguish meaningful drift from natural variance. We hypothesized that combining Kolmogorov-Smirnov tests with feature importance weighting could work. Initial experiments using simple threshold-based detection produced excessive false positives (47% false alarm rate). We tested alternative approaches including CUSUM and Page-Hinkley change detection. After systematic evaluation across multiple production datasets, we discovered that ensemble voting with adaptive thresholds reduced false alarms to 4% while detecting 96% of genuine drift events within 15 minutes.",
+    "expected_score": 9,
+    "classification": "QUALIFYING",
+    "difficulty": "medium",
+    "annotations": {
+      "irs_rationale": "Qualifies under Section 41(d)(1): technical uncertainty about distinguishing meaningful drift from variance. Process of experimentation per Section 41(d)(1)(C) shown through hypothesis, failed initial approach with quantified results, alternative testing, and systematic discovery.",
+      "failure_patterns": [],
+      "positive_indicators": ["researched", "technical uncertainty", "hypothesized", "experiments", "produced excessive false positives", "alternative approaches", "systematic evaluation", "4%", "96%"]
+    }
+  },
+  {
+    "id": "NQ008",
+    "narrative": "We deployed a new monitoring solution to improve visibility into our production systems. The team set up dashboards using a popular observability platform and configured alerting rules based on industry best practices. We integrated log aggregation from all services and established retention policies. The new setup provides better insights into system behavior and helps the team respond faster to incidents. Response time to critical alerts decreased from 15 minutes to 5 minutes. The improved monitoring helped us maintain our SLA commitments and keep customers satisfied.",
+    "expected_score": 52,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "easy",
+    "annotations": {
+      "irs_rationale": "Excluded under Section 41(d)(3): routine system administration using established monitoring tools and practices. Vague language ('improve visibility', 'better insights', 'respond faster'). No technical uncertainty - standard observability setup with known capabilities.",
+      "failure_patterns": ["routine_engineering", "vague_language"],
+      "flagged_terms": ["improve visibility", "better insights", "respond faster", "improved monitoring"]
+    }
+  },
+  {
+    "id": "NQ009",
+    "narrative": "Our engineering team modernized the legacy reporting system to improve data accuracy and reduce maintenance burden. We migrated from stored procedures to a modern ETL framework and rewrote complex SQL queries as transformation pipelines. The new architecture uses industry-standard practices for data validation and error handling. We also added comprehensive testing to catch data quality issues early. Report generation time decreased from 4 hours to 45 minutes. The modernized system is easier to maintain and extend with new report types as business needs evolve.",
+    "expected_score": 45,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "medium",
+    "annotations": {
+      "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Routine engineering per Section 41(d)(3): migration using established ETL patterns and industry-standard practices. Vague claims ('improve data accuracy', 'easier to maintain') without documented uncertainty.",
+      "failure_patterns": ["routine_engineering", "vague_language"],
+      "flagged_terms": ["modernized", "improve data accuracy", "industry-standard practices", "easier to maintain"]
+    }
+  },
+  {
+    "id": "NQ010",
+    "narrative": "We implemented a feature flag system to enable safer deployments and faster experimentation. The team evaluated several open-source solutions and selected one that matched our requirements. Integration involved adding SDK calls throughout the codebase and setting up the management console. We established processes for flag lifecycle management and gradual rollouts. This enabled the product team to test new features with a subset of users before full release. The system improved our deployment confidence and reduced rollback frequency by 60%.",
+    "expected_score": 48,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "medium",
+    "annotations": {
+      "irs_rationale": "Excluded under Section 41(d)(3): routine software engineering using existing feature flag solutions. No technical uncertainty - capability of feature flag systems is well-established. Vague language ('safer deployments', 'improved our deployment confidence').",
+      "failure_patterns": ["routine_engineering", "vague_language"],
+      "flagged_terms": ["implemented", "evaluated", "improved our deployment confidence", "safer deployments"]
+    }
+  },
+  {
+    "id": "NQ011",
+    "narrative": "We enhanced our API gateway to handle increased traffic and improve response times. The team upgraded to a newer version with better performance characteristics and configured rate limiting and caching policies. We also implemented request coalescing for frequently accessed endpoints. Load testing confirmed the gateway could handle 3x our peak traffic with sub-50ms P95 latency. These improvements positioned us well for the upcoming product launch and expected user growth. The changes helped us deliver a better experience to our growing customer base.",
+    "expected_score": 55,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty documented. Routine engineering per Section 41(d)(3): standard gateway optimization using established patterns (rate limiting, caching, coalescing). Vague claims ('better performance', 'better experience') without documented uncertainty about outcomes.",
+      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
+      "flagged_terms": ["enhanced", "improve response times", "better performance", "better experience", "growing customer base"]
+    }
+  },
+  {
+    "id": "NQ012",
+    "narrative": "Our team built a data lake to centralize analytics and enable self-service reporting for business stakeholders. We set up cloud storage with appropriate partitioning and implemented a metadata catalog for data discovery. The architecture follows the medallion pattern with bronze, silver, and gold layers for different data quality levels. We integrated with existing BI tools and trained analysts on the new platform. Query performance improved significantly, and business users can now access data without engineering support. This reduced time-to-insight and helped drive better business decisions.",
+    "expected_score": 60,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Excluded under Section 41(d)(3): routine data engineering using established medallion architecture pattern. Contains business risk language ('drive better business decisions', 'time-to-insight'). Vague claims ('improved significantly', 'better business decisions') without technical uncertainty.",
+      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
+      "flagged_terms": ["centralize", "improved significantly", "better business decisions", "time-to-insight"]
+    }
+  },
+  {
+    "id": "NQ013",
+    "narrative": "We refactored our notification system to support multiple channels and improve delivery reliability. The team redesigned the architecture to use a message queue with at-least-once delivery guarantees. We implemented retry logic with exponential backoff for failed deliveries and added dead letter queues for troubleshooting. The new system supports email, SMS, push notifications, and in-app messages through a unified interface. Delivery success rate improved from 97% to 99.5%. These improvements enhanced customer communication and supported our goal of increasing user engagement.",
+    "expected_score": 42,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Standard software engineering patterns per Section 41(d)(3): message queues, retry logic, dead letter queues are well-established. Contains business risk language ('increasing user engagement'). While numeric results cited, methods used are routine.",
+      "failure_patterns": ["routine_engineering", "business_risk"],
+      "flagged_terms": ["refactored", "improve delivery reliability", "enhanced customer communication", "increasing user engagement"]
+    }
+  },
+  {
+    "id": "NQ014",
+    "narrative": "Our development team consolidated multiple microservices to reduce operational complexity and improve system performance. We identified services with high coupling and merged them into cohesive bounded contexts. The consolidation eliminated inter-service network calls for common operations and simplified the deployment pipeline. We updated the API contracts to maintain backward compatibility during the transition. The simplified architecture reduced infrastructure costs by 35% and deployment time by 50%. This strategic move improved developer productivity and allowed us to focus resources on core business features.",
+    "expected_score": 58,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Excluded under Section 41(d)(3): routine architecture work (service consolidation) using established domain-driven design patterns. Contains business risk language ('strategic move', 'core business features', 'developer productivity'). No technical uncertainty - outcomes of consolidation were predictable.",
+      "failure_patterns": ["routine_engineering", "business_risk", "vague_language"],
+      "flagged_terms": ["consolidated", "improve system performance", "strategic move", "core business features", "improved developer productivity"]
+    }
+  },
+  {
+    "id": "Q012",
+    "narrative": "We researched approaches to achieve accurate pose estimation from single monocular images without depth sensors. The uncertainty was whether learning-based methods could generalize across different body types and clothing without extensive per-subject calibration. Our hypothesis involved training on synthetic data with domain randomization. Initial experiments with direct regression produced unacceptable 85mm mean joint position error on real-world data. We tested alternative architectures including heatmap-based detection and graph neural networks for skeletal constraints. Through systematic ablation, we discovered that combining 2D heatmaps with learned depth priors and temporal smoothing achieved 23mm mean error, enabling markerless motion capture for fitness applications.",
+    "expected_score": 14,
+    "classification": "QUALIFYING",
+    "difficulty": "medium",
+    "annotations": {
+      "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about generalization across body types without calibration. Section 41(d)(1)(C) experimentation shown through hypothesis, failed initial approach (85mm error), systematic testing of alternatives, and discovery (23mm error).",
+      "failure_patterns": [],
+      "positive_indicators": ["researched", "uncertainty", "hypothesis", "experiments", "unacceptable", "alternative", "systematic ablation", "23mm"]
+    }
+  },
+  {
+    "id": "Q013",
+    "narrative": "Our investigation targeted achieving consistent sub-10ms end-to-end latency for real-time collaborative editing across geographically distributed users. The uncertainty was whether operational transformation could handle high-frequency concurrent edits without divergence or excessive latency. We hypothesized that conflict-free replicated data types with optimized merge algorithms could work. Early experiments with standard CRDT implementations showed unacceptable latency spikes of 200ms during burst edit scenarios. We tested alternative approaches including hybrid OT-CRDT systems and evaluated their convergence properties. After systematic optimization, we discovered that batching operations with priority-based conflict resolution achieved 8ms P99 latency while guaranteeing eventual consistency across all replicas.",
+    "expected_score": 18,
+    "classification": "QUALIFYING",
+    "difficulty": "hard",
+    "annotations": {
+      "irs_rationale": "Meets Section 41(d)(1): uncertainty about handling concurrent edits without divergence or latency issues. Process of experimentation per Section 41(d)(1)(C) evident through hypothesis, failed standard CRDT approach, systematic evaluation of alternatives, and discovery.",
+      "failure_patterns": [],
+      "positive_indicators": ["investigation", "uncertainty", "hypothesized", "experiments", "unacceptable latency", "alternative approaches", "systematic optimization", "8ms"]
+    }
+  },
+  {
+    "id": "NQ015",
+    "narrative": "We upgraded our CI/CD pipeline to reduce build times and improve developer experience. The team migrated from our legacy build system to a modern platform with better parallelization support. We implemented build caching, optimized dependency resolution, and configured incremental builds for faster feedback. Test parallelization was improved by distributing tests across multiple runners. Build times decreased from 25 minutes to 8 minutes on average. These improvements boosted team morale and helped us ship features more quickly to stay ahead of competitors.",
+    "expected_score": 53,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "easy",
+    "annotations": {
+      "irs_rationale": "Excluded under Section 41(d)(3): routine DevOps optimization using established CI/CD practices. Contains business risk language ('stay ahead of competitors', 'ship features more quickly'). Vague claims ('improve developer experience', 'boosted team morale'). No technical uncertainty.",
+      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
+      "flagged_terms": ["upgraded", "improve developer experience", "boosted team morale", "stay ahead of competitors"]
+    }
+  },
+  {
+    "id": "NQ016",
+    "narrative": "Our team implemented automated scaling for our cloud infrastructure to handle variable workloads more efficiently. We configured auto-scaling policies based on CPU utilization and request queue depth. The implementation included custom metrics for application-specific scaling triggers and predictive scaling for anticipated traffic patterns. We also added safeguards to prevent runaway scaling and cost overruns. The system now automatically adjusts capacity between 10 and 100 instances based on demand. This reduced our infrastructure costs by 40% while maintaining response time SLAs during peak periods.",
+    "expected_score": 46,
+    "classification": "NON_QUALIFYING",
+    "difficulty": "easy",
+    "annotations": {
+      "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Standard cloud infrastructure management per Section 41(d)(3): auto-scaling is well-documented cloud platform feature. While quantitative results cited, methods used are routine configuration of existing capabilities.",
+      "failure_patterns": ["routine_engineering"],
+      "flagged_terms": ["implemented", "configured", "handle variable workloads more efficiently"]
+    }
+  },
+  {
+    "id": "Q014",
+    "narrative": "We investigated methods to detect and prevent prompt injection attacks in LLM-powered applications without significantly degrading response quality. The uncertainty was whether input sanitization could block adversarial prompts while preserving legitimate user intent. Our hypothesis involved multi-stage filtering with semantic similarity checks. Initial experiments with keyword-based blocking failed catastrophically, blocking 23% of legitimate queries while missing 67% of injection attempts. We tested alternative approaches including trained classifiers and output validation. Through systematic red-team testing, we discovered that combining input embedding analysis with output constraint verification blocked 99.2% of injection attacks while affecting only 0.8% of legitimate queries.",
+    "expected_score": 16,
+    "classification": "QUALIFYING",
+    "difficulty": "easy",
+    "annotations": {
+      "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about blocking adversarial prompts while preserving legitimate intent. Section 41(d)(1)(C) experimentation demonstrated through hypothesis, failed keyword blocking (quantified), systematic testing of alternatives, and discovery of effective solution.",
+      "failure_patterns": [],
+      "positive_indicators": ["investigated", "uncertainty", "hypothesis", "experiments", "failed catastrophically", "alternative approaches", "systematic", "99.2%", "0.8%"]
+    }
   }
 ]
