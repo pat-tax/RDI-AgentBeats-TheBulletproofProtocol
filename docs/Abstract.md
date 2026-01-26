@@ -54,10 +54,10 @@ The benchmark exposes an A2A-compatible HTTP server implementing the AgentBeats 
 ## Keywords
 
 - Bulletproof Protocol
-- green-agent Assessor, Substantiator, Participant
-- purple-agent: Assessee, Examiner, Evaluator
-- R&D tax
+- R&D tax credit (Compliance Audit)
 - IRS Section 41 (Compliance)
 - Section 174 (Regulatory Criteria)
-- routine engineering, experimentation
-- qualified research, eligible activities
+- Routine engineering, Experimentation, Investigation
+- Qualified Research, Eligible Activities
+- Green Agent Assessor, Examiner, Evaluator
+- Purple Agent: Assessee, Substantiator, Participant
