@@ -50,3 +50,14 @@ By converting 4-hour manual tax compliance reviews into 5-minute automated evalu
 ## Implementation
 
 The benchmark exposes an A2A-compatible HTTP server implementing the AgentBeats protocol. All code, datasets, and validation scripts are open source. Docker images are publicly available on GitHub Container Registry for reproducible deployment.
+
+## Keywords
+
+- Bulletproof Protocol
+- green-agent Assessor, Substantiator, Participant
+- purple-agent: Assessee, Examiner, Evaluator
+- R&D tax
+- IRS Section 41 (Compliance)
+- Section 174 (Regulatory Criteria)
+- routine engineering, experimentation
+- qualified research, eligible activities
