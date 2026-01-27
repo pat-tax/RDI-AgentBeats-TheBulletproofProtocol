@@ -74,6 +74,20 @@ def create_agent_card(base_url: str = "http://localhost:8000") -> dict[str, Any]
     }
 
 
+def _validate_skill(skill: Any) -> bool:
+    """Validate a single skill entry.
+
+    Args:
+        skill: Skill entry to validate.
+
+    Returns:
+        True if skill has required fields, False otherwise.
+    """
+    if not isinstance(skill, dict):
+        return False
+    return all(field in skill for field in ("id", "name", "description"))
+
+
 def validate_agent_card(card: dict[str, Any]) -> bool:
     """Validate an AgentCard against the JSON schema.
 
@@ -84,9 +98,9 @@ def validate_agent_card(card: dict[str, Any]) -> bool:
         True if valid, False otherwise.
     """
     # Check required fields
-    for field in AGENT_CARD_SCHEMA["required"]:
-        if field not in card:
-            return False
+    required = set(AGENT_CARD_SCHEMA["required"])
+    if not required.issubset(card.keys()):
+        return False
 
     # Check capabilities type if present
     if "capabilities" in card and not isinstance(card["capabilities"], dict):
@@ -98,11 +112,6 @@ def validate_agent_card(card: dict[str, Any]) -> bool:
 
     # Validate each skill has required fields
     if "skills" in card:
-        for skill in card["skills"]:
-            if not isinstance(skill, dict):
-                return False
-            for field in ["id", "name", "description"]:
-                if field not in skill:
-                    return False
+        return all(_validate_skill(skill) for skill in card["skills"])
 
     return True

@@ -120,6 +120,49 @@ class PurpleAgentExecutor:
             return part_data.data
         return None
 
+    def _infer_template_from_text(self, text: str) -> str | None:
+        """Infer template type from text content.
+
+        Args:
+            text: Text content to analyze.
+
+        Returns:
+            Template type string or None if not determinable.
+        """
+        text_lower = text.lower()
+        if "non-qualifying" in text_lower or "non_qualifying" in text_lower:
+            return "non_qualifying"
+        if "edge" in text_lower:
+            return "edge_case"
+        return None
+
+    def _parse_request(self, params: MessageSendParams) -> tuple[str, dict[str, Any] | None]:
+        """Parse template type and signals from message params.
+
+        Args:
+            params: Message parameters from the request.
+
+        Returns:
+            Tuple of (template_type, signals).
+        """
+        template_type = "qualifying"
+        signals: dict[str, Any] | None = None
+
+        if not (params.message and params.message.parts):
+            return template_type, signals
+
+        for part in params.message.parts:
+            text = self._extract_text_from_part(part)
+            if text and (inferred := self._infer_template_from_text(text)):
+                template_type = inferred
+
+            data = self._extract_data_from_part(part)
+            if data:
+                template_type = data.get("template_type", template_type)
+                signals = data.get("signals", signals)
+
+        return template_type, signals
+
     async def execute(
         self, params: MessageSendParams, task: Task
     ) -> AsyncGenerator[Message | Task]:
@@ -132,26 +175,7 @@ class PurpleAgentExecutor:
         Yields:
             Task updates and final Message with generated narrative.
         """
-        # Extract request from message parts
-        template_type = "qualifying"
-        signals: dict[str, Any] | None = None
-
-        if params.message and params.message.parts:
-            for part in params.message.parts:
-                text = self._extract_text_from_part(part)
-                if text:
-                    text_lower = text.lower()
-                    if "non-qualifying" in text_lower or "non_qualifying" in text_lower:
-                        template_type = "non_qualifying"
-                    elif "edge" in text_lower:
-                        template_type = "edge_case"
-
-                data = self._extract_data_from_part(part)
-                if data:
-                    if "template_type" in data:
-                        template_type = data["template_type"]
-                    if "signals" in data:
-                        signals = data["signals"]
+        template_type, signals = self._parse_request(params)
 
         # Update task to working
         task.status = TaskStatus(state=TaskState.working)

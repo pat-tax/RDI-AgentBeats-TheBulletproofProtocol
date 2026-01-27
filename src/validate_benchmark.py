@@ -172,6 +172,25 @@ class BenchmarkValidator:
         """
         return [self.validate_entry(entry) for entry in data]
 
+    def _classify_result(self, result: ValidationResult) -> str:
+        """Classify a result as TP, FP, FN, or TN.
+
+        Args:
+            result: ValidationResult to classify.
+
+        Returns:
+            Classification string: "tp", "fp", "fn", or "tn".
+        """
+        expected_pos = result.expected_classification == "QUALIFYING"
+        actual_pos = result.actual_classification == "QUALIFYING"
+        if expected_pos and actual_pos:
+            return "tp"
+        if expected_pos:
+            return "fn"
+        if actual_pos:
+            return "fp"
+        return "tn"
+
     def compute_metrics(self, results: list[ValidationResult]) -> dict[str, float]:
         """Compute precision, recall, F1, and accuracy metrics.
 
@@ -187,19 +206,11 @@ class BenchmarkValidator:
         Returns:
             Dict with precision, recall, f1_score, accuracy
         """
-        tp = fp = fn = tn = 0
-
+        counts = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
         for r in results:
-            if r.expected_classification == "QUALIFYING":
-                if r.actual_classification == "QUALIFYING":
-                    tp += 1
-                else:
-                    fn += 1
-            else:  # NON_QUALIFYING
-                if r.actual_classification == "QUALIFYING":
-                    fp += 1
-                else:
-                    tn += 1
+            counts[self._classify_result(r)] += 1
+
+        tp, fp, fn, tn = counts["tp"], counts["fp"], counts["fn"], counts["tn"]
 
         # Handle edge cases to avoid division by zero
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
