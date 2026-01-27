@@ -36,7 +36,7 @@ source "$SCRIPT_DIR/lib/common.sh"
 # Configuration
 RALPH_MODEL=${RALPH_MODEL:-"sonnet"}  # Model: sonnet, opus, haiku
 MAX_ITERATIONS=${MAX_ITERATIONS:-25}
-REQUIRE_REFACTOR=${REQUIRE_REFACTOR:-true}  # Require [REFACTOR] commit (true/false)
+REQUIRE_REFACTOR=${REQUIRE_REFACTOR:-false}  # Require [REFACTOR] commit (true/false)
 PRD_JSON="ralph/docs/prd.json"
 PROGRESS_FILE="ralph/docs/progress.txt"
 PROMPT_FILE="ralph/docs/templates/prompt.md"
