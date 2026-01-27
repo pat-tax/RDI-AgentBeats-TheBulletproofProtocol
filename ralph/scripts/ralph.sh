@@ -5,21 +5,24 @@
 # Usage: ./ralph/scripts/ralph.sh
 #
 # Environment variables:
-#   RALPH_MODEL     - Claude model to use (default: sonnet)
-#   MAX_ITERATIONS  - Maximum loop iterations (default: 10)
+#   RALPH_MODEL      - Claude model to use (default: sonnet)
+#   MAX_ITERATIONS   - Maximum loop iterations (default: 10)
+#   REQUIRE_REFACTOR - Require [REFACTOR] commit (default: true)
 #
 # This script orchestrates autonomous task execution by:
 # 1. Reading prd.json for incomplete stories
 # 2. Executing single story via Claude Code (with TDD workflow)
-# 3. Verifying TDD commits (RED + GREEN phases)
+# 3. Verifying TDD commits (RED + GREEN + optional REFACTOR phases)
 # 4. Running quality checks (make validate)
 # 5. Updating prd.json status on success
 # 6. Appending learnings to progress.txt
+# 7. Logging all output to logs/ralph/YYYY-MM-DD_HH:MM:SS.log
 #
 # TDD Workflow Enforcement:
 # - Agent must make separate commits for RED (tests) and GREEN (implementation)
-# - Script verifies at least 2 commits were made during execution
-# - Checks for [RED] and [GREEN] markers in commit messages
+# - REFACTOR phase is optional (controlled by REQUIRE_REFACTOR variable)
+# - Script verifies commits were made in correct order: RED → GREEN → REFACTOR
+# - Checks for [RED], [GREEN], and [REFACTOR]/[BLUE] markers in commit messages
 #
 
 set -euo pipefail
@@ -33,11 +36,19 @@ source "$SCRIPT_DIR/lib/common.sh"
 # Configuration
 RALPH_MODEL=${RALPH_MODEL:-"sonnet"}  # Model: sonnet, opus, haiku
 MAX_ITERATIONS=${MAX_ITERATIONS:-10}
+REQUIRE_REFACTOR=${REQUIRE_REFACTOR:-true}  # Require [REFACTOR] commit (true/false)
 PRD_JSON="ralph/docs/prd.json"
 PROGRESS_FILE="ralph/docs/progress.txt"
 PROMPT_FILE="ralph/docs/templates/prompt.md"
-BRANCH_PREFIX="ralph/story-"
 MAX_RETRIES=3
+
+# Set up logging
+LOG_DIR="logs/ralph"
+LOG_FILE="$LOG_DIR/$(date +%Y-%m-%d_%H:%M:%S).log"
+mkdir -p "$LOG_DIR"
+
+# Redirect all output to both console and log file
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 # Validate environment
 validate_environment() {
@@ -165,18 +176,23 @@ run_quality_checks() {
 }
 
 # Check that TDD commits were made during story execution
-# Verifies: at least 2 commits, [RED] and [GREEN] markers, correct order
+# Verifies: at least 2 commits, [RED] and [GREEN] markers, [REFACTOR] optional, correct order
 check_tdd_commits() {
     local story_id="$1"
     local commits_before="$2"
 
-    log_info "Checking TDD commits..."
+    log_info "Checking TDD commits (REQUIRE_REFACTOR=$REQUIRE_REFACTOR)..."
 
     local commits_after=$(git rev-list --count HEAD)
     local new_commits=$((commits_after - commits_before))
 
-    if [ $new_commits -lt 2 ]; then
-        log_error "Expected at least 2 commits (RED + GREEN), found $new_commits"
+    local min_commits=2
+    if [ "$REQUIRE_REFACTOR" = "true" ]; then
+        min_commits=3
+    fi
+
+    if [ $new_commits -lt $min_commits ]; then
+        log_error "Expected at least $min_commits commits (RED + GREEN + REFACTOR), found $new_commits"
         return 1
     fi
 
@@ -190,6 +206,14 @@ check_tdd_commits() {
         return 1
     fi
 
+    # Check REFACTOR marker if required
+    if [ "$REQUIRE_REFACTOR" = "true" ]; then
+        if ! echo "$recent_commits" | grep -qE "\[REFACTOR\]|\[BLUE\]"; then
+            log_error "Missing [REFACTOR] or [BLUE] marker (REQUIRE_REFACTOR=true)"
+            return 1
+        fi
+    fi
+
     # Verify order: [RED] must appear after [GREEN] in git log (older = later in output)
     local red_line=$(echo "$recent_commits" | grep -n "\[RED\]" | head -1 | cut -d: -f1)
     local green_line=$(echo "$recent_commits" | grep -n "\[GREEN\]" | head -1 | cut -d: -f1)
@@ -199,13 +223,26 @@ check_tdd_commits() {
         return 1
     fi
 
-    log_info "TDD verified: [RED] → [GREEN] order correct"
+    # If REFACTOR exists, verify it comes after GREEN
+    if echo "$recent_commits" | grep -qE "\[REFACTOR\]|\[BLUE\]"; then
+        local refactor_line=$(echo "$recent_commits" | grep -nE "\[REFACTOR\]|\[BLUE\]" | head -1 | cut -d: -f1)
+        if [ "$refactor_line" -ge "$green_line" ]; then
+            log_error "[REFACTOR]/[BLUE] must be committed AFTER [GREEN]"
+            return 1
+        fi
+        log_info "TDD verified: [RED] → [GREEN] → [REFACTOR] order correct"
+    else
+        log_info "TDD verified: [RED] → [GREEN] order correct"
+    fi
+
     return 0
 }
 
 # Main loop
 main() {
-    log_info "Starting Ralph Loop (max iterations: $MAX_ITERATIONS, model: $RALPH_MODEL)"
+    log_info "Starting Ralph Loop"
+    log_info "Configuration: MAX_ITERATIONS=$MAX_ITERATIONS, RALPH_MODEL=$RALPH_MODEL, REQUIRE_REFACTOR=$REQUIRE_REFACTOR"
+    log_info "Log file: $LOG_FILE"
 
     validate_environment
 
