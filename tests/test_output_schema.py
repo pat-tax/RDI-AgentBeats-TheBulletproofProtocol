@@ -3,10 +3,15 @@
 This test module validates the acceptance criteria for STORY-020:
 - Version and timestamp fields
 - Narrative ID (UUID)
-- Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)
-- Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)
-- Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)
-- Redline object with severity counts (total_issues, critical, high, medium, issues array)
+- Primary metrics object (compliance_classification, confidence, risk_score,
+  risk_category, predicted_audit_outcome)
+- Component scores object (routine_engineering_penalty, vagueness_penalty,
+  business_risk_penalty, experimentation_penalty, specificity_penalty,
+  total_penalty)
+- Diagnostics object (routine_patterns_detected, vague_phrases_detected,
+  business_keywords_detected, experimentation_evidence_score, specificity_score)
+- Redline object with severity counts (total_issues, critical, high, medium,
+  issues array)
 - Metadata object (evaluation_time_ms, rules_version, irs_citations)
 - JSON schema validation
 - Backwards compatibility with legacy fields
@@ -126,8 +131,14 @@ class TestPrimaryMetrics:
         low_output = low_risk.to_dict()
         high_output = high_risk.to_dict()
 
-        assert low_output["primary_metrics"]["compliance_classification"] in ["QUALIFYING", "NON_QUALIFYING"]
-        assert high_output["primary_metrics"]["compliance_classification"] in ["QUALIFYING", "NON_QUALIFYING"]
+        assert low_output["primary_metrics"]["compliance_classification"] in [
+            "QUALIFYING",
+            "NON_QUALIFYING",
+        ]
+        assert high_output["primary_metrics"]["compliance_classification"] in [
+            "QUALIFYING",
+            "NON_QUALIFYING",
+        ]
 
     def test_predicted_audit_outcome_field(self):
         """Test that predicted_audit_outcome is included."""

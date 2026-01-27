@@ -5,7 +5,10 @@ detection of disqualifying patterns.
 """
 
 import re
+import time
+import uuid
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 
 
 @dataclass
@@ -24,18 +27,114 @@ class Redline:
 
     total_issues: int = 0
     issues: list[Issue] = field(default_factory=list)
+    critical: int = 0
+    high: int = 0
+    medium: int = 0
+
+    def to_dict(self) -> dict:
+        """Convert redline to dictionary format."""
+        return {
+            "total_issues": self.total_issues,
+            "critical": self.critical,
+            "high": self.high,
+            "medium": self.medium,
+            "issues": [
+                {
+                    "category": issue.category,
+                    "severity": issue.severity,
+                    "text": issue.text,
+                    "suggestion": issue.suggestion,
+                }
+                for issue in self.issues
+            ],
+        }
 
 
 @dataclass
 class EvaluationResult:
     """Structured evaluation result per Green-Agent-Metrics-Specification.md."""
 
+    # Legacy fields (for backwards compatibility)
     classification: str = "NON_QUALIFYING"
     confidence: float = 0.0
     risk_score: int = 100
     risk_category: str = "CRITICAL"
     component_scores: dict[str, int] = field(default_factory=dict)
     redline: Redline = field(default_factory=Redline)
+
+    # New schema fields
+    version: str = "1.0"
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
+    narrative_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    predicted_audit_outcome: str = "FAIL_AUDIT"
+
+    # Diagnostic counters
+    routine_patterns_detected: int = 0
+    vague_phrases_detected: int = 0
+    business_keywords_detected: int = 0
+    experimentation_evidence_score: float = 0.0
+    specificity_score: float = 0.0
+
+    # Metadata
+    evaluation_time_ms: float = 0.0
+    rules_version: str = "1.0.0"
+    irs_citations: list[str] = field(default_factory=lambda: [
+        "IRS Section 41(d)(1)",
+        "26 CFR § 1.41-4"
+    ])
+
+    def to_dict(self) -> dict:
+        """Convert evaluation result to dictionary format per specification."""
+        # Calculate total_penalty
+        total_penalty = sum([
+            self.component_scores.get("routine_engineering_penalty", 0),
+            self.component_scores.get("business_risk_penalty", 0),
+            self.component_scores.get("vagueness_penalty", 0),
+            self.component_scores.get("experimentation_penalty", 0),
+            self.component_scores.get("specificity_penalty", 0),
+        ])
+
+        return {
+            "version": self.version,
+            "timestamp": self.timestamp,
+            "narrative_id": self.narrative_id,
+            "primary_metrics": {
+                "compliance_classification": self.classification,
+                "confidence": self.confidence,
+                "risk_score": self.risk_score,
+                "risk_category": self.risk_category,
+                "predicted_audit_outcome": self.predicted_audit_outcome,
+            },
+            "component_scores": {
+                "routine_engineering_penalty": self.component_scores.get(
+                    "routine_engineering_penalty", 0
+                ),
+                "vagueness_penalty": self.component_scores.get("vagueness_penalty", 0),
+                "business_risk_penalty": self.component_scores.get(
+                    "business_risk_penalty", 0
+                ),
+                "experimentation_penalty": self.component_scores.get(
+                    "experimentation_penalty", 0
+                ),
+                "specificity_penalty": self.component_scores.get(
+                    "specificity_penalty", 0
+                ),
+                "total_penalty": total_penalty,
+            },
+            "diagnostics": {
+                "routine_patterns_detected": self.routine_patterns_detected,
+                "vague_phrases_detected": self.vague_phrases_detected,
+                "business_keywords_detected": self.business_keywords_detected,
+                "experimentation_evidence_score": self.experimentation_evidence_score,
+                "specificity_score": self.specificity_score,
+            },
+            "redline": self.redline.to_dict(),
+            "metadata": {
+                "evaluation_time_ms": self.evaluation_time_ms,
+                "rules_version": self.rules_version,
+                "irs_citations": self.irs_citations,
+            },
+        }
 
 
 class RuleBasedEvaluator:
@@ -122,16 +221,27 @@ class RuleBasedEvaluator:
         Returns:
             EvaluationResult with risk score, classification, and redline markup
         """
+        # Track evaluation time
+        start_time = time.perf_counter()
+
         issues: list[Issue] = []
         text_lower = narrative.lower()
 
         # REVIEW/FIXME: Custom penalty detection (not using pre-built NLP/ML packages)
         # Calculate component penalties using pattern-based detection
-        routine_penalty = self._detect_routine_engineering(text_lower, issues)
-        business_penalty = self._detect_business_risk(text_lower, issues)
-        vagueness_penalty = self._detect_vagueness(text_lower, issues)
-        experimentation_penalty = self._detect_missing_experimentation(text_lower, issues)
-        specificity_penalty = self._detect_lack_of_specificity(narrative, issues)
+        routine_penalty, routine_count = self._detect_routine_engineering(
+            text_lower, issues
+        )
+        business_penalty, business_count = self._detect_business_risk(
+            text_lower, issues
+        )
+        vagueness_penalty, vague_count = self._detect_vagueness(text_lower, issues)
+        experimentation_penalty, exp_score = self._detect_missing_experimentation(
+            text_lower, issues
+        )
+        specificity_penalty, spec_score = self._detect_lack_of_specificity(
+            narrative, issues
+        )
 
         # REVIEW/FIXME: Custom risk aggregation (intentionally hand-crafted, not ML-based)
         # Calculate total risk score (sum of penalties, capped at 100)
@@ -160,7 +270,25 @@ class RuleBasedEvaluator:
             "specificity_penalty": specificity_penalty,
         }
 
-        redline = Redline(total_issues=len(issues), issues=issues)
+        # Calculate severity counts
+        critical_count = sum(1 for issue in issues if issue.severity == "critical")
+        high_count = sum(1 for issue in issues if issue.severity == "high")
+        medium_count = sum(1 for issue in issues if issue.severity == "medium")
+
+        redline = Redline(
+            total_issues=len(issues),
+            issues=issues,
+            critical=critical_count,
+            high=high_count,
+            medium=medium_count,
+        )
+
+        # Determine audit outcome
+        predicted_audit_outcome = "PASS_AUDIT" if risk_score < 20 else "FAIL_AUDIT"
+
+        # Calculate evaluation time
+        end_time = time.perf_counter()
+        evaluation_time_ms = (end_time - start_time) * 1000
 
         return EvaluationResult(
             classification=classification,
@@ -169,17 +297,29 @@ class RuleBasedEvaluator:
             risk_category=risk_category,
             component_scores=component_scores,
             redline=redline,
+            predicted_audit_outcome=predicted_audit_outcome,
+            routine_patterns_detected=routine_count,
+            vague_phrases_detected=vague_count,
+            business_keywords_detected=business_count,
+            experimentation_evidence_score=exp_score,
+            specificity_score=spec_score,
+            evaluation_time_ms=evaluation_time_ms,
         )
 
-    def _detect_routine_engineering(self, text: str, issues: list[Issue]) -> int:
+    def _detect_routine_engineering(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect routine engineering patterns. Max penalty: 30 points.
 
         REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/text classification)
+
+        Returns:
+            tuple[int, int]: (penalty, count of patterns detected)
         """
         penalty = 0
+        count = 0
         for pattern, description in self.ROUTINE_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
                 penalty += 5
+                count += 1
                 issues.append(
                     Issue(
                         category="routine_engineering",
@@ -189,17 +329,22 @@ class RuleBasedEvaluator:
                         "not routine implementation details.",
                     )
                 )
-        return min(30, penalty)
+        return min(30, penalty), count
 
-    def _detect_business_risk(self, text: str, issues: list[Issue]) -> int:
+    def _detect_business_risk(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect business risk language. Max penalty: 20 points.
 
         REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/text classification)
+
+        Returns:
+            tuple[int, int]: (penalty, count of patterns detected)
         """
         penalty = 0
+        count = 0
         for pattern, description in self.BUSINESS_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
                 penalty += 5
+                count += 1
                 issues.append(
                     Issue(
                         category="business_risk",
@@ -209,17 +354,22 @@ class RuleBasedEvaluator:
                         "business or market objectives.",
                     )
                 )
-        return min(20, penalty)
+        return min(20, penalty), count
 
-    def _detect_vagueness(self, text: str, issues: list[Issue]) -> int:
+    def _detect_vagueness(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect vague language without specific metrics. Max penalty: 25 points.
 
         REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/sentiment analysis)
+
+        Returns:
+            tuple[int, int]: (penalty, count of vague phrases detected)
         """
         penalty = 0
+        count = 0
         for pattern, description in self.VAGUE_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
                 penalty += 6
+                count += 1
                 issues.append(
                     Issue(
                         category="vagueness",
@@ -229,12 +379,15 @@ class RuleBasedEvaluator:
                         "(e.g., '45ms latency' instead of 'better performance').",
                     )
                 )
-        return min(25, penalty)
+        return min(25, penalty), count
 
-    def _detect_missing_experimentation(self, text: str, issues: list[Issue]) -> int:
+    def _detect_missing_experimentation(self, text: str, issues: list[Issue]) -> tuple[int, float]:
         """Detect missing experimentation evidence. Max penalty: 15 points.
 
         REVIEW/FIXME: Custom pattern counting (not using pre-built ML/NLP libraries)
+
+        Returns:
+            tuple[int, float]: (penalty, experimentation_evidence_score 0.0-1.0)
         """
         # Count positive experimentation indicators
         evidence_count = 0
@@ -242,11 +395,15 @@ class RuleBasedEvaluator:
             if re.search(pattern, text, re.IGNORECASE):
                 evidence_count += 1
 
+        # Calculate evidence score (normalized to 0.0-1.0)
+        max_patterns = len(self.EXPERIMENTATION_PATTERNS)
+        evidence_score = min(1.0, evidence_count / max(1, max_patterns * 0.4))
+
         # Penalty inversely proportional to evidence found
         if evidence_count >= 4:
-            return 0
+            return 0, evidence_score
         elif evidence_count >= 2:
-            return 5
+            return 5, evidence_score
         else:
             # Add issue for missing experimentation
             issues.append(
@@ -258,20 +415,27 @@ class RuleBasedEvaluator:
                     "failures encountered, and iterative refinements.",
                 )
             )
-            return 15
+            return 15, evidence_score
 
-    def _detect_lack_of_specificity(self, text: str, issues: list[Issue]) -> int:
+    def _detect_lack_of_specificity(self, text: str, issues: list[Issue]) -> tuple[int, float]:
         """Detect lack of specific metrics. Max penalty: 10 points.
 
         REVIEW/FIXME: Custom regex matching (not using pre-built metric extraction libraries)
+
+        Returns:
+            tuple[int, float]: (penalty, specificity_score 0.0-1.0)
         """
         # Count specific metrics in the text
         metrics = self.SPECIFICITY_PATTERN.findall(text)
 
+        # Calculate specificity score (normalized to 0.0-1.0)
+        # Good narratives have 3+ metrics
+        specificity_score = min(1.0, len(metrics) / 3.0)
+
         if len(metrics) >= 3:
-            return 0
+            return 0, specificity_score
         elif len(metrics) >= 1:
-            return 3
+            return 3, specificity_score
         else:
             issues.append(
                 Issue(
@@ -282,7 +446,7 @@ class RuleBasedEvaluator:
                     "throughput, memory usage, error rates).",
                 )
             )
-            return 10
+            return 10, specificity_score
 
     def _get_risk_category(self, risk_score: int) -> str:
         """Map risk score to risk category."""
