@@ -448,8 +448,8 @@
         "Backwards compatibility with legacy fields"
       ],
       "files": [],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-27T20:57:00Z",
       "content_hash": "c6d8994e5732c8b2b8d9685b2456c6ab72b7609032e79b0ee5e1eae010db06e5",
       "depends_on": []
     },
