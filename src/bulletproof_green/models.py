@@ -124,6 +124,52 @@ class ScoreResult(BaseModel):
     experimentation: float
 
 
+class NarrativeRequest(BaseModel):
+    """Request for narrative generation from Purple Agent."""
+
+    template_type: str
+    signals: dict[str, Any] | None = None
+    context: str | None = None
+
+
+class NarrativeResponse(BaseModel):
+    """Response containing generated narrative from Purple Agent."""
+
+    narrative: str
+    metadata: dict[str, Any] | None = None
+    task_id: str | None = None
+
+
+class LLMJudgeConfig(BaseModel):
+    """Configuration for LLM-as-Judge evaluation."""
+
+    alpha: float = 0.7
+    beta: float = 0.3
+    temperature: float = 0
+    model: str = "gpt-4"
+    timeout: float = 30.0
+
+
+class LLMScoreResult(BaseModel):
+    """Result from LLM evaluation."""
+
+    score: float
+    reasoning: str
+    categories: dict[str, float]
+
+
+class HybridScoreResult(BaseModel):
+    """Result from hybrid (rule + LLM) evaluation."""
+
+    final_score: float
+    rule_score: float
+    llm_score: float | None
+    alpha: float
+    beta: float
+    fallback_used: bool
+    llm_reasoning: str | None = None
+
+
 class GreenAgentOutput(BaseModel):
     """AgentBeats-compatible output schema for Green Agent evaluation results."""
 

@@ -6,46 +6,17 @@ Enables Green Agent to call Purple Agent for narrative generation via A2A protoc
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass
 from typing import Any
 
 import httpx
+
+from bulletproof_green.models import NarrativeRequest, NarrativeResponse
 
 DEFAULT_TIMEOUT = 300
 
 
 class A2AClientError(Exception):
     """Exception raised for A2A client errors."""
-
-
-@dataclass
-class NarrativeRequest:
-    """Request for narrative generation from Purple Agent.
-
-    Attributes:
-        template_type: Type of narrative template (qualifying, non_qualifying, edge_case).
-        signals: Optional engineering signals for narrative generation.
-        context: Optional additional context for the request.
-    """
-
-    template_type: str
-    signals: dict[str, Any] | None = None
-    context: str | None = None
-
-
-@dataclass
-class NarrativeResponse:
-    """Response containing generated narrative from Purple Agent.
-
-    Attributes:
-        narrative: The generated narrative text.
-        metadata: Optional metadata about the narrative.
-        task_id: Optional task ID from the A2A protocol.
-    """
-
-    narrative: str
-    metadata: dict[str, Any] | None = None
-    task_id: str | None = None
 
 
 class A2AClient:

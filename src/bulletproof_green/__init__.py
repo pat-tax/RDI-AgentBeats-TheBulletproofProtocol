@@ -1,12 +1,7 @@
 """Green Agent - IRS Section 41 narrative evaluator."""
 
 from bulletproof_green import a2a_client, agent_card, arena_executor, llm_judge
-from bulletproof_green.a2a_client import (
-    A2AClient,
-    A2AClientError,
-    NarrativeRequest,
-    NarrativeResponse,
-)
+from bulletproof_green.a2a_client import A2AClient, A2AClientError
 from bulletproof_green.agent_card import (
     AGENT_CARD_SCHEMA,
     AgentCardCache,
@@ -23,13 +18,18 @@ from bulletproof_green.arena_executor import (
     IterationRecord,
 )
 from bulletproof_green.evaluator import RuleBasedEvaluator
-from bulletproof_green.llm_judge import (
+from bulletproof_green.llm_judge import LLMJudge
+from bulletproof_green.models import (
+    EvaluationResult,
     HybridScoreResult,
-    LLMJudge,
+    Issue,
     LLMJudgeConfig,
     LLMScoreResult,
+    NarrativeRequest,
+    NarrativeResponse,
+    Redline,
+    ScoreResult,
 )
-from bulletproof_green.models import EvaluationResult, Issue, Redline, ScoreResult
 from bulletproof_green.scorer import AgentBeatsScorer
 
 __all__ = [

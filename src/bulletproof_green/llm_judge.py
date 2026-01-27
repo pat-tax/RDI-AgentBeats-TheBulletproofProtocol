@@ -11,67 +11,11 @@ from __future__ import annotations
 import json
 import logging
 import os
-from dataclasses import dataclass
 from typing import Any
 
+from bulletproof_green.models import HybridScoreResult, LLMJudgeConfig, LLMScoreResult
+
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class LLMJudgeConfig:
-    """Configuration for LLM-as-Judge evaluation.
-
-    Attributes:
-        alpha: Weight for rule-based score (default: 0.7).
-        beta: Weight for LLM score (default: 0.3).
-        temperature: LLM temperature for consistency (default: 0).
-        model: OpenAI model to use (default: gpt-4).
-        timeout: Timeout for LLM calls in seconds (default: 30).
-    """
-
-    alpha: float = 0.7
-    beta: float = 0.3
-    temperature: float = 0
-    model: str = "gpt-4"
-    timeout: float = 30.0
-
-
-@dataclass
-class LLMScoreResult:
-    """Result from LLM evaluation.
-
-    Attributes:
-        score: Overall LLM score in [0, 1] range.
-        reasoning: LLM's reasoning for the score.
-        categories: Breakdown scores by category.
-    """
-
-    score: float
-    reasoning: str
-    categories: dict[str, float]
-
-
-@dataclass
-class HybridScoreResult:
-    """Result from hybrid (rule + LLM) evaluation.
-
-    Attributes:
-        final_score: Combined score = α*rule_score + β*llm_score.
-        rule_score: Rule-based evaluation score.
-        llm_score: LLM evaluation score (None if fallback used).
-        alpha: Weight used for rule score.
-        beta: Weight used for LLM score.
-        fallback_used: True if LLM was unavailable and rule-only used.
-        llm_reasoning: Optional reasoning from LLM.
-    """
-
-    final_score: float
-    rule_score: float
-    llm_score: float | None
-    alpha: float
-    beta: float
-    fallback_used: bool
-    llm_reasoning: str | None = None
 
 
 class LLMJudge:
