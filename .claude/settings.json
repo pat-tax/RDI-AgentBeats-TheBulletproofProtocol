@@ -15,7 +15,8 @@
     "excludedCommands": ["git", "make", "uv"],
     "allowUnsandboxedCommands": true,
     "network": {
-      "allowLocalBinding": true
+      "allowLocalBinding": true,
+      "allowedHosts": ["api.github.com"]
     },
     "enableWeakerNestedSandbox": false
   },
