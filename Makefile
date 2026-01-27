@@ -60,17 +60,6 @@ setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Co
 	$(MAKE) -s setup_claude_code
 
 
-# MARK: run markdownlint
-
-
-run_markdownlint:  ## Lint markdown files. Usage from root dir: make run_markdownlint INPUT_FILES="docs/**/*.md"
-	if [ -z "$(INPUT_FILES)" ]; then
-		echo "Error: No input files specified. Use INPUT_FILES=\"docs/**/*.md\""
-		exit 1
-	fi
-	uv run pymarkdown fix $(INPUT_FILES)
-
-
 # MARK: Sanity
 
 
@@ -78,24 +67,42 @@ ruff:  ## Lint: Format and check with ruff
 	uv run ruff format --exclude tests
 	uv run ruff check --fix --exclude tests
 
+complexity:  ## Check cognitive complexity with complexipy
+	uv run complexipy
+
 test_all:  ## Run all tests
 	uv run pytest
+
+test_quick:  ## Quick test - rerun only failed tests (use during fix iterations)
+	uv run pytest --lf -x
+
+test_coverage:  ## Run tests with coverage threshold (configured in pyproject.toml)
+	echo "Running tests with coverage gate (fail_under=70% in pyproject.toml)..."
+	uv run pytest --cov
 
 type_check:  ## Check for static typing errors
 	uv run pyright src
 
 validate:  ## Complete pre-commit validation sequence
-	echo "Running complete validation sequence ..."
+	set -e
+	echo "Running complete validation sequence..."
 	$(MAKE) -s ruff
 	$(MAKE) -s type_check
-	$(MAKE) -s test_all
-	echo "Validation sequence completed (check output for any failures)"
+	$(MAKE) -s complexity
+	$(MAKE) -s test_coverage
+	echo "Validation completed successfully"
 
 quick_validate:  ## Fast development cycle validation
 	echo "Running quick validation ..."
 	$(MAKE) -s ruff
 	$(MAKE) -s type_check
 	echo "Quick validation completed (check output for any failures)"
+
+markdownlint:  ## Fix markdown files. Usage: make run_markdownlint [INPUT_FILES="docs/**/*.md"] (default: docs/)
+	INPUT=$${INPUT_FILES:-docs/}
+	echo $$INPUT
+	uv run pymarkdown fix --recurse $$INPUT
+	uv run pymarkdown scan --recurse $$INPUT
 
 
 # MARK: ralph

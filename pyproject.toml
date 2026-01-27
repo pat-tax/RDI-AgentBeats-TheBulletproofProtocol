@@ -10,6 +10,7 @@ dependencies = [
     "uvicorn>=0.30.0",
     "scikit-learn>=1.5.0",
     "openai>=1.0.0",
+    "httpx>=0.27.0",
 ]
 
 [build-system]
@@ -21,17 +22,23 @@ packages = ["src/bulletproof_purple", "src/bulletproof_green", "src/TheBulletpro
 
 [dependency-groups]
 dev = [
+    "complexipy>=0.6.0",
     "pymarkdownlnt>=0.9.0",
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
+    "pytest-cov>=7.0.0",
     "ruff>=0.8.0",
     "pyright>=1.1.0",
-    "httpx>=0.27.0",
 ]
+
+[tool.uv]
+package = true
+exclude-newer = "2026-01-26T00:00:00Z"
 
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+include = ["src/**/*.py", "tests/**/*.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
@@ -42,6 +49,12 @@ pythonVersion = "3.13"
 typeCheckingMode = "basic"
 reportMissingImports = true
 reportMissingTypeStubs = false
+include = ["src", "tests"]
+
+[tool.complexipy]
+paths = ["src"]
+max-complexity-allowed = 15
+exclude = ["tests/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -52,8 +65,57 @@ addopts = "-v --tb=short"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
-    "integration: marks tests as integration tests (requires docker-compose services running)",
+    "integration: marks tests as integration tests",
+    "benchmark: marks tests as benchmark tests",
 ]
+
+[tool.coverage]
+
+[tool.coverage.run]
+include = [
+    "src/**/*.py",
+]
+# omit = []
+# branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    # 'pragma: no cover',
+    'raise AssertionError',
+    'raise NotImplementedError',
+]
+omit = [
+    'env/*',
+    'venv/*',
+    '.venv/*',
+    '*/virtualenv/*',
+    '*/virtualenvs/*',
+    '*/tests/*',
+]
+
+# Pymarkdown configuration for markdown linting
+# Rules: https://github.com/jackdewinter/pymarkdown/blob/master/docs/rules.md
+[tool.pymarkdown]
+log.level = "CRITICAL"
+# MD013: Line too long
+plugins.md013.enabled = false
+# MD025: Multiple top-level headings in the same document
+plugins.md025.enabled = false
+# MD032: Lists should be surrounded by blank lines
+# Note: Autofix pending (scheduled after v1.0.0 release
+# violations must be fixed manually before that
+# https://pymarkdown.readthedocs.io/en/stable/plugins/rule_md032/
+plugins.md032.enabled = true
+# frontmatter extension suppresses violations as of v0.9.34
+# the specific rules have toe be disabled instead
+# extensions.front-matter.enabled = true
+# MD041: First line should be a top-level heading
+plugins.md041.enabled = false
+# MD022: Headings need blank lines around
+# plugins.md022.enabled = false
+# MD003: Inconsistent heading styles (setext vs atx)
+plugins.md003.enabled = false
 
 [tool.bumpversion]
 current_version = "0.0.0"
