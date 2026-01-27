@@ -150,15 +150,39 @@ execute_story() {
         echo "Read prd.json for full acceptance criteria and expected files."
     } >> "$iteration_prompt"
 
+    # Mark log position before agent execution
+    local log_start=$(wc -l < "$LOG_FILE" 2>/dev/null || echo "0")
+
     # Execute via Claude Code
     log_info "Running Claude Code with story context..."
     if cat "$iteration_prompt" | claude -p --dangerously-skip-permissions --model "$RALPH_MODEL"; then
+        # Check if agent reported story already complete
+        if detect_already_complete "$log_start"; then
+            log_info "Agent detected story is already complete"
+            rm "$iteration_prompt"
+            return 2  # Special return code for pre-completion
+        fi
         rm "$iteration_prompt"
         return 0
     else
         rm "$iteration_prompt"
         return 1
     fi
+}
+
+# Detect if agent output indicates story is already complete
+detect_already_complete() {
+    local start_line="$1"
+
+    # Extract agent output from log (everything after start_line)
+    local agent_output=$(tail -n +$((start_line + 1)) "$LOG_FILE" 2>/dev/null)
+
+    # Patterns that indicate pre-completion
+    if echo "$agent_output" | grep -qi "is functionally complete\|already complete\|work is already done\|no further implementation.*required\|already implemented"; then
+        return 0
+    fi
+
+    return 1
 }
 
 # Run quality checks
@@ -273,8 +297,37 @@ main() {
         # Record commit count before execution
         local commits_before=$(git rev-list --count HEAD)
 
-        # Execute story
-        if execute_story "$story_id" "$details"; then
+        # Execute story and capture return code (use || true to prevent set -e from exiting on non-zero)
+        local exec_status=0
+        execute_story "$story_id" "$details" || exec_status=$?
+
+        if [ $exec_status -eq 2 ]; then
+            # Story already complete - skip TDD verification, just run quality checks
+            log_info "Story already complete - verifying with quality checks"
+
+            if run_quality_checks; then
+                # Mark as passing
+                update_story_status "$story_id" "true"
+                log_progress "$iteration" "$story_id" "PASS" "Already complete, verified by quality checks"
+                log_info "Story $story_id marked as PASSING (pre-existing implementation)"
+
+                # Commit state files
+                log_info "Committing state files..."
+                git add "$PRD_JSON" "$PROGRESS_FILE" 2>/dev/null || log_warn "Could not stage state files (may be ignored)"
+                git commit -m "chore: Update Ralph state after verifying $story_id (already complete)" || log_warn "No state changes to commit"
+            else
+                log_error "Story reported as complete but quality checks failed"
+                log_progress "$iteration" "$story_id" "FAIL" "Quality checks failed despite reported completion"
+                retry_count=$((retry_count + 1))
+                if [ $retry_count -ge $MAX_RETRIES ]; then
+                    log_error "Max retries reached for story $story_id"
+                    exit 1
+                fi
+                continue
+            fi
+
+        elif [ $exec_status -eq 0 ]; then
+            # Normal execution - verify TDD commits
             log_info "Story execution completed"
 
             # Verify TDD commits were made
@@ -315,7 +368,9 @@ main() {
                 log_warn "Story completed but quality checks failed"
                 log_progress "$iteration" "$story_id" "FAIL" "Quality checks failed"
             fi
+
         else
+            # Execution failed
             log_error "Story execution failed"
             log_progress "$iteration" "$story_id" "FAIL" "Execution error"
         fi

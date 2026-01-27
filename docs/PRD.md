@@ -214,6 +214,123 @@ target_risk_score = 20
 
 ---
 
+#### Feature 10: Enhanced Output Schema [Phase 2]
+
+**Description**: Standardized evaluation output format per Green-Agent-Metrics-Specification.md.
+
+**Acceptance Criteria**:
+- [ ] Version and timestamp fields
+- [ ] Narrative ID (UUID)
+- [ ] Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)
+- [ ] Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)
+- [ ] Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)
+- [ ] Redline object with severity counts (total_issues, critical, high, medium, issues array)
+- [ ] Metadata object (evaluation_time_ms, rules_version, irs_citations)
+
+**Technical Requirements**:
+- JSON schema validation
+- Backwards compatibility with legacy fields
+
+---
+
+#### Feature 11: Advanced Pattern Detectors [Phase 2]
+
+**Description**: Additional rule-based detectors for comprehensive IRS Section 41 compliance.
+
+**Acceptance Criteria**:
+- [ ] Business risk detector: market, revenue, customers, sales, ROI, profit keywords
+- [ ] Specificity detector: failure citations (dates, error codes, metrics), hypothesis-test-failure-iteration patterns
+- [ ] Integrated into evaluator scoring pipeline
+- [ ] Returns detection counts for diagnostics
+
+**Technical Requirements**:
+- Modular detector architecture
+- Pattern weight configuration
+
+---
+
+#### Feature 12: ABC Benchmark Rigor [Phase 2]
+
+**Description**: Statistical validation and baseline testing for benchmark credibility.
+
+**Acceptance Criteria**:
+- [ ] Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)
+- [ ] Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)
+- [ ] Held-out test set (separate from training/validation data)
+- [ ] Documented limitations and edge cases
+
+**Technical Requirements**:
+- scipy or statsmodels for statistical calculations
+- Test framework integration
+
+---
+
+#### Feature 13: Difficulty-Based Evaluation [Phase 2]
+
+**Description**: Stratified benchmark testing across difficulty tiers.
+
+**Acceptance Criteria**:
+- [ ] Difficulty tags in ground truth (EASY, MEDIUM, HARD)
+- [ ] Per-tier accuracy reporting
+- [ ] Even distribution across tiers
+- [ ] Validation script reports breakdown by difficulty
+
+**Technical Requirements**:
+- Updated JSON schema for difficulty field
+- Reporting dashboard or CLI output
+
+---
+
+#### Feature 14: Anti-Gaming Measures [Phase 2]
+
+**Description**: Adversarial testing to prevent benchmark exploitation.
+
+**Acceptance Criteria**:
+- [ ] Adversarial test narratives (keyword stuffing, template gaming)
+- [ ] LLM reward hacking detection
+- [ ] Pattern variation resistance
+- [ ] Robustness tests (capitalization, whitespace, paraphrasing)
+
+**Technical Requirements**:
+- Adversarial test suite
+- Gaming detection metrics
+
+---
+
+#### Feature 15: SSE Task Updates [Phase 2]
+
+**Description**: Server-Sent Events for real-time A2A task status streaming.
+
+**Acceptance Criteria**:
+- [ ] SSE endpoint for task progress updates
+- [ ] Emits events during multi-turn arena evaluations
+- [ ] Client-side event handling
+- [ ] Graceful degradation if SSE unavailable
+
+**Technical Requirements**:
+- SSE protocol implementation
+- A2A protocol extension
+
+---
+
+#### Feature 16: ART Fine-tuning Pipeline [Phase 2]
+
+**Description**: Adversarial Reward Training (ART) for Purple Agent improvement.
+
+**Acceptance Criteria**:
+- [ ] Trajectory store captures Purple agent generation paths
+- [ ] Reward function based on risk score (lower = better)
+- [ ] GRPO trainer integration
+- [ ] LoRA adapter updates
+- [ ] WeightWatcher validation (Alpha 2-6)
+
+**Technical Requirements**:
+- Integration with fine-tuning framework (e.g., Hugging Face PEFT)
+- Trajectory storage format
+- Reward computation logic
+
+---
+
 ## Non-Functional Requirements
 
 **Performance**:
@@ -311,11 +428,19 @@ target_risk_score = 20
 **Submission**:
 - STORY-014: Write abstract and demo video (depends: STORY-013)
 
-### Story Breakdown - Phase 2 (6 stories total)
+### Story Breakdown - Phase 2 (21 stories total)
 
-- **Feature 4** → STORY-015: Implement Arena Mode orchestration (depends: STORY-006)
-- **Feature 5** → STORY-016: Implement LLM-as-Judge (depends: STORY-003)
-- **Feature 6** → STORY-017: Expand ground truth to 20+ narratives (depends: STORY-008)
-- STORY-018: Add inter-rater reliability validation (depends: STORY-016, STORY-017)
-- STORY-019: Implement real Git/Jira data ingestion (depends: STORY-001)
-- STORY-020: Fine-tune on SVT historical data (depends: STORY-017)
+- **Feature 4** (Arena Mode orchestration) → STORY-015: Implement Arena Mode orchestration (depends: STORY-006)
+- **Feature 5** (Hybrid Evaluation) → STORY-016: Implement LLM-as-Judge (depends: STORY-003)
+- **Feature 6** (Expanded Ground Truth) → STORY-017: Expand ground truth to 20+ narratives (depends: STORY-008)
+- **Feature 10** (Enhanced Output Schema) → STORY-018: Wire server to accept mode=arena (depends: STORY-020), STORY-019: Integrate hybrid scoring into server (depends: STORY-020), STORY-020: Update output schema per specification, STORY-021: Update tests for new output schema (depends: STORY-020)
+- **Feature 11** (Advanced Pattern Detectors) → STORY-022: Create business_risk_detector.py, STORY-023: Create specificity_detector.py, STORY-024: Integrate new detectors into evaluator (depends: STORY-022, STORY-023)
+- **Feature 12** (ABC Benchmark Rigor) → STORY-025: Trivial agent baseline tests, STORY-026: Statistical rigor (Cohen's κ, 95% CI), STORY-027: Create held-out test set, STORY-028: Document benchmark limitations
+- **Feature 13** (Difficulty-Based Evaluation) → STORY-029: Add difficulty tags to ground truth, STORY-030: Report accuracy by difficulty tier (depends: STORY-029)
+- **Feature 14** (Anti-Gaming Measures) → STORY-031: Create adversarial test narratives, STORY-032: LLM reward hacking tests
+- **Feature 15** (SSE Task Updates) → STORY-033: A2A task updates (SSE streaming)
+- **Feature 16** (ART Fine-tuning Pipeline) → STORY-034: Verify Docker ENTRYPOINT parameters, STORY-035: Task isolation tests, STORY-036: ART trainer integration, STORY-037: Trajectory store, STORY-038: Reward function
+
+**Deferred to Phase 3**:
+- Real Git/Jira data ingestion
+- Fine-tune on SVT historical data

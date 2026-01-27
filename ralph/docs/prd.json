@@ -1,9 +1,9 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-  "scope": "Phase 1 (STORY-001 to STORY-014): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 (STORY-015+): Arena mode, Hybrid evaluation, expanded dataset, Git/Jira integration.",
+  "scope": "Phase 1 complete (STORY-001 to STORY-021): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
   "source": "docs/PRD.md",
-  "generated": "2026-01-25 18:05:00",
+  "generated": "2026-01-27 19:38:20",
   "stories": [
     {
       "id": "STORY-001",
@@ -385,6 +385,432 @@
       "depends_on": [
         "STORY-008"
       ]
+    },
+    {
+      "id": "STORY-018",
+      "title": "Wire server to accept mode=arena",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Wire server to accept mode=arena",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "2ae9cbb898298f9861a44c698d9308167d3ea0278838989c7914600bb611d0c4",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-019",
+      "title": "Integrate hybrid scoring into server",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Integrate hybrid scoring into server",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "e924401a5e099cfd59ad1a3e7f287b42753771fb01b56c7399381bf08950dd2e",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-020",
+      "title": "Update output schema per specification",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Update output schema per specification",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "c6d8994e5732c8b2b8d9685b2456c6ab72b7609032e79b0ee5e1eae010db06e5",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-021",
+      "title": "Update tests for new output schema",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Update tests for new output schema",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "bbce5e542eff0d53dcca7a30c345f9637df658d49bb62c3e5ca3d87233a8c7a8",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-022",
+      "title": "Create business_risk_detector.py",
+      "description": "Create messenger.py with A2A client utilities (create_message, send_message, Messenger class) for green agent to call purple agents via A2A protocol",
+      "acceptance": [
+        "messenger.py exposes create_message() function for A2A message construction",
+        "messenger.py exposes send_message() function for HTTP POST to purple agents",
+        "Messenger class provides high-level API for agent-to-agent communication",
+        "Handles A2A protocol errors and timeouts gracefully",
+        "Unit tests verify message format and sending logic"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_messenger.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "48291996f29aff91d2e0df571643f24b668513c03f4df60c4f2ca6a4f10693b2",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-023",
+      "title": "Create specificity_detector.py",
+      "description": "Create arena_executor.py with multi-turn orchestration: green agent iteratively calls purple agent, evaluates response, provides critique, until risk_score < target or max_iterations reached",
+      "acceptance": [
+        "Supports configurable max_iterations (default: 5)",
+        "Supports configurable target_risk_score (default: 20)",
+        "Returns structured ArenaResult with iteration history",
+        "Each iteration includes: narrative, evaluation, critique",
+        "Terminates when risk_score < target OR max_iterations reached",
+        "Critique feedback derived from redline issues to guide purple agent refinement"
+      ],
+      "files": [
+        "src/bulletproof_green/arena_executor.py",
+        "tests/test_arena_executor.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "8902275cdc12564a47236c8d15a9a124a7bc5bde893939f109ba46730c8e567b",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-024",
+      "title": "Integrate new detectors into evaluator",
+      "description": "Extend green agent server to handle arena mode requests via mode=arena parameter, routing to ArenaExecutor instead of single-shot evaluation",
+      "acceptance": [
+        "Business risk detector: market, revenue, customers, sales, ROI, profit keywords",
+        "Specificity detector: failure citations (dates, error codes, metrics), hypothesis-test-failure-iteration patterns",
+        "Integrated into evaluator scoring pipeline",
+        "Returns detection counts for diagnostics",
+        "Modular detector architecture",
+        "Pattern weight configuration"
+      ],
+      "files": [
+        "src/bulletproof_green/server.py",
+        "tests/integration/test_arena_mode.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "03f4b9df8fda961b9c4e79e63cfb831696dcebe06c05be8bd8ff41089a8f0eac",
+      "depends_on": [
+        "STORY-022",
+        "STORY-023"
+      ]
+    },
+    {
+      "id": "STORY-025",
+      "title": "Trivial agent baseline tests",
+      "description": "Create llm_judge.py with LLM-as-Judge implementation using GPT-4 to score narratives based on IRS criteria",
+      "acceptance": [
+        "llm_judge.py implements LLMJudge class with score() method",
+        "Uses OpenAI API (GPT-4) for scoring",
+        "Returns structured scores with reasoning",
+        "Handles API errors gracefully",
+        "Add openai to pyproject.toml dependencies"
+      ],
+      "files": [
+        "src/bulletproof_green/llm_judge.py",
+        "tests/test_llm_judge.py",
+        "pyproject.toml"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "46d326ee972a7f20e0731773fa485fcc0e6494b8f46c99d7f7213fc944a7a13a",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-026",
+      "title": "Statistical rigor (Cohen's \u03ba, 95% CI)",
+      "description": "Integrate LLM judge with rule-based scoring to create hybrid evaluation system",
+      "acceptance": [
+        "Evaluator uses both rule-based and LLM scoring",
+        "Scorer combines rule-based and LLM scores",
+        "Weighted combination or fallback strategy implemented",
+        "Integration tests verify hybrid approach"
+      ],
+      "files": [
+        "src/bulletproof_green/evaluator.py",
+        "src/bulletproof_green/scorer.py",
+        "tests/test_hybrid_evaluation.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "a4dab19779b5b1606d9c67a2adbc7894eb5c71c26f477f1eb3fd8f3e65ed97f5",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-027",
+      "title": "Create held-out test set",
+      "description": "Test benchmark with trivial agents (empty response, random text) to establish baseline scores and ensure they score >80 (high risk = failing)",
+      "acceptance": [
+        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
+        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
+        "Held-out test set (separate from training/validation data)",
+        "Documented limitations and edge cases",
+        "scipy or statsmodels for statistical calculations",
+        "Test framework integration"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "ce3925e946f7121befe813bff7e47aa47b6340379dd3754973d27c752b6c33d8",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-028",
+      "title": "Document benchmark limitations",
+      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's \u03ba)",
+      "acceptance": [
+        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
+        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
+        "Held-out test set (separate from training/validation data)",
+        "Documented limitations and edge cases",
+        "scipy or statsmodels for statistical calculations",
+        "Test framework integration"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "dbe9acae0389afa2119c78550d9563e1c2f071ef1ba0805711a0f35262a830fb",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-029",
+      "title": "Add difficulty tags to ground truth",
+      "description": "Implement data contamination prevention: maintain held-out test set not in public ground truth, version tracking for all narratives, document data provenance",
+      "acceptance": [
+        "Difficulty tags in ground truth (EASY, MEDIUM, HARD)",
+        "Per-tier accuracy reporting",
+        "Even distribution across tiers",
+        "Validation script reports breakdown by difficulty",
+        "Updated JSON schema for difficulty field",
+        "Reporting dashboard or CLI output"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "f805a8ad4ce46e7c2fb00e3e079c609b38b572950ee7e3e1f1d67d6c09d538fc",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-030",
+      "title": "Report accuracy by difficulty tier",
+      "description": "Document known benchmark limitations, quantify impact of keyword-based evaluation gaps, provide guidance on result interpretation",
+      "acceptance": [
+        "Difficulty tags in ground truth (EASY, MEDIUM, HARD)",
+        "Per-tier accuracy reporting",
+        "Even distribution across tiers",
+        "Validation script reports breakdown by difficulty",
+        "Updated JSON schema for difficulty field",
+        "Reporting dashboard or CLI output"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "dfdd88147dc3d439bc185910b78574617c13af60a7e7df998887fdd0d6b12484",
+      "depends_on": [
+        "STORY-029"
+      ]
+    },
+    {
+      "id": "STORY-031",
+      "title": "Create adversarial test narratives",
+      "description": "Adversarial testing to prevent benchmark exploitation. - Create adversarial test narratives",
+      "acceptance": [
+        "Adversarial test narratives (keyword stuffing, template gaming)",
+        "LLM reward hacking detection",
+        "Pattern variation resistance",
+        "Robustness tests (capitalization, whitespace, paraphrasing)",
+        "Adversarial test suite",
+        "Gaming detection metrics"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/business_risk_detector.py",
+        "src/bulletproof_green/evaluator.py",
+        "src/bulletproof_green/scorer.py",
+        "tests/test_business_risk_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "49b2f7322b5375edc22f26569681d5b295dd60ee016132b4f1d80f5fa3476a5f",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-032",
+      "title": "LLM reward hacking tests",
+      "description": "Adversarial testing to prevent benchmark exploitation. - LLM reward hacking tests",
+      "acceptance": [
+        "Adversarial test narratives (keyword stuffing, template gaming)",
+        "LLM reward hacking detection",
+        "Pattern variation resistance",
+        "Robustness tests (capitalization, whitespace, paraphrasing)",
+        "Adversarial test suite",
+        "Gaming detection metrics"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/specificity_detector.py",
+        "tests/test_specificity_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "76a95defb658f6cd8999cb00115c3a97e00c2c95c87f667b7ad567e9ae51b6cf",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-033",
+      "title": "A2A task updates (SSE streaming)",
+      "description": "Wire business_risk_detector and specificity_detector into evaluator pipeline",
+      "acceptance": [
+        "Evaluator imports and uses business_risk_detector",
+        "Evaluator imports and uses specificity_detector",
+        "Both detectors integrated into evaluation flow",
+        "Integration tests verify detectors are called"
+      ],
+      "files": [
+        "src/bulletproof_green/evaluator.py",
+        "tests/test_evaluator_integration.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "0a6ae3791adce9a1c346d5e7353bd0d26cf33973874cd976c17330a3e4d498bd",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-034",
+      "title": "Verify Docker ENTRYPOINT parameters",
+      "description": "Adversarial Reward Training (ART) for Purple Agent improvement. - Verify Docker ENTRYPOINT parameters",
+      "acceptance": [
+        "Add difficulty tags (EASY, MEDIUM, HARD) to ground_truth.json",
+        "Tag at least 10 test cases per difficulty level",
+        "Tags based on IRS complexity and edge case handling"
+      ],
+      "files": [
+        "data/ground_truth.json"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "09a5ba0c8867603b29edc82346a912d7f9cd3f3cef1cc236bf2094fb5a118c4c",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-035",
+      "title": "Task isolation tests",
+      "description": "Extend validate_benchmark.py to report accuracy by difficulty level",
+      "acceptance": [
+        "Report accuracy breakdown by difficulty level (EASY, MEDIUM, HARD)",
+        "Show pass/fail counts per difficulty",
+        "Include difficulty distribution in output"
+      ],
+      "files": [
+        "src/validate_benchmark.py",
+        "tests/test_benchmark_validation.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "1c81b7385d1ca236849431b50d56f6c14d5420eddd02e735c0189a5b03919513",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-036",
+      "title": "ART trainer integration",
+      "description": "Adversarial Reward Training (ART) for Purple Agent improvement. - ART trainer integration",
+      "acceptance": [
+        "Create adversarial_narratives.json with gaming attempts",
+        "Test rule-based anti-gaming detection",
+        "Include keyword stuffing, overgeneralization, irrelevance tests",
+        "Verify rule-based detectors catch gaming attempts"
+      ],
+      "files": [
+        "data/adversarial_narratives.json",
+        "tests/test_anti_gaming.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "a2e39360a4bcf70f56afaf1eb42ea19758326df24f11acb0a0595e9e36fb15ff",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-037",
+      "title": "Trajectory store",
+      "description": "Adversarial Reward Training (ART) for Purple Agent improvement. - Trajectory store",
+      "acceptance": [
+        "Test LLM reward hacking scenarios",
+        "Document known LLM judge limitations",
+        "Test cases for prompt injection, context manipulation",
+        "Add limitations to BENCHMARK_LIMITATIONS.md"
+      ],
+      "files": [
+        "tests/test_anti_gaming.py",
+        "docs/AgentBeats/BENCHMARK_LIMITATIONS.md"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "5f38846ee7a76b0eaf4d9f252850e592bdb7e14eaa227e5bb3edf89c70f7a560",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-038",
+      "title": "Reward function",
+      "description": "Adversarial Reward Training (ART) for Purple Agent improvement. - Reward function",
+      "acceptance": [
+        "Trajectory store captures Purple agent generation paths",
+        "Reward function based on risk score (lower = better)",
+        "GRPO trainer integration",
+        "LoRA adapter updates",
+        "WeightWatcher validation (Alpha 2-6)",
+        "Integration with fine-tuning framework (e.g., Hugging Face PEFT)",
+        "Trajectory storage format",
+        "Reward computation logic"
+      ],
+      "files": [],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "b58f726cd8740d8d49799c10467dc0ff0829bc4a76c588d381fcf23b38fe2a65",
+      "depends_on": []
     }
   ]
 }

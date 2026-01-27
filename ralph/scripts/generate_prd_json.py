@@ -211,57 +211,67 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
         ]
     }
     """
-    # Find the "Story Breakdown" section (any phase)
-    breakdown_match = re.search(
-        r"Story Breakdown[^\n]*\((\d+) stories[^\n]*\):\s*\n(.*?)(?=\d+\.|###|##|\Z)",
+    # Find ALL "Story Breakdown" sections (Phase 1, Phase 2, etc.)
+    # Updated regex to handle "stories total)" or "stories)" patterns
+    # Made colon optional since PRD.md may not have it
+    breakdown_matches = list(re.finditer(
+        r"Story Breakdown[^\n]*\((\d+) stories[^\n]*?\):?\s*\n(.*?)(?=###|##|\Z)",
         prd_content,
         re.DOTALL,
-    )
+    ))
 
-    if not breakdown_match:
+    if not breakdown_matches:
         print("Warning: Could not find 'Story Breakdown' section")
         return {}
 
-    breakdown_text = breakdown_match.group(2)
+    print(f"Found {len(breakdown_matches)} Story Breakdown section(s)")
 
-    # Parse each feature mapping: "- **Feature N (...) → STORY-X, STORY-Y, ..."
+    # Parse each breakdown section and merge mappings
     mapping = {}
 
-    # Pattern: Feature N (Name) → STORY-XXX: Description, STORY-YYY: Description
-    feature_pattern = r"\*\*Feature (\d+)[^→]+→\s*(.+?)(?=\n\s*-\s*\*\*|\Z)"
+    for breakdown_match in breakdown_matches:
+        breakdown_text = breakdown_match.group(2)
 
-    for match in re.finditer(feature_pattern, breakdown_text, re.DOTALL):
-        feature_num = int(match.group(1))
-        stories_text = match.group(2).strip()
+        # Parse each feature mapping: "- **Feature N (...) → STORY-X, STORY-Y, ..."
+        # Pattern: Feature N (Name) → STORY-XXX: Description, STORY-YYY: Description
+        feature_pattern = r"\*\*Feature (\d+)[^→]+→\s*(.+?)(?=\n\s*-\s*\*\*|\Z)"
 
-        # Parse individual stories: STORY-XXX: Title (depends: STORY-YYY, STORY-ZZZ)
-        # Pattern captures: story_num, title, optional depends clause
-        story_pattern = r"STORY-(\d+):\s*([^,(]+?)(?:\s*\(depends:\s*([^)]+)\))?(?=,|\n|\Z)"
+        for match in re.finditer(feature_pattern, breakdown_text, re.DOTALL):
+            feature_num = int(match.group(1))
+            stories_text = match.group(2).strip()
 
-        story_specs = []
-        for story_match in re.finditer(story_pattern, stories_text):
-            story_num = story_match.group(1)
-            story_title = story_match.group(2).strip()
-            depends_str = story_match.group(3)
+            # Parse individual stories: STORY-XXX: Title (depends: STORY-YYY, STORY-ZZZ)
+            # Pattern captures: story_num, title, optional depends clause
+            # Updated to handle titles with parentheses (only stop at "(depends:" not just "(")
+            story_pattern = r"STORY-(\d+):\s*(.+?)(?:\s*\(depends:\s*([^)]+)\))?(?=\s*,\s*STORY-|\n|\Z)"
 
-            # Parse depends_on list
-            depends_on = []
-            if depends_str:
-                # Extract STORY-XXX patterns from depends string
-                for dep_match in re.finditer(r"STORY-\d+", depends_str):
-                    depends_on.append(dep_match.group(0))
+            story_specs = []
+            for story_match in re.finditer(story_pattern, stories_text):
+                story_num = story_match.group(1)
+                story_title = story_match.group(2).strip()
+                depends_str = story_match.group(3)
 
-            story_specs.append(
-                {
-                    "id": f"STORY-{story_num}",
-                    "title": story_title,
-                    "acceptance_filter": [],  # Will filter from feature acceptance
-                    "files": [],  # Will use feature files or empty
-                    "depends_on": depends_on,
-                }
-            )
+                # Parse depends_on list
+                depends_on = []
+                if depends_str:
+                    # Extract STORY-XXX patterns from depends string
+                    for dep_match in re.finditer(r"STORY-\d+", depends_str):
+                        depends_on.append(dep_match.group(0))
 
-        mapping[feature_num] = story_specs
+                story_specs.append(
+                    {
+                        "id": f"STORY-{story_num}",
+                        "title": story_title,
+                        "acceptance_filter": [],  # Will filter from feature acceptance
+                        "files": [],  # Will use feature files or empty
+                        "depends_on": depends_on,
+                    }
+                )
+
+            # Merge into mapping (later sections can override earlier ones)
+            if feature_num not in mapping:
+                mapping[feature_num] = []
+            mapping[feature_num].extend(story_specs)
 
     return mapping
 
@@ -565,7 +575,7 @@ def main():
 
     print(f"Generated {len(phase2_stories)} Phase 2 stories")
 
-    # Load existing Phase 1 stories
+    # Load existing stories
     existing_stories = []
     if existing_prd_json_path.exists():
         with open(existing_prd_json_path) as f:
@@ -573,11 +583,11 @@ def main():
             existing_stories = existing_data.get("stories", [])
             print(f"Loaded {len(existing_stories)} existing stories from prd.json")
 
-    # Phase 1 stories (STORY-001 to STORY-021) - preserve status
-    phase1_stories = [s for s in existing_stories if int(s["id"].split("-")[1]) <= 21]
+    # Get existing story IDs to avoid duplicates
+    existing_story_ids = {s["id"] for s in existing_stories}
 
-    # Add content_hash and depends_on to Phase 1 stories if missing
-    for story in phase1_stories:
+    # Add content_hash and depends_on to existing stories if missing
+    for story in existing_stories:
         if "content_hash" not in story:
             story["content_hash"] = compute_hash(
                 story["title"], story["description"], story["acceptance"]
@@ -585,8 +595,12 @@ def main():
         if "depends_on" not in story:
             story["depends_on"] = []
 
-    # Combine Phase 1 + Phase 2
-    all_stories = phase1_stories + phase2_stories
+    # Filter out new stories that already exist (avoid duplicates)
+    new_stories = [s for s in phase2_stories if s["id"] not in existing_story_ids]
+    print(f"Filtered to {len(new_stories)} new stories (skipped {len(phase2_stories) - len(new_stories)} duplicates)")
+
+    # Combine existing + new stories
+    all_stories = existing_stories + new_stories
 
     # Sort by ID
     all_stories.sort(key=lambda s: int(s["id"].split("-")[1]))
@@ -608,8 +622,8 @@ def main():
 
     print(f"\n✅ Generated {output_path}")
     print(f"Total stories: {len(all_stories)}")
-    print(f"  - Phase 1 (preserved): {len(phase1_stories)} stories")
-    print(f"  - Phase 2 (generated): {len(phase2_stories)} stories")
+    print(f"  - Existing (preserved): {len(existing_stories)} stories")
+    print(f"  - New (appended): {len(new_stories)} stories")
 
     # Summary
     completed = sum(1 for s in all_stories if s["passes"])
