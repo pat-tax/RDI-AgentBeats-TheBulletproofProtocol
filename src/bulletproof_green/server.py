@@ -31,7 +31,6 @@ from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.models import GreenAgentOutput
 from bulletproof_green.scorer import AgentBeatsScorer
 
-
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
 
@@ -211,7 +210,7 @@ class GreenAgentExecutor:
                     "risk_score": eval_result.risk_score,
                     "risk_category": eval_result.risk_category,
                     "confidence": eval_result.confidence,
-                    "redline": eval_result.redline.to_dict(),
+                    "redline": eval_result.redline.model_dump(),
                 }
             )
 

@@ -6,7 +6,8 @@ from bulletproof_purple.agent_card import (
     create_agent_card,
     validate_agent_card,
 )
-from bulletproof_purple.generator import Narrative, NarrativeGenerator
+from bulletproof_purple.generator import NarrativeGenerator
+from bulletproof_purple.models import Narrative
 
 __all__ = [
     "NarrativeGenerator",

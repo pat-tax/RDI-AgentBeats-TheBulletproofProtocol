@@ -22,14 +22,15 @@ from bulletproof_green.arena_executor import (
     ArenaResult,
     IterationRecord,
 )
-from bulletproof_green.evaluator import EvaluationResult, Issue, Redline, RuleBasedEvaluator
+from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.llm_judge import (
     HybridScoreResult,
     LLMJudge,
     LLMJudgeConfig,
     LLMScoreResult,
 )
-from bulletproof_green.scorer import AgentBeatsScorer, ScoreResult
+from bulletproof_green.models import EvaluationResult, Issue, Redline, ScoreResult
+from bulletproof_green.scorer import AgentBeatsScorer
 
 __all__ = [
     "RuleBasedEvaluator",

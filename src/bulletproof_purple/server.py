@@ -30,7 +30,6 @@ from a2a.utils import new_agent_parts_message, new_task
 from bulletproof_purple.generator import NarrativeGenerator
 from bulletproof_purple.models import PurpleAgentOutput
 
-
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
 

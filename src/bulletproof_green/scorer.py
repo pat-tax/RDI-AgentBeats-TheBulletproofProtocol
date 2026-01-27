@@ -4,25 +4,7 @@ Converts rule-based evaluation results into AgentBeats compatible scores
 in the 0.0-1.0 scale.
 """
 
-from dataclasses import dataclass
-
-from bulletproof_green.evaluator import EvaluationResult
-
-
-@dataclass
-class ScoreResult:
-    """AgentBeats-compatible score result.
-
-    All scores are in the 0.0-1.0 scale where:
-    - 1.0 = perfect score (no issues detected)
-    - 0.0 = worst score (maximum penalties applied)
-    """
-
-    overall_score: float
-    correctness: float
-    safety: float
-    specificity: float
-    experimentation: float
+from bulletproof_green.models import EvaluationResult, ScoreResult
 
 
 class AgentBeatsScorer:

@@ -4,16 +4,9 @@ Generates Four-Part Test narratives from engineering signals with focus on
 Process of Experimentation and technical uncertainty evidence.
 """
 
-from dataclasses import dataclass, field
 from typing import Any
 
-
-@dataclass
-class Narrative:
-    """Structured narrative output with metadata."""
-
-    text: str
-    metadata: dict[str, Any] = field(default_factory=dict)
+from bulletproof_purple.models import Narrative
 
 
 class NarrativeGenerator:
