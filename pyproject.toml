@@ -35,21 +35,35 @@ dev = [
 package = true
 exclude-newer = "2026-01-26T00:00:00Z"
 
+[tool.pyright]
+pythonVersion = "3.13"
+include = ["src", "tests"]
+typeCheckingMode = "strict"
+extraPaths = ["./venv/lib/python3.13/site-packages"]
+useLibraryCodeForTypes = true
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUnknownMemberType = "none"
+reportUnknownVariableType = "none"
+
 [tool.ruff]
-line-length = 100
 target-version = "py313"
-include = ["src/**/*.py", "tests/**/*.py"]
+src = ["src", "tests"]
+line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
-ignore = ["N999"]  # Allow PascalCase module name for TheBulletproofProtocol
+# ignore = ["E203"]  # Whitespace before ':'
+unfixable = ["B"]
 
-[tool.pyright]
-pythonVersion = "3.13"
-typeCheckingMode = "basic"
-reportMissingImports = true
-reportMissingTypeStubs = false
-include = ["src", "tests"]
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "tests"]
 
 [tool.complexipy]
 paths = ["src"]
@@ -57,13 +71,12 @@ max-complexity-allowed = 15
 exclude = ["tests/*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
+addopts = "--strict-markers"  # addopts = "-v --tb=short"
 asyncio_mode = "auto"
+# "function", "class", "module", "package", "session"
 asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["src"]
+testpaths = ["tests"]
 markers = [
     "integration: marks tests as integration tests",
     "benchmark: marks tests as benchmark tests",
