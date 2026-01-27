@@ -309,7 +309,7 @@ main() {
 
                 # Commit state files
                 log_info "Committing state files..."
-                git add "$PRD_JSON" "$PROGRESS_FILE"
+                git add "$PRD_JSON" "$PROGRESS_FILE" 2>/dev/null || log_warn "Could not stage state files (may be ignored)"
                 git commit -m "chore: Update Ralph state after completing $story_id" || log_warn "No state changes to commit"
             else
                 log_warn "Story completed but quality checks failed"
