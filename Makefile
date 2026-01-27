@@ -24,7 +24,13 @@ setup_claude_code:  ## Setup claude code CLI
 	echo "Claude Code CLI version: $$(claude --version)"
 
 setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
+	# Required for Claude Code sandboxing on Linux/WSL2:
+	# - bubblewrap: Provides filesystem and process isolation
+	# - socat: Handles network socket communication for sandbox proxy
+	# Without these, sandbox falls back to unsandboxed execution (security risk)
 	# https://code.claude.com/docs/en/sandboxing
+	# https://code.claude.com/docs/en/settings#sandbox-settings
+	# https://code.claude.com/docs/en/security
 	echo "Installing sandbox dependencies ..."
 	if command -v apt-get > /dev/null; then \
 		sudo apt-get update -qq && sudo apt-get install -y bubblewrap socat; \
@@ -42,7 +48,7 @@ setup_project:  ## Customize template with your project details. Run with help: 
 setup_devc_project:  ## Devcontainer: Full project env (sandbox + Python/Node deps + project customization)
 	$(MAKE) -s setup_sandbox
 	$(MAKE) -s setup_dev
-	$(MAKE) -s setup_project
+	# $(MAKE) -s setup_project
 
 setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Code)
 	$(MAKE) -s setup_sandbox
@@ -100,7 +106,7 @@ ralph_prd_md:  ## [Optional] Generate PRD.md from UserStory.md
 
 ralph_prd_json:  ## [Optional] Generate PRD.json from PRD.md
 	echo "Generating PRD.json from PRD.md ..."
-	claude "/generating-prd-json-from-prd-md"
+	claude -p "/generating-prd-json-from-prd-md"
 
 ralph_init:  ## Initialize Ralph loop environment
 	echo "Initializing Ralph loop environment ..."
