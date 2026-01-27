@@ -10,8 +10,9 @@ This test module validates the acceptance criteria for STORY-004:
 
 import pytest
 
-from bulletproof_green.evaluator import EvaluationResult, Redline, RuleBasedEvaluator
-from bulletproof_green.scorer import AgentBeatsScorer, ScoreResult
+from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.models import EvaluationResult, Redline, ScoreResult
+from bulletproof_green.scorer import AgentBeatsScorer
 
 
 class TestOverallScoreCalculation:
@@ -436,10 +437,10 @@ class TestScoreResultStructure:
         assert hasattr(score_result, "experimentation")
 
     def test_score_result_is_dataclass(self):
-        """Test that ScoreResult is a proper dataclass."""
-        from dataclasses import is_dataclass
+        """Test that ScoreResult is a proper Pydantic model."""
+        from pydantic import BaseModel
 
-        assert is_dataclass(ScoreResult)
+        assert issubclass(ScoreResult, BaseModel)
 
     def test_score_result_repr(self):
         """Test that ScoreResult has a meaningful repr."""

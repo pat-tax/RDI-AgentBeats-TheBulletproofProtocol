@@ -485,7 +485,8 @@ class TestRuleBasedRemainsUnchanged:
 
     def test_rule_evaluator_unchanged_interface(self):
         """Test RuleBasedEvaluator interface remains unchanged."""
-        from bulletproof_green.evaluator import EvaluationResult, RuleBasedEvaluator
+        from bulletproof_green.evaluator import RuleBasedEvaluator
+        from bulletproof_green.models import EvaluationResult
 
         evaluator = RuleBasedEvaluator()
         result = evaluator.evaluate("Test narrative")

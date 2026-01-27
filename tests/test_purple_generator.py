@@ -10,7 +10,8 @@ This test module validates the acceptance criteria for STORY-001:
 """
 
 
-from bulletproof_purple.generator import Narrative, NarrativeGenerator
+from bulletproof_purple.generator import NarrativeGenerator
+from bulletproof_purple.models import Narrative
 
 
 class TestNarrativeWordCount:

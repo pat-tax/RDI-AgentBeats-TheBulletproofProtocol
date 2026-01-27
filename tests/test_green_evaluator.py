@@ -11,11 +11,8 @@ This test module validates the acceptance criteria for STORY-003:
 - Returns structured evaluation per Green-Agent-Metrics-Specification.md
 """
 
-from bulletproof_green.evaluator import (
-    EvaluationResult,
-    Issue,
-    RuleBasedEvaluator,
-)
+from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.models import EvaluationResult, Issue
 
 
 class TestRoutineEngineeringDetection:
