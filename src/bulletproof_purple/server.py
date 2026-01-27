@@ -26,8 +26,17 @@ from a2a.types import (
     TextPart,
 )
 from a2a.utils import new_agent_parts_message, new_task
+from pydantic import BaseModel
 
 from bulletproof_purple.generator import NarrativeGenerator
+
+
+class PurpleAgentOutput(BaseModel):
+    """Output schema for Purple Agent narrative generation results."""
+
+    narrative: str
+    metadata: dict[str, Any]
+
 
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
@@ -188,13 +197,16 @@ class PurpleAgentExecutor:
                 timeout=self.timeout,
             )
 
-            # Create response with DataPart
-            data_part = DataPart(
-                data={
+            # Validate output with Pydantic model
+            output = PurpleAgentOutput.model_validate(
+                {
                     "narrative": narrative.text,
                     "metadata": narrative.metadata,
                 }
             )
+
+            # Create response with DataPart
+            data_part = DataPart(data=output.model_dump())
 
             # Mark task completed
             task.status = TaskStatus(state=TaskState.completed)

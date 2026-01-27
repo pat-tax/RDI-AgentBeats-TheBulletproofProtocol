@@ -262,18 +262,19 @@ class TestEvaluatorScorerIntegration:
             assert "result" in data
             result = data["result"]
 
-            # Find the DataPart with scores
+            # Find the DataPart with scores in AgentBeats format
             if "parts" in result:
                 for part in result["parts"]:
                     if "data" in part:
                         score_data = part["data"]
-                        assert "overall_score" in score_data
-                        # Score should be in 0.0-1.0 range
-                        assert 0.0 <= score_data["overall_score"] <= 1.0
+                        assert "score" in score_data
+                        assert "max_score" in score_data
+                        # Score should be in 0 to max_score range
+                        assert 0 <= score_data["score"] <= score_data["max_score"]
 
     @pytest.mark.asyncio
-    async def test_response_contains_component_scores(self):
-        """Test response contains all component scores."""
+    async def test_response_contains_agentbeats_fields(self):
+        """Test response contains all AgentBeats required fields."""
         app = create_app()
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
@@ -295,15 +296,16 @@ class TestEvaluatorScorerIntegration:
                 for part in result["parts"]:
                     if "data" in part:
                         score_data = part["data"]
-                        # Check for component scores
-                        assert "correctness" in score_data
-                        assert "safety" in score_data
-                        assert "specificity" in score_data
-                        assert "experimentation" in score_data
+                        # Check for AgentBeats required fields
+                        assert "domain" in score_data
+                        assert "score" in score_data
+                        assert "max_score" in score_data
+                        assert "pass_rate" in score_data
+                        assert "task_rewards" in score_data
 
     @pytest.mark.asyncio
-    async def test_response_contains_evaluation_details(self):
-        """Test response contains evaluation details (classification, risk_score)."""
+    async def test_response_contains_task_rewards(self):
+        """Test response contains task_rewards with component scores."""
         app = create_app()
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
@@ -319,13 +321,17 @@ class TestEvaluatorScorerIntegration:
                 for part in result["parts"]:
                     if "data" in part:
                         score_data = part["data"]
-                        # Should contain evaluation metadata
-                        assert "classification" in score_data
-                        assert "risk_score" in score_data
+                        # Should contain task_rewards with 4 component tasks
+                        assert "task_rewards" in score_data
+                        task_rewards = score_data["task_rewards"]
+                        assert "0" in task_rewards  # correctness
+                        assert "1" in task_rewards  # safety
+                        assert "2" in task_rewards  # specificity
+                        assert "3" in task_rewards  # experimentation
 
     @pytest.mark.asyncio
-    async def test_qualifying_narrative_gets_low_risk(self):
-        """Test a qualifying narrative gets risk_score < 20."""
+    async def test_qualifying_narrative_gets_high_pass_rate(self):
+        """Test a qualifying narrative gets high pass_rate."""
         app = create_app()
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
@@ -353,13 +359,13 @@ class TestEvaluatorScorerIntegration:
                 for part in result["parts"]:
                     if "data" in part:
                         score_data = part["data"]
-                        # Qualifying means risk_score < 20
-                        assert score_data["risk_score"] < 20
-                        assert score_data["classification"] == "QUALIFYING"
+                        # Qualifying narratives should have high pass_rate (>50%)
+                        assert score_data["pass_rate"] > 50
+                        assert score_data["domain"] == "irs-r&d"
 
     @pytest.mark.asyncio
-    async def test_non_qualifying_narrative_gets_high_risk(self):
-        """Test a non-qualifying narrative gets risk_score >= 20."""
+    async def test_non_qualifying_narrative_gets_low_pass_rate(self):
+        """Test a non-qualifying narrative gets low pass_rate."""
         app = create_app()
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
@@ -382,9 +388,9 @@ class TestEvaluatorScorerIntegration:
                 for part in result["parts"]:
                     if "data" in part:
                         score_data = part["data"]
-                        # Non-qualifying means risk_score >= 20
-                        assert score_data["risk_score"] >= 20
-                        assert score_data["classification"] == "NON_QUALIFYING"
+                        # Non-qualifying narratives should have low pass_rate (<=50%)
+                        assert score_data["pass_rate"] <= 50
+                        assert score_data["domain"] == "irs-r&d"
 
 
 class TestJSONRPCErrorHandling:

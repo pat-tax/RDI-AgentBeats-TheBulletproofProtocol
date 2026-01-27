@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncGenerator
-from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
 from a2a.server.apps import A2AFastAPIApplication
@@ -27,9 +26,34 @@ from a2a.types import (
     TextPart,
 )
 from a2a.utils import new_agent_parts_message, new_task
+from pydantic import BaseModel
 
 from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.scorer import AgentBeatsScorer
+
+
+class GreenAgentOutput(BaseModel):
+    """AgentBeats-compatible output schema for Green Agent evaluation results."""
+
+    # AgentBeats required fields
+    domain: str
+    score: float
+    max_score: int
+    pass_rate: float
+    task_rewards: dict[str, float]
+    time_used: float
+    # Evaluation metrics
+    overall_score: float
+    correctness: float
+    safety: float
+    specificity: float
+    experimentation: float
+    classification: str
+    risk_score: int
+    risk_category: str
+    confidence: float
+    redline: dict[str, Any]
+
 
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
@@ -179,23 +203,43 @@ class GreenAgentExecutor:
                 timeout=self.timeout,
             )
 
-            # Create response with DataPart containing scores and evaluation
-            data_part = DataPart(
-                data={
-                    # Scores from scorer
+            # Calculate task rewards (1.0 if score > 0.5, else 0.0)
+            task_rewards = {
+                "0": 1.0 if score_result.correctness > 0.5 else 0.0,
+                "1": 1.0 if score_result.safety > 0.5 else 0.0,
+                "2": 1.0 if score_result.specificity > 0.5 else 0.0,
+                "3": 1.0 if score_result.experimentation > 0.5 else 0.0,
+            }
+            score = sum(task_rewards.values())
+            max_score = len(task_rewards)
+            pass_rate = (score / max_score) * 100 if max_score > 0 else 0.0
+
+            # Validate output with Pydantic model
+            output = GreenAgentOutput.model_validate(
+                {
+                    # AgentBeats required fields
+                    "domain": "irs-r&d",
+                    "score": score,
+                    "max_score": max_score,
+                    "pass_rate": pass_rate,
+                    "task_rewards": task_rewards,
+                    "time_used": eval_result.evaluation_time_ms / 1000,
+                    # Evaluation metrics
                     "overall_score": score_result.overall_score,
                     "correctness": score_result.correctness,
                     "safety": score_result.safety,
                     "specificity": score_result.specificity,
                     "experimentation": score_result.experimentation,
-                    # Evaluation metadata
                     "classification": eval_result.classification,
                     "risk_score": eval_result.risk_score,
                     "risk_category": eval_result.risk_category,
                     "confidence": eval_result.confidence,
-                    "redline": asdict(eval_result.redline),
+                    "redline": eval_result.redline.to_dict(),
                 }
             )
+
+            # Create response with DataPart in AgentBeats format
+            data_part = DataPart(data=output.model_dump())
 
             # Mark task completed
             task.status = TaskStatus(state=TaskState.completed)
