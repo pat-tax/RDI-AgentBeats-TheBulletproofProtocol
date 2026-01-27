@@ -214,11 +214,13 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
     # Find ALL "Story Breakdown" sections (Phase 1, Phase 2, etc.)
     # Updated regex to handle "stories total)" or "stories)" patterns
     # Made colon optional since PRD.md may not have it
-    breakdown_matches = list(re.finditer(
-        r"Story Breakdown[^\n]*\((\d+) stories[^\n]*?\):?\s*\n(.*?)(?=###|##|\Z)",
-        prd_content,
-        re.DOTALL,
-    ))
+    breakdown_matches = list(
+        re.finditer(
+            r"Story Breakdown[^\n]*\((\d+) stories[^\n]*?\):?\s*\n(.*?)(?=###|##|\Z)",
+            prd_content,
+            re.DOTALL,
+        )
+    )
 
     if not breakdown_matches:
         print("Warning: Could not find 'Story Breakdown' section")
@@ -243,7 +245,9 @@ def parse_story_breakdown(prd_content: str) -> dict[int, list[dict]]:
             # Parse individual stories: STORY-XXX: Title (depends: STORY-YYY, STORY-ZZZ)
             # Pattern captures: story_num, title, optional depends clause
             # Updated to handle titles with parentheses (only stop at "(depends:" not just "(")
-            story_pattern = r"STORY-(\d+):\s*(.+?)(?:\s*\(depends:\s*([^)]+)\))?(?=\s*,\s*STORY-|\n|\Z)"
+            story_pattern = (
+                r"STORY-(\d+):\s*(.+?)(?:\s*\(depends:\s*([^)]+)\))?(?=\s*,\s*STORY-|\n|\Z)"
+            )
 
             story_specs = []
             for story_match in re.finditer(story_pattern, stories_text):
@@ -358,7 +362,11 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
     """
     enhancements = {
         "STORY-022": {
-            "description": "Create messenger.py with A2A client utilities (create_message, send_message, Messenger class) for green agent to call purple agents via A2A protocol",
+            "description": (
+                "Create messenger.py with A2A client utilities "
+                "(create_message, send_message, Messenger class) for green agent "
+                "to call purple agents via A2A protocol"
+            ),
             "acceptance": [
                 "messenger.py exposes create_message() function for A2A message construction",
                 "messenger.py exposes send_message() function for HTTP POST to purple agents",
@@ -369,7 +377,11 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
             "files": ["src/bulletproof_green/messenger.py", "tests/test_messenger.py"],
         },
         "STORY-023": {
-            "description": "Create arena_executor.py with multi-turn orchestration: green agent iteratively calls purple agent, evaluates response, provides critique, until risk_score < target or max_iterations reached",
+            "description": (
+                "Create arena_executor.py with multi-turn orchestration: "
+                "green agent iteratively calls purple agent, evaluates response, "
+                "provides critique, until risk_score < target or max_iterations reached"
+            ),
             "acceptance": [
                 "Supports configurable max_iterations (default: 5)",
                 "Supports configurable target_risk_score (default: 20)",
@@ -381,25 +393,48 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
             "files": ["src/bulletproof_green/arena_executor.py", "tests/test_arena_executor.py"],
         },
         "STORY-024": {
-            "description": "Extend green agent server to handle arena mode requests via mode=arena parameter, routing to ArenaExecutor instead of single-shot evaluation",
+            "description": (
+                "Extend green agent server to handle arena mode requests "
+                "via mode=arena parameter, routing to ArenaExecutor "
+                "instead of single-shot evaluation"
+            ),
             "files": ["src/bulletproof_green/server.py", "tests/integration/test_arena_mode.py"],
         },
         # Feature 5 - Benchmark rigor sub-features (027-030)
         "STORY-027": {
-            "description": "Test benchmark with trivial agents (empty response, random text) to establish baseline scores and ensure they score >80 (high risk = failing)"
+            "description": (
+                "Test benchmark with trivial agents (empty response, random text) "
+                "to establish baseline scores and ensure they score >80 "
+                "(high risk = failing)"
+            )
         },
         "STORY-028": {
-            "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's κ)"
+            "description": (
+                "Add statistical rigor: report 95% confidence intervals, "
+                "run benchmark multiple times for reproducibility, "
+                "calculate inter-rater reliability (Cohen's κ)"
+            )
         },
         "STORY-029": {
-            "description": "Implement data contamination prevention: maintain held-out test set not in public ground truth, version tracking for all narratives, document data provenance"
+            "description": (
+                "Implement data contamination prevention: maintain held-out "
+                "test set not in public ground truth, version tracking for "
+                "all narratives, document data provenance"
+            )
         },
         "STORY-030": {
-            "description": "Document known benchmark limitations, quantify impact of keyword-based evaluation gaps, provide guidance on result interpretation"
+            "description": (
+                "Document known benchmark limitations, quantify impact of "
+                "keyword-based evaluation gaps, provide guidance on result "
+                "interpretation"
+            )
         },
         # Feature 4 - Split between create (025) and integrate (026)
         "STORY-025": {
-            "description": "Create llm_judge.py with LLM-as-Judge implementation using GPT-4 to score narratives based on IRS criteria",
+            "description": (
+                "Create llm_judge.py with LLM-as-Judge implementation "
+                "using GPT-4 to score narratives based on IRS criteria"
+            ),
             "acceptance": [
                 "llm_judge.py implements LLMJudge class with score() method",
                 "Uses OpenAI API (GPT-4) for scoring",
@@ -414,7 +449,9 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
             ],
         },
         "STORY-026": {
-            "description": "Integrate LLM judge with rule-based scoring to create hybrid evaluation system",
+            "description": (
+                "Integrate LLM judge with rule-based scoring to create hybrid evaluation system"
+            ),
             "acceptance": [
                 "Evaluator uses both rule-based and LLM scoring",
                 "Scorer combines rule-based and LLM scores",
@@ -444,7 +481,9 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
             ]
         },
         "STORY-033": {
-            "description": "Wire business_risk_detector and specificity_detector into evaluator pipeline",
+            "description": (
+                "Wire business_risk_detector and specificity_detector into evaluator pipeline"
+            ),
             "acceptance": [
                 "Evaluator imports and uses business_risk_detector",
                 "Evaluator imports and uses specificity_detector",
@@ -597,7 +636,8 @@ def main():
 
     # Filter out new stories that already exist (avoid duplicates)
     new_stories = [s for s in phase2_stories if s["id"] not in existing_story_ids]
-    print(f"Filtered to {len(new_stories)} new stories (skipped {len(phase2_stories) - len(new_stories)} duplicates)")
+    skipped_count = len(phase2_stories) - len(new_stories)
+    print(f"Filtered to {len(new_stories)} new stories (skipped {skipped_count} duplicates)")
 
     # Combine existing + new stories
     all_stories = existing_stories + new_stories
@@ -608,8 +648,18 @@ def main():
     # Create final prd.json structure
     prd_data = {
         "project": "RDI-AgentBeats-TheBulletproofProtocol",
-        "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-        "scope": "Phase 1 complete (STORY-001 to STORY-021). Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
+        "description": (
+            "Legal Domain Agent Benchmark for AgentBeats competition - "
+            "IRS Section 41 R&D tax credit evaluator. "
+            "Purple agent (reference implementation) generates test narratives, "
+            "Green agent (benchmark) evaluates them for IRS compliance."
+        ),
+        "scope": (
+            "Phase 1 complete (STORY-001 to STORY-021): Core agents, A2A protocol, "
+            "ground truth dataset, Docker deployment, AgentBeats registration. "
+            "Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), "
+            "Arena mode, Hybrid evaluation, Benchmark rigor."
+        ),
         "source": "docs/PRD.md",
         "generated": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
         "stories": all_stories,

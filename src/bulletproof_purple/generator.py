@@ -5,6 +5,7 @@ Process of Experimentation and technical uncertainty evidence.
 """
 
 from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass
@@ -12,7 +13,7 @@ class Narrative:
     """Structured narrative output with metadata."""
 
     text: str
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class NarrativeGenerator:
@@ -146,7 +147,7 @@ and provides a foundation for future development efforts in this area.""",
     def generate(
         self,
         template_type: str = "qualifying",
-        signals: dict | None = None,
+        signals: dict[str, Any] | None = None,
     ) -> Narrative:
         """Generate an IRS Section 41 compliant narrative.
 
@@ -160,7 +161,7 @@ and provides a foundation for future development efforts in this area.""",
         effective_signals = {**self.DEFAULT_SIGNALS, **(signals or {})}
         template = self.TEMPLATES.get(template_type, self.TEMPLATES["qualifying"])
 
-        sections = []
+        sections: list[str] = []
         for key in [
             "intro",
             "hypothesis",
@@ -194,7 +195,7 @@ and provides a foundation for future development efforts in this area.""",
             },
         )
 
-    def _generate_padding(self, signals: dict, target_words: int) -> str:
+    def _generate_padding(self, signals: dict[str, Any], target_words: int) -> str:
         """Generate additional content to reach target word count."""
         padding_template = """
 Additional technical documentation captures the engineering activities performed
@@ -209,7 +210,9 @@ identify remaining uncertainties requiring resolution.
 """
         return padding_template.format(**signals).strip()
 
-    def _extract_technical_uncertainties(self, signals: dict, template_type: str) -> list[str]:
+    def _extract_technical_uncertainties(
+        self, signals: dict[str, Any], template_type: str
+    ) -> list[str]:
         """Extract technical uncertainty evidence from signals and template type."""
         uncertainties = []
 

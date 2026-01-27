@@ -64,8 +64,8 @@ setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Co
 
 
 ruff:  ## Lint: Format and check with ruff
-	uv run ruff format --exclude tests
-	uv run ruff check --fix --exclude tests
+	uv run ruff format --exclude tests --exclude .claude --exclude _archive
+	uv run ruff check --fix --exclude tests --exclude .claude --exclude _archive
 
 complexity:  ## Check cognitive complexity with complexipy
 	uv run complexipy

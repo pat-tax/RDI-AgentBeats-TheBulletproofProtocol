@@ -114,7 +114,7 @@ class PurpleAgentExecutor:
         part_data = part.root if hasattr(part, "root") else part
 
         # Check for DataPart
-        if isinstance(part_data, DataPart) and isinstance(part_data.data, dict):
+        if isinstance(part_data, DataPart) and isinstance(part_data.data, dict):  # type: ignore[reportUnnecessaryIsInstance]
             return part_data.data
         if hasattr(part_data, "data") and isinstance(part_data.data, dict):
             return part_data.data

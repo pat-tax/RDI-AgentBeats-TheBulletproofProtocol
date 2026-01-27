@@ -7,6 +7,7 @@ the Green Agent evaluator on each narrative and computing accuracy metrics.
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.scorer import AgentBeatsScorer
@@ -85,7 +86,7 @@ class BenchmarkReport:
         return "\n".join(lines)
 
 
-def load_ground_truth(path: Path) -> list[dict]:
+def load_ground_truth(path: Path) -> list[dict[str, Any]]:
     """Load ground truth dataset from JSON file.
 
     Args:
@@ -125,7 +126,7 @@ class BenchmarkValidator:
         self.evaluator = RuleBasedEvaluator()
         self.scorer = AgentBeatsScorer()
 
-    def validate_entry(self, entry: dict) -> ValidationResult:
+    def validate_entry(self, entry: dict[str, Any]) -> ValidationResult:
         """Validate a single ground truth entry.
 
         Args:
@@ -160,7 +161,7 @@ class BenchmarkValidator:
             difficulty=difficulty,
         )
 
-    def validate_all(self, data: list[dict]) -> list[ValidationResult]:
+    def validate_all(self, data: list[dict[str, Any]]) -> list[ValidationResult]:
         """Validate all entries in ground truth dataset.
 
         Args:
@@ -268,7 +269,7 @@ class BenchmarkValidator:
         gaps = []
 
         for r in results:
-            reasons = []
+            reasons: list[str] = []
 
             if not r.classification_match:
                 reasons.append(
@@ -323,7 +324,7 @@ class BenchmarkValidator:
         else:
             return "Review scoring calibration for this difficulty tier."
 
-    def generate_report(self, data: list[dict]) -> BenchmarkReport:
+    def generate_report(self, data: list[dict[str, Any]]) -> BenchmarkReport:
         """Generate complete benchmark validation report.
 
         Args:
