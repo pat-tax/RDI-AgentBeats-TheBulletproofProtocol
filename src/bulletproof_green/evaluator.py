@@ -9,6 +9,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 
 @dataclass
@@ -31,7 +32,7 @@ class Redline:
     high: int = 0
     medium: int = 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert redline to dictionary format."""
         return {
             "total_issues": self.total_issues,
@@ -78,21 +79,22 @@ class EvaluationResult:
     # Metadata
     evaluation_time_ms: float = 0.0
     rules_version: str = "1.0.0"
-    irs_citations: list[str] = field(default_factory=lambda: [
-        "IRS Section 41(d)(1)",
-        "26 CFR § 1.41-4"
-    ])
+    irs_citations: list[str] = field(
+        default_factory=lambda: ["IRS Section 41(d)(1)", "26 CFR § 1.41-4"]
+    )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert evaluation result to dictionary format per specification."""
         # Calculate total_penalty
-        total_penalty = sum([
-            self.component_scores.get("routine_engineering_penalty", 0),
-            self.component_scores.get("business_risk_penalty", 0),
-            self.component_scores.get("vagueness_penalty", 0),
-            self.component_scores.get("experimentation_penalty", 0),
-            self.component_scores.get("specificity_penalty", 0),
-        ])
+        total_penalty = sum(
+            [
+                self.component_scores.get("routine_engineering_penalty", 0),
+                self.component_scores.get("business_risk_penalty", 0),
+                self.component_scores.get("vagueness_penalty", 0),
+                self.component_scores.get("experimentation_penalty", 0),
+                self.component_scores.get("specificity_penalty", 0),
+            ]
+        )
 
         return {
             "version": self.version,
@@ -110,15 +112,9 @@ class EvaluationResult:
                     "routine_engineering_penalty", 0
                 ),
                 "vagueness_penalty": self.component_scores.get("vagueness_penalty", 0),
-                "business_risk_penalty": self.component_scores.get(
-                    "business_risk_penalty", 0
-                ),
-                "experimentation_penalty": self.component_scores.get(
-                    "experimentation_penalty", 0
-                ),
-                "specificity_penalty": self.component_scores.get(
-                    "specificity_penalty", 0
-                ),
+                "business_risk_penalty": self.component_scores.get("business_risk_penalty", 0),
+                "experimentation_penalty": self.component_scores.get("experimentation_penalty", 0),
+                "specificity_penalty": self.component_scores.get("specificity_penalty", 0),
                 "total_penalty": total_penalty,
             },
             "diagnostics": {
@@ -229,19 +225,13 @@ class RuleBasedEvaluator:
 
         # REVIEW/FIXME: Custom penalty detection (not using pre-built NLP/ML packages)
         # Calculate component penalties using pattern-based detection
-        routine_penalty, routine_count = self._detect_routine_engineering(
-            text_lower, issues
-        )
-        business_penalty, business_count = self._detect_business_risk(
-            text_lower, issues
-        )
+        routine_penalty, routine_count = self._detect_routine_engineering(text_lower, issues)
+        business_penalty, business_count = self._detect_business_risk(text_lower, issues)
         vagueness_penalty, vague_count = self._detect_vagueness(text_lower, issues)
         experimentation_penalty, exp_score = self._detect_missing_experimentation(
             text_lower, issues
         )
-        specificity_penalty, spec_score = self._detect_lack_of_specificity(
-            narrative, issues
-        )
+        specificity_penalty, spec_score = self._detect_lack_of_specificity(narrative, issues)
 
         # REVIEW/FIXME: Custom risk aggregation (intentionally hand-crafted, not ML-based)
         # Calculate total risk score (sum of penalties, capped at 100)
