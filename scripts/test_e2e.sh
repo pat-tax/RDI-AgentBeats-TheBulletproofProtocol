@@ -2,17 +2,64 @@
 #
 # End-to-end test script for Purple and Green agents
 #
-# Usage: ./scripts/test_e2e.sh
+# Usage: ./scripts/test_e2e.sh [MODE] [OPTIONS]
+#
+# Modes:
+#   quick (default)      Quick smoke test with 2 narratives
+#   comprehensive/full   Full test with ground truth dataset
+#
+# Options:
+#   --build              Rebuild Docker images before starting
+#   --help, -h           Show this help message
+#
+# Environment:
+#   E2E_MODE=quick|comprehensive   Set test mode
+#   E2E_BUILD=1                    Enable --build flag
 #
 # Prerequisites:
 #   - Docker and docker-compose installed
 #   - Ports 8001 and 8002 available
 #
 # Outputs:
-#   - logs/e2e_YYYYMMDD_HHMMSS/ - Full test logs and responses
+#   - logs/e2e_YYYYMMDD_HHMMSS/ - Test logs and responses
 #
 
 set -e
+
+# Defaults from environment
+TEST_MODE="${E2E_MODE:-quick}"
+BUILD_FLAG=""
+[[ "${E2E_BUILD:-0}" == "1" ]] && BUILD_FLAG="--build"
+
+# Parse command line arguments
+for arg in "$@"; do
+    case "$arg" in
+        quick|--quick)
+            TEST_MODE="quick"
+            ;;
+        comprehensive|--comprehensive|full|--full)
+            TEST_MODE="comprehensive"
+            ;;
+        --build)
+            BUILD_FLAG="--build"
+            ;;
+        --help|-h)
+            echo "Usage: $0 [MODE] [OPTIONS]"
+            echo ""
+            echo "Modes:"
+            echo "  quick (default)      Quick smoke test with 2 narratives"
+            echo "  comprehensive/full   Full test with ground truth dataset"
+            echo ""
+            echo "Options:"
+            echo "  --build              Rebuild containers before testing"
+            echo ""
+            echo "Environment variables:"
+            echo "  E2E_MODE=quick|comprehensive"
+            echo "  E2E_BUILD=1"
+            exit 0
+            ;;
+    esac
+done
 
 # Setup logging
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -22,114 +69,167 @@ mkdir -p "$LOG_DIR"
 echo "=========================================="
 echo "End-to-End Agent Test"
 echo "=========================================="
+echo "Mode: $TEST_MODE"
 echo "Logs: $LOG_DIR"
 
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
 pass() { echo -e "${GREEN}✓ $1${NC}"; echo "PASS: $1" >> "$LOG_DIR/summary.log"; }
 fail() { echo -e "${RED}✗ $1${NC}"; echo "FAIL: $1" >> "$LOG_DIR/summary.log"; exit 1; }
+warn() { echo -e "${YELLOW}⚠ $1${NC}"; echo "WARN: $1" >> "$LOG_DIR/summary.log"; }
+info() { echo -e "${YELLOW}ℹ $1${NC}"; echo "INFO: $1" >> "$LOG_DIR/summary.log"; }
 
-# Step 1: Start containers
-echo ""
-echo "Step 1: Starting containers..."
-docker-compose up -d --build
+# Required output fields
+REQUIRED_FIELDS="domain score max_score pass_rate task_rewards time_used overall_score correctness safety specificity experimentation classification risk_score risk_category confidence redline"
 
-# Wait for containers to be healthy
-echo "Waiting for agents to be ready..."
-for i in {1..30}; do
-    if curl -s http://localhost:8001/.well-known/agent-card.json > /dev/null 2>&1 && \
-       curl -s http://localhost:8002/.well-known/agent-card.json > /dev/null 2>&1; then
-        break
+#
+# Start containers
+#
+start_containers() {
+    echo ""
+    echo "Step 1: Starting containers..."
+    if [ -n "$BUILD_FLAG" ]; then
+        echo "(with --build)"
     fi
-    sleep 1
-done
+    docker-compose up -d $BUILD_FLAG
 
-# Step 2: Check containers running
-echo ""
-echo "Step 2: Checking containers..."
-if docker-compose ps | grep -q "Up"; then
-    pass "Containers running"
-else
-    fail "Containers not running"
-fi
+    echo "Waiting for agents to be ready..."
+    for i in {1..30}; do
+        if curl -s http://localhost:8001/.well-known/agent-card.json > /dev/null 2>&1 && \
+           curl -s http://localhost:8002/.well-known/agent-card.json > /dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
 
-# Step 3: Test Purple AgentCard
-echo ""
-echo "Step 3: Testing Purple AgentCard..."
-PURPLE_CARD=$(curl -s http://localhost:8001/.well-known/agent-card.json)
-echo "$PURPLE_CARD" > "$LOG_DIR/purple_agent_card.json"
-if echo "$PURPLE_CARD" | grep -q "Bulletproof Purple Agent"; then
-    pass "Purple AgentCard OK"
-else
-    fail "Purple AgentCard failed"
-fi
+    echo ""
+    echo "Step 2: Checking containers..."
+    if docker-compose ps | grep -q "Up"; then
+        pass "Containers running"
+    else
+        fail "Containers not running"
+    fi
+}
 
-# Step 4: Test Green AgentCard
-echo ""
-echo "Step 4: Testing Green AgentCard..."
-GREEN_CARD=$(curl -s http://localhost:8002/.well-known/agent-card.json)
-echo "$GREEN_CARD" > "$LOG_DIR/green_agent_card.json"
-if echo "$GREEN_CARD" | grep -q "Bulletproof Green Agent"; then
-    pass "Green AgentCard OK"
-else
-    fail "Green AgentCard failed"
-fi
+#
+# Test agent cards
+#
+test_agent_cards() {
+    echo ""
+    echo "Step 3: Testing Purple AgentCard..."
+    PURPLE_CARD=$(curl -s http://localhost:8001/.well-known/agent-card.json)
+    echo "$PURPLE_CARD" > "$LOG_DIR/purple_agent_card.json"
+    if echo "$PURPLE_CARD" | grep -q "Bulletproof Purple Agent"; then
+        pass "Purple AgentCard OK"
+    else
+        fail "Purple AgentCard failed"
+    fi
 
-# Step 5: Test Purple narrative generation
-echo ""
-echo "Step 5: Testing Purple Agent (narrative generation)..."
-PURPLE_RESPONSE=$(curl -s -X POST http://localhost:8001/ \
-    -H "Content-Type: application/json" \
-    -d '{"jsonrpc":"2.0","id":"1","method":"message/send","params":{"message":{"messageId":"test-1","role":"user","parts":[{"text":"Generate a qualifying R&D narrative"}]}}}')
-echo "$PURPLE_RESPONSE" > "$LOG_DIR/purple_narrative_response.json"
+    echo ""
+    echo "Step 4: Testing Green AgentCard..."
+    GREEN_CARD=$(curl -s http://localhost:8002/.well-known/agent-card.json)
+    echo "$GREEN_CARD" > "$LOG_DIR/green_agent_card.json"
+    if echo "$GREEN_CARD" | grep -q "Bulletproof Green Agent"; then
+        pass "Green AgentCard OK"
+    else
+        fail "Green AgentCard failed"
+    fi
+}
 
-if echo "$PURPLE_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if 'narrative' in str(d) else 1)" 2>/dev/null; then
-    pass "Purple Agent generated narrative"
-else
-    fail "Purple Agent failed to generate narrative"
-fi
+#
+# Test Purple narrative generation
+#
+test_purple_agent() {
+    echo ""
+    echo "Step 5: Testing Purple Agent (narrative generation)..."
+    PURPLE_RESPONSE=$(curl -s -X POST http://localhost:8001/ \
+        -H "Content-Type: application/json" \
+        -d '{"jsonrpc":"2.0","id":"1","method":"message/send","params":{"message":{"messageId":"test-1","role":"user","parts":[{"text":"Generate a qualifying R&D narrative"}]}}}')
+    echo "$PURPLE_RESPONSE" > "$LOG_DIR/purple_narrative_response.json"
 
-# Step 6: Test Green evaluation (non-qualifying)
-echo ""
-echo "Step 6: Testing Green Agent (non-qualifying narrative)..."
-GREEN_RESPONSE_BAD=$(curl -s -X POST http://localhost:8002/ \
-    -H "Content-Type: application/json" \
-    -d '{"jsonrpc":"2.0","id":"2","method":"message/send","params":{"message":{"messageId":"test-2","role":"user","parts":[{"text":"We used standard debugging and routine maintenance to fix bugs and improve market share."}]}}}')
-echo "$GREEN_RESPONSE_BAD" > "$LOG_DIR/green_eval_non_qualifying.json"
+    if echo "$PURPLE_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if 'narrative' in str(d) else 1)" 2>/dev/null; then
+        pass "Purple Agent generated narrative"
+    else
+        fail "Purple Agent failed to generate narrative"
+    fi
+}
 
-CLASSIFICATION_BAD=$(echo "$GREEN_RESPONSE_BAD" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['result']['parts'][0]['data']['classification'])" 2>/dev/null || echo "ERROR")
-if [ "$CLASSIFICATION_BAD" = "NON_QUALIFYING" ]; then
-    pass "Green Agent correctly identified NON_QUALIFYING"
-else
-    echo "Got classification: $CLASSIFICATION_BAD"
-    fail "Green Agent failed to identify NON_QUALIFYING"
-fi
+#
+# Call Green Agent and return response
+#
+call_green_agent() {
+    local narrative="$1"
+    local id="$2"
+    curl -s -X POST http://localhost:8002/ \
+        -H "Content-Type: application/json" \
+        -d "{\"jsonrpc\":\"2.0\",\"id\":\"$id\",\"method\":\"message/send\",\"params\":{\"message\":{\"messageId\":\"test-$id\",\"role\":\"user\",\"parts\":[{\"text\":\"$narrative\"}]}}}"
+}
 
-# Step 7: Test Green evaluation (qualifying)
-echo ""
-echo "Step 7: Testing Green Agent (qualifying narrative)..."
-GREEN_RESPONSE_GOOD=$(curl -s -X POST http://localhost:8002/ \
-    -H "Content-Type: application/json" \
-    -d '{"jsonrpc":"2.0","id":"3","method":"message/send","params":{"message":{"messageId":"test-3","role":"user","parts":[{"text":"Our hypothesis was that a novel architecture could resolve the technical uncertainty. Through experimentation, we tested alternatives. Iterations failed with 50ms latency. The unknown solution emerged from systematic failure analysis."}]}}}')
-echo "$GREEN_RESPONSE_GOOD" > "$LOG_DIR/green_eval_qualifying.json"
+#
+# Extract field from Green Agent response
+#
+extract_field() {
+    local response="$1"
+    local field="$2"
+    echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin)['result']['parts'][0]['data']['$field'])" 2>/dev/null || echo "ERROR"
+}
 
-CLASSIFICATION_GOOD=$(echo "$GREEN_RESPONSE_GOOD" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['result']['parts'][0]['data']['classification'])" 2>/dev/null || echo "ERROR")
-if [ "$CLASSIFICATION_GOOD" = "QUALIFYING" ]; then
-    pass "Green Agent correctly identified QUALIFYING"
-else
-    echo "Got classification: $CLASSIFICATION_GOOD"
-    fail "Green Agent failed to identify QUALIFYING"
-fi
+#
+# Print metrics from response
+#
+print_metrics() {
+    local response="$1"
+    local label="$2"
+    echo "$label:"
+    echo "$response" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)['result']['parts'][0]['data']
+print(f\"  Classification: {d['classification']}\")
+print(f\"  Risk Score: {d['risk_score']}\")
+print(f\"  Risk Category: {d['risk_category']}\")
+print(f\"  Overall Score: {d['overall_score']:.2f}\")
+print(f\"  Pass Rate: {d['pass_rate']:.1f}%\")
+print(f\"  Score: {d['score']}/{d['max_score']}\")
+" 2>/dev/null || echo "  Could not extract metrics"
+}
 
-# Step 8: Validate Green Agent outputs scores
-echo ""
-echo "Step 8: Validating Green Agent score output..."
+#
+# Quick mode tests
+#
+run_quick_tests() {
+    echo ""
+    echo "Step 6: Testing Green Agent (non-qualifying narrative)..."
+    GREEN_RESPONSE_BAD=$(call_green_agent "We used standard debugging and routine maintenance to fix bugs and improve market share." "2")
+    echo "$GREEN_RESPONSE_BAD" > "$LOG_DIR/green_eval_non_qualifying.json"
 
-REQUIRED_FIELDS="overall_score correctness safety specificity experimentation risk_score risk_category confidence classification redline"
-MISSING_FIELDS=$(echo "$GREEN_RESPONSE_BAD" | python3 -c "
+    PASS_RATE_BAD=$(extract_field "$GREEN_RESPONSE_BAD" "pass_rate")
+    if python3 -c "exit(0 if float('$PASS_RATE_BAD') <= 50 else 1)" 2>/dev/null; then
+        pass "Green Agent correctly identified NON_QUALIFYING (pass_rate=$PASS_RATE_BAD%)"
+    else
+        echo "Got pass_rate: $PASS_RATE_BAD%"
+        fail "Green Agent failed to identify NON_QUALIFYING"
+    fi
+
+    echo ""
+    echo "Step 7: Testing Green Agent (qualifying narrative)..."
+    GREEN_RESPONSE_GOOD=$(call_green_agent "Our hypothesis was that a novel architecture could resolve the technical uncertainty. Through experimentation, we tested alternatives. Iterations failed with 50ms latency. The unknown solution emerged from systematic failure analysis." "3")
+    echo "$GREEN_RESPONSE_GOOD" > "$LOG_DIR/green_eval_qualifying.json"
+
+    PASS_RATE_GOOD=$(extract_field "$GREEN_RESPONSE_GOOD" "pass_rate")
+    if python3 -c "exit(0 if float('$PASS_RATE_GOOD') > 50 else 1)" 2>/dev/null; then
+        pass "Green Agent correctly identified QUALIFYING (pass_rate=$PASS_RATE_GOOD%)"
+    else
+        echo "Got pass_rate: $PASS_RATE_GOOD%"
+        fail "Green Agent failed to identify QUALIFYING"
+    fi
+
+    echo ""
+    echo "Step 8: Validating Green Agent output fields..."
+    MISSING_FIELDS=$(echo "$GREEN_RESPONSE_BAD" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)['result']['parts'][0]['data']
 required = '$REQUIRED_FIELDS'.split()
@@ -138,70 +238,22 @@ if missing:
     print(' '.join(missing))
 " 2>/dev/null)
 
-if [ -z "$MISSING_FIELDS" ]; then
-    pass "Green Agent outputs all required score fields"
-else
-    echo "Missing fields: $MISSING_FIELDS"
-    fail "Green Agent missing score fields"
-fi
+    if [ -z "$MISSING_FIELDS" ]; then
+        pass "Green Agent outputs all required fields"
+    else
+        echo "Missing fields: $MISSING_FIELDS"
+        fail "Green Agent missing fields"
+    fi
 
-# Step 9: Score Summary
-echo ""
-echo "Step 9: Score Summary..."
-echo "----------------------------------------"
+    echo ""
+    echo "Step 9: Score Summary..."
+    echo "----------------------------------------"
+    print_metrics "$GREEN_RESPONSE_BAD" "Non-qualifying narrative"
+    echo ""
+    print_metrics "$GREEN_RESPONSE_GOOD" "Qualifying narrative"
 
-# Extract and log metrics
-echo "=== METRICS ===" > "$LOG_DIR/metrics.log"
-echo "" >> "$LOG_DIR/metrics.log"
-
-echo "Non-qualifying narrative:"
-echo "Non-qualifying narrative:" >> "$LOG_DIR/metrics.log"
-METRICS_BAD=$(echo "$GREEN_RESPONSE_BAD" | python3 -c "
-import sys,json
-d=json.load(sys.stdin)['result']['parts'][0]['data']
-print(f\"  Risk Score: {d['risk_score']}\")
-print(f\"  Classification: {d['classification']}\")
-print(f\"  Risk Category: {d['risk_category']}\")
-print(f\"  Confidence: {d['confidence']}\")
-print(f\"  Overall Score: {d['overall_score']:.2f}\")
-print(f\"  Correctness: {d['correctness']:.2f}\")
-print(f\"  Safety: {d['safety']:.2f}\")
-print(f\"  Specificity: {d['specificity']:.2f}\")
-print(f\"  Experimentation: {d['experimentation']:.2f}\")
-" 2>/dev/null || echo "  Could not extract metrics")
-echo "$METRICS_BAD"
-echo "$METRICS_BAD" >> "$LOG_DIR/metrics.log"
-
-echo ""
-echo "" >> "$LOG_DIR/metrics.log"
-
-echo "Qualifying narrative:"
-echo "Qualifying narrative:" >> "$LOG_DIR/metrics.log"
-METRICS_GOOD=$(echo "$GREEN_RESPONSE_GOOD" | python3 -c "
-import sys,json
-d=json.load(sys.stdin)['result']['parts'][0]['data']
-print(f\"  Risk Score: {d['risk_score']}\")
-print(f\"  Classification: {d['classification']}\")
-print(f\"  Risk Category: {d['risk_category']}\")
-print(f\"  Confidence: {d['confidence']}\")
-print(f\"  Overall Score: {d['overall_score']:.2f}\")
-print(f\"  Correctness: {d['correctness']:.2f}\")
-print(f\"  Safety: {d['safety']:.2f}\")
-print(f\"  Specificity: {d['specificity']:.2f}\")
-print(f\"  Experimentation: {d['experimentation']:.2f}\")
-" 2>/dev/null || echo "  Could not extract metrics")
-echo "$METRICS_GOOD"
-echo "$METRICS_GOOD" >> "$LOG_DIR/metrics.log"
-
-# Generate AgentBeats-compatible results.json
-echo "$GREEN_RESPONSE_BAD" | python3 -c "
-import sys, json
-from datetime import datetime
-
-bad = json.load(sys.stdin)['result']['parts'][0]['data']
-" > /dev/null 2>&1
-
-python3 -c "
+    # Generate results.json
+    python3 -c "
 import json
 from datetime import datetime
 
@@ -211,47 +263,142 @@ good = json.loads('''$GREEN_RESPONSE_GOOD''')['result']['parts'][0]['data']
 results = {
     'timestamp': datetime.utcnow().isoformat() + 'Z',
     'version': '1.0',
-    'participants': {
-        'substantiator': 'local-test'
-    },
+    'mode': 'quick',
+    'participants': {'agent': 'green-agent-local'},
     'results': [
-        {
-            'test_case': 'non_qualifying',
-            'overall_score': bad['overall_score'],
-            'classification': bad['classification'],
-            'risk_score': bad['risk_score'],
-            'risk_category': bad['risk_category'],
-            'confidence': bad['confidence'],
-            'component_scores': {
-                'correctness': bad['correctness'],
-                'safety': bad['safety'],
-                'specificity': bad['specificity'],
-                'experimentation': bad['experimentation']
-            }
-        },
-        {
-            'test_case': 'qualifying',
-            'overall_score': good['overall_score'],
-            'classification': good['classification'],
-            'risk_score': good['risk_score'],
-            'risk_category': good['risk_category'],
-            'confidence': good['confidence'],
-            'component_scores': {
-                'correctness': good['correctness'],
-                'safety': good['safety'],
-                'specificity': good['specificity'],
-                'experimentation': good['experimentation']
-            }
-        }
+        {k: bad[k] for k in ['domain', 'score', 'max_score', 'pass_rate', 'task_rewards', 'time_used', 'classification', 'risk_score', 'overall_score']},
+        {k: good[k] for k in ['domain', 'score', 'max_score', 'pass_rate', 'task_rewards', 'time_used', 'classification', 'risk_score', 'overall_score']}
     ]
 }
+results['results'][0]['test_case'] = 'non_qualifying'
+results['results'][1]['test_case'] = 'qualifying'
 
 print(json.dumps(results, indent=2))
 " > "$LOG_DIR/results.json" 2>/dev/null
+}
+
+#
+# Comprehensive mode tests
+#
+run_comprehensive_tests() {
+    echo ""
+    echo "Step 6: Testing all narratives from ground truth..."
+    echo "Dataset size: $(jq 'length' data/ground_truth.json)"
+    echo "=========================================="
+
+    # Initialize counters
+    local total=0
+    local correct=0
+
+    # Process each narrative
+    jq -c '.[]' data/ground_truth.json | while read -r test_case; do
+        INDEX=$(echo "$test_case" | jq -r '.id')
+        EXPECTED_CLASS=$(echo "$test_case" | jq -r '.classification')
+        NARRATIVE=$(echo "$test_case" | jq -r '.narrative' | sed 's/"/\\"/g')
+
+        echo ""
+        echo "Testing $INDEX ($EXPECTED_CLASS)..."
+
+        RESPONSE=$(call_green_agent "$NARRATIVE" "$INDEX")
+        echo "$RESPONSE" > "$LOG_DIR/${INDEX}_response.json"
+
+        ACTUAL_CLASS=$(extract_field "$RESPONSE" "classification")
+        ACTUAL_SCORE=$(extract_field "$RESPONSE" "overall_score")
+
+        if [ "$ACTUAL_CLASS" = "$EXPECTED_CLASS" ]; then
+            pass "$INDEX: $ACTUAL_CLASS (score: $ACTUAL_SCORE)"
+        else
+            warn "$INDEX: Expected $EXPECTED_CLASS, got $ACTUAL_CLASS (score: $ACTUAL_SCORE)"
+        fi
+    done
+
+    echo ""
+    echo "Step 7: Generating comprehensive report..."
+
+    # Generate comprehensive report
+    python3 << 'PYTHON_EOF'
+import json
+from datetime import datetime
+import glob
+import os
+
+log_dir = os.environ.get('LOG_DIR', 'logs')
+
+# Load ground truth
+with open("data/ground_truth.json") as f:
+    ground_truth = {item["id"]: item for item in json.load(f)}
+
+results = {
+    "timestamp": datetime.utcnow().isoformat() + "Z",
+    "version": "1.0",
+    "mode": "comprehensive",
+    "total_tests": 0,
+    "correct": 0,
+    "incorrect": 0,
+    "accuracy": 0.0,
+    "tests": []
+}
+
+# Process each response
+for response_file in sorted(glob.glob(f"{log_dir}/*_response.json")):
+    test_id = os.path.basename(response_file).split("_")[0]
+    if test_id in ["purple", "green"]:
+        continue
+
+    try:
+        with open(response_file) as f:
+            response = json.load(f)
+
+        data = response.get("result", {}).get("parts", [{}])[0].get("data", {})
+        actual_class = data.get("classification", "ERROR")
+        expected = ground_truth.get(test_id, {})
+        expected_class = expected.get("classification", "UNKNOWN")
+
+        results["total_tests"] += 1
+        match = actual_class == expected_class
+        if match:
+            results["correct"] += 1
+        else:
+            results["incorrect"] += 1
+
+        results["tests"].append({
+            "id": test_id,
+            "expected": expected_class,
+            "actual": actual_class,
+            "match": match,
+            "score": data.get("overall_score"),
+            "pass_rate": data.get("pass_rate")
+        })
+    except Exception as e:
+        print(f"Error processing {response_file}: {e}")
+
+if results["total_tests"] > 0:
+    results["accuracy"] = round((results["correct"] / results["total_tests"]) * 100, 2)
+
+with open(f"{log_dir}/results.json", "w") as f:
+    json.dump(results, f, indent=2)
+
+print(f"\nAccuracy: {results['accuracy']}% ({results['correct']}/{results['total_tests']})")
+PYTHON_EOF
+}
+
+#
+# Main execution
+#
+start_containers
+test_agent_cards
+test_purple_agent
+
+if [ "$TEST_MODE" = "comprehensive" ]; then
+    export LOG_DIR
+    run_comprehensive_tests
+else
+    run_quick_tests
+fi
 
 echo ""
 echo "=========================================="
-echo -e "${GREEN}All tests passed!${NC}"
+echo -e "${GREEN}All tests completed!${NC}"
 echo "=========================================="
 echo ""
 echo "Logs saved to: $LOG_DIR"
