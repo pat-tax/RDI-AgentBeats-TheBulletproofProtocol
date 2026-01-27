@@ -52,5 +52,8 @@
       }
     }
   },
+  "containerEnv": {
+    "UV_LINK_MODE": "copy"
+  },
   "postCreateCommand": "make setup_devc_project"
 }
