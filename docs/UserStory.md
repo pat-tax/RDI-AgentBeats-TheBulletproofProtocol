@@ -1,11 +1,9 @@
 ---
-title: User Story
+title: User Story - The Bulletproof Protocol
 version: 2.0
 applies-to: Agents and humans
 purpose: Product vision, value proposition, and success metrics
 ---
-
-# User Story: The Bulletproof Protocol
 
 ## Problem Statement
 
