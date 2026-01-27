@@ -45,10 +45,6 @@ site/
 # type checking
 .mypy_cache/
 
-# Misc
-ralph/
-
-
 # configs (created by Claude Code sandbox)
 .bash_profile
 .bashrc

@@ -43,9 +43,14 @@ setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
 	echo "Sandbox dependencies installed."
 
 setup_project:  ## Customize template with your project details. Run with help: bash scripts/setup_project.sh help
-	bash scripts/setup_project.sh || { echo ""; echo "ERROR: Project setup failed. Please check the error messages above."; exit 1; }
+	bash scripts/setup_project.sh || {
+		echo "";
+		echo "ERROR: Project setup failed. Please check the error messages above.";
+		exit 1;
+	}
 
 setup_devc_project:  ## Devcontainer: Full project env (sandbox + Python/Node deps + project customization)
+	cp -r .claude/.claude.json ~/.claude.json
 	$(MAKE) -s setup_sandbox
 	$(MAKE) -s setup_dev
 	# $(MAKE) -s setup_project
