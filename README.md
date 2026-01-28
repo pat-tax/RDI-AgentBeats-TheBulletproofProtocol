@@ -29,14 +29,49 @@
 # 1. Setup development environment
 make setup_dev
 
-# 2. Local testing with docker-compose
+# 2. Configure environment (required for LLM features)
+cp .env.example .env
+# Edit .env and set GREEN_OPENAI_API_KEY=sk-your-key-here
+
+# 3. Local testing with docker-compose
 docker-compose up -d
 curl http://localhost:8001/.well-known/agent-card.json  # Purple agent
 curl http://localhost:8002/.well-known/agent-card.json  # Green agent
 
-# 3. Run E2E tests
+# 4. Run E2E tests
 bash scripts/test_e2e.sh
 ```
+
+## Configuration
+
+**Environment Setup:**
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+# Edit .env with your values
+```
+
+**Required Settings:**
+- `GREEN_OPENAI_API_KEY` - OpenAI API key for LLM-based evaluation (system falls back to rule-only scoring if not provided)
+
+**Optional Settings:**
+- All other settings have sensible defaults (ports, timeouts, LLM weights, etc.)
+- See `.env.example` for full configuration reference
+
+**Debug Current Settings:**
+
+```bash
+# View current configuration (respects environment overrides)
+python -m bulletproof_green.settings
+python -m bulletproof_purple.settings
+
+# Test with overrides
+GREEN_PORT=9000 python -m bulletproof_green.settings
+```
+
+**Configuration is validated at startup** - misconfigurations are caught immediately with clear error messages.
 
 For Ralph Loop autonomous development, see [ralph/README.md](ralph/README.md).
 
