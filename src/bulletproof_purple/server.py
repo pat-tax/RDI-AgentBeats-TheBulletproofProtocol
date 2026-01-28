@@ -33,9 +33,6 @@ from bulletproof_purple.models import PurpleAgentOutput
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
 
-DEFAULT_PORT = 8000
-DEFAULT_TIMEOUT = 300
-
 
 def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
     """Create the AgentCard for Purple Agent.
@@ -79,9 +76,11 @@ def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
 class PurpleAgentExecutor:
     """Executor that generates narratives using the NarrativeGenerator."""
 
-    def __init__(self, timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, timeout: int | None = None):
+        from bulletproof_purple.settings import settings
+
         self.generator = NarrativeGenerator()
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else settings.timeout
 
     def _extract_text_from_part(self, part: Any) -> str | None:
         """Extract text content from a message part.
@@ -215,7 +214,7 @@ class PurpleAgentExecutor:
 class PurpleRequestHandler(DefaultRequestHandler):
     """Request handler for Purple Agent A2A server."""
 
-    def __init__(self, timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, timeout: int | None = None):
         self.task_store = InMemoryTaskStore()
         self.executor = PurpleAgentExecutor(timeout=timeout)
         super().__init__(
@@ -253,11 +252,11 @@ class PurpleRequestHandler(DefaultRequestHandler):
         return final_result
 
 
-def create_app(timeout: int = DEFAULT_TIMEOUT) -> Any:
+def create_app(timeout: int | None = None) -> Any:
     """Create the A2A FastAPI application.
 
     Args:
-        timeout: Task timeout in seconds (default 300).
+        timeout: Task timeout in seconds (uses settings if not provided).
 
     Returns:
         Configured FastAPI application.
@@ -277,8 +276,10 @@ def main() -> None:
     """Run the Purple Agent A2A server."""
     import uvicorn
 
+    from bulletproof_purple.settings import settings
+
     app = create_app()
-    uvicorn.run(app, host="0.0.0.0", port=DEFAULT_PORT)
+    uvicorn.run(app, host=settings.host, port=settings.port)
 
 
 if __name__ == "__main__":

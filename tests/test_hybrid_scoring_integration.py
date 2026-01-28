@@ -7,7 +7,6 @@ This test module validates the acceptance criteria for STORY-019:
 - Hybrid scores properly combined using alpha*rule + beta*llm formula
 """
 
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -48,25 +47,25 @@ class TestHybridScoringIntegration:
     @pytest.mark.asyncio
     async def test_server_uses_hybrid_scoring_when_llm_available(self):
         """Test server uses hybrid scoring when OPENAI_API_KEY is available."""
-        # Set API key in environment
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            # Mock OpenAI client to track if it's called
-            mock_response = MagicMock()
-            mock_response.choices = [
-                MagicMock(
-                    message=MagicMock(
-                        content='{"score": 0.85, "reasoning": "Test reasoning", '
-                        '"categories": {"technical_uncertainty": 0.8, "experimentation": 0.9, '
-                        '"technological_nature": 0.85, "business_component": 0.8}}'
-                    )
+        # Mock OpenAI client to track if it's called
+        mock_response = MagicMock()
+        mock_response.choices = [
+            MagicMock(
+                message=MagicMock(
+                    content='{"score": 0.85, "reasoning": "Test reasoning", '
+                    '"categories": {"technical_uncertainty": 0.8, "experimentation": 0.9, '
+                    '"technological_nature": 0.85, "business_component": 0.8}}'
                 )
-            ]
-            mock_client = MagicMock()
-            mock_client.chat = MagicMock()
-            mock_client.chat.completions = MagicMock()
-            mock_create = AsyncMock(return_value=mock_response)
-            mock_client.chat.completions.create = mock_create
+            )
+        ]
+        mock_client = MagicMock()
+        mock_client.chat = MagicMock()
+        mock_client.chat.completions = MagicMock()
+        mock_create = AsyncMock(return_value=mock_response)
+        mock_client.chat.completions.create = mock_create
 
+        # Patch settings to provide API key (avoids caching issues with os.environ)
+        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
@@ -99,8 +98,8 @@ class TestHybridScoringIntegration:
     @pytest.mark.asyncio
     async def test_server_falls_back_to_rule_only_when_llm_unavailable(self):
         """Test server falls back to rule-only scoring when LLM unavailable."""
-        # Ensure no API key in environment
-        with patch.dict(os.environ, {}, clear=True):
+        # Ensure no API key via settings
+        with patch("bulletproof_green.settings.settings.openai_api_key", None):
             app = create_app()
             async with AsyncClient(
                 transport=ASGITransport(app=app), base_url="http://test"
@@ -127,22 +126,22 @@ class TestHybridScoringIntegration:
     async def test_hybrid_score_combines_rule_and_llm_scores(self):
         """Test hybrid score properly combines rule and LLM scores using formula."""
         # Mock LLM to return known score
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            mock_response = MagicMock()
-            mock_response.choices = [
-                MagicMock(
-                    message=MagicMock(
-                        content='{"score": 0.9, "reasoning": "Excellent", "categories": '
-                        '{"technical_uncertainty": 0.9, "experimentation": 0.9, '
-                        '"technological_nature": 0.9, "business_component": 0.9}}'
-                    )
+        mock_response = MagicMock()
+        mock_response.choices = [
+            MagicMock(
+                message=MagicMock(
+                    content='{"score": 0.9, "reasoning": "Excellent", "categories": '
+                    '{"technical_uncertainty": 0.9, "experimentation": 0.9, '
+                    '"technological_nature": 0.9, "business_component": 0.9}}'
                 )
-            ]
-            mock_client = MagicMock()
-            mock_client.chat = MagicMock()
-            mock_client.chat.completions = MagicMock()
-            mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
+            )
+        ]
+        mock_client = MagicMock()
+        mock_client.chat = MagicMock()
+        mock_client.chat.completions = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
+        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
@@ -210,13 +209,13 @@ class TestHybridScoringIntegration:
     @pytest.mark.asyncio
     async def test_llm_failure_gracefully_falls_back(self):
         """Test graceful fallback when LLM call fails."""
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            # Mock LLM client to raise exception
-            mock_client = MagicMock()
-            mock_client.chat = MagicMock()
-            mock_client.chat.completions = MagicMock()
-            mock_client.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
+        # Mock LLM client to raise exception
+        mock_client = MagicMock()
+        mock_client.chat = MagicMock()
+        mock_client.chat.completions = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
 
+        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(

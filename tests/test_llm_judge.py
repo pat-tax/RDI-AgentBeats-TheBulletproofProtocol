@@ -132,13 +132,15 @@ class TestLLMJudgeConstruction:
         judge = LLMJudge(api_key="test-key")
         assert judge._api_key == "test-key"
 
-    def test_judge_reads_api_key_from_env(self):
-        """Test judge reads API key from environment."""
+    def test_judge_reads_api_key_from_settings(self):
+        """Test judge reads API key from settings."""
+        from unittest.mock import patch
+
         from bulletproof_green.llm_judge import LLMJudge
 
-        with patch.dict("os.environ", {"OPENAI_API_KEY": "env-key"}):
+        with patch("bulletproof_green.settings.settings.openai_api_key", "settings-key"):
             judge = LLMJudge()
-            assert judge._api_key == "env-key"
+            assert judge._api_key == "settings-key"
 
 
 class TestLLMScoreResult:
@@ -410,10 +412,12 @@ class TestLLMJudgeFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_missing_api_key(self):
         """Test fallback when no API key is configured."""
+        from unittest.mock import patch
+
         from bulletproof_green.llm_judge import LLMJudge
 
-        # No API key provided and no env var
-        with patch.dict("os.environ", {}, clear=True):
+        # No API key provided via settings
+        with patch("bulletproof_green.settings.settings.openai_api_key", None):
             judge = LLMJudge()  # No api_key
 
             result = await judge.hybrid_score(

@@ -11,8 +11,7 @@ from typing import Any
 import httpx
 
 from bulletproof_green.models import NarrativeRequest, NarrativeResponse
-
-DEFAULT_TIMEOUT = 300
+from bulletproof_green.settings import settings
 
 
 class A2AClientError(Exception):
@@ -30,15 +29,15 @@ class A2AClient:
         timeout: Request timeout in seconds.
     """
 
-    def __init__(self, base_url: str, timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, base_url: str, timeout: int | None = None):
         """Initialize the A2A client.
 
         Args:
             base_url: Base URL of the Purple Agent (e.g., "http://localhost:8001").
-            timeout: Request timeout in seconds (default 300).
+            timeout: Request timeout in seconds (uses settings if not provided).
         """
         self.base_url = base_url
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else settings.timeout
         self._agent_card: dict[str, Any] | None = None
 
     async def discover(self) -> dict[str, Any]:

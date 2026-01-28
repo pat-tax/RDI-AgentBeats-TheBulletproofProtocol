@@ -39,9 +39,6 @@ AGENT_CARD_SCHEMA: dict[str, Any] = {
     },
 }
 
-DEFAULT_TIMEOUT = 30
-DEFAULT_CACHE_TTL = 300  # 5 minutes
-
 
 class AgentCardDiscoveryError(Exception):
     """Exception raised when agent discovery fails."""
@@ -58,12 +55,16 @@ class AgentCardCache:
         ttl_seconds: Time-to-live for cached entries in seconds.
     """
 
-    def __init__(self, ttl_seconds: int = DEFAULT_CACHE_TTL):
+    def __init__(self, ttl_seconds: int | None = None):
         """Initialize the cache.
 
         Args:
-            ttl_seconds: Time-to-live for cached entries (default 300 seconds).
+            ttl_seconds: Time-to-live for cached entries (uses settings if not provided).
         """
+        if ttl_seconds is None:
+            from bulletproof_green.settings import settings
+
+            ttl_seconds = settings.agent_card_cache_ttl
         self.ttl_seconds = ttl_seconds
         self._cache: dict[str, tuple[dict[str, Any], float]] = {}
 
@@ -191,14 +192,14 @@ def validate_agent_card(card: dict[str, Any]) -> bool:
 
 async def discover_agent(
     base_url: str,
-    timeout: int = DEFAULT_TIMEOUT,
+    timeout: int | None = None,
     cache: AgentCardCache | None = None,
 ) -> dict[str, Any]:
     """Discover an agent via its /.well-known/agent-card.json endpoint.
 
     Args:
         base_url: Base URL of the agent to discover.
-        timeout: Request timeout in seconds.
+        timeout: Request timeout in seconds (uses settings if not provided).
         cache: Optional cache instance for caching discovered cards.
 
     Returns:
@@ -208,6 +209,11 @@ async def discover_agent(
         AgentCardDiscoveryError: If discovery fails due to network issues.
         AgentCardValidationError: If the returned AgentCard is invalid.
     """
+    if timeout is None:
+        from bulletproof_green.settings import settings
+
+        timeout = settings.agent_card_timeout
+
     # Check cache first
     if cache is not None:
         cached = cache.get(base_url)

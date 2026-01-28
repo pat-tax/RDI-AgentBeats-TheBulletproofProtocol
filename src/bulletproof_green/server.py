@@ -6,7 +6,6 @@ Exposes narrative evaluation and scoring via JSON-RPC 2.0 protocol following A2A
 from __future__ import annotations
 
 import asyncio
-import os
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any
 
@@ -33,13 +32,10 @@ from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.llm_judge import LLMJudge
 from bulletproof_green.models import GreenAgentOutput
 from bulletproof_green.scorer import AgentBeatsScorer
+from bulletproof_green.settings import settings
 
 if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
-
-DEFAULT_PORT = 8000
-DEFAULT_TIMEOUT = 300
-DEFAULT_PURPLE_AGENT_URL = "http://localhost:8001"
 
 
 def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
@@ -84,16 +80,14 @@ class GreenAgentExecutor:
 
     def __init__(
         self,
-        timeout: int = DEFAULT_TIMEOUT,
+        timeout: int | None = None,
         purple_agent_url: str | None = None,
     ):
         self.evaluator = RuleBasedEvaluator()
         self.scorer = AgentBeatsScorer()
         self.llm_judge = LLMJudge()  # Initialize LLM judge for hybrid scoring
-        self.timeout = timeout
-        self.purple_agent_url = purple_agent_url or os.getenv(
-            "PURPLE_AGENT_URL", DEFAULT_PURPLE_AGENT_URL
-        )
+        self.timeout = timeout if timeout is not None else settings.timeout
+        self.purple_agent_url = purple_agent_url or settings.purple_agent_url
 
     def _extract_text_from_part(self, part: Any) -> str | None:
         """Extract text content from a message part.
@@ -381,7 +375,7 @@ class GreenRequestHandler(DefaultRequestHandler):
 
     def __init__(
         self,
-        timeout: int = DEFAULT_TIMEOUT,
+        timeout: int | None = None,
         purple_agent_url: str | None = None,
     ):
         self.task_store = InMemoryTaskStore()
@@ -425,14 +419,14 @@ class GreenRequestHandler(DefaultRequestHandler):
 
 
 def create_app(
-    timeout: int = DEFAULT_TIMEOUT,
+    timeout: int | None = None,
     purple_agent_url: str | None = None,
 ) -> Any:
     """Create the A2A FastAPI application.
 
     Args:
-        timeout: Task timeout in seconds (default 300).
-        purple_agent_url: Optional Purple Agent URL for arena mode.
+        timeout: Task timeout in seconds (uses settings.timeout if not provided).
+        purple_agent_url: Purple Agent URL for arena mode (uses settings if not provided).
 
     Returns:
         Configured FastAPI application.
@@ -456,7 +450,7 @@ def main() -> None:
     import uvicorn
 
     app = create_app()
-    uvicorn.run(app, host="0.0.0.0", port=DEFAULT_PORT)
+    uvicorn.run(app, host=settings.host, port=settings.port)
 
 
 if __name__ == "__main__":

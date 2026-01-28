@@ -1,6 +1,6 @@
 """Purple Agent - IRS Section 41 narrative generator."""
 
-from bulletproof_purple import agent_card
+from bulletproof_purple import agent_card, settings
 from bulletproof_purple.agent_card import (
     AGENT_CARD_SCHEMA,
     create_agent_card,
@@ -13,6 +13,7 @@ __all__ = [
     "NarrativeGenerator",
     "Narrative",
     "agent_card",
+    "settings",
     "create_agent_card",
     "validate_agent_card",
     "AGENT_CARD_SCHEMA",

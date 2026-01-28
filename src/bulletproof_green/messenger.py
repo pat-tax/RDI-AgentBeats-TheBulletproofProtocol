@@ -13,7 +13,7 @@ from typing import Any
 
 import httpx
 
-DEFAULT_TIMEOUT = 300
+from bulletproof_green.settings import settings
 
 
 class MessengerError(Exception):
@@ -60,14 +60,14 @@ def create_message(
 async def send_message(
     url: str,
     message: dict[str, Any],
-    timeout: int = DEFAULT_TIMEOUT,
+    timeout: int | None = None,
 ) -> dict[str, Any]:
     """Send an A2A message via HTTP POST to a purple agent.
 
     Args:
         url: Base URL of the purple agent
         message: A2A message structure (from create_message)
-        timeout: Request timeout in seconds (default: 300)
+        timeout: Request timeout in seconds (uses settings if not provided)
 
     Returns:
         Response data extracted from JSON-RPC result
@@ -80,6 +80,8 @@ async def send_message(
         >>> response = await send_message("http://localhost:8001", msg)
         >>> narrative = response["narrative"]
     """
+    if timeout is None:
+        timeout = settings.timeout
     # Build JSON-RPC 2.0 request
     request_body = {
         "jsonrpc": "2.0",
@@ -155,15 +157,15 @@ class Messenger:
         >>> narrative = response["narrative"]
     """
 
-    def __init__(self, base_url: str, timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, base_url: str, timeout: int | None = None):
         """Initialize the messenger.
 
         Args:
             base_url: Base URL of the purple agent
-            timeout: Request timeout in seconds (default: 300)
+            timeout: Request timeout in seconds (uses settings if not provided)
         """
         self.base_url = base_url
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else settings.timeout
 
     async def send(
         self,

@@ -10,10 +10,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from typing import Any
 
 from bulletproof_green.models import HybridScoreResult, LLMJudgeConfig, LLMScoreResult
+from bulletproof_green.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +37,10 @@ class LLMJudge:
 
         Args:
             config: Optional configuration (uses defaults if not provided).
-            api_key: Optional OpenAI API key (falls back to OPENAI_API_KEY env var).
+            api_key: Optional OpenAI API key (falls back to settings.openai_api_key).
         """
         self.config = config if config is not None else LLMJudgeConfig()
-        self._api_key = api_key or os.environ.get("OPENAI_API_KEY")
+        self._api_key = api_key or settings.openai_api_key
         self._client: Any = None
 
         # Initialize OpenAI client if API key is available

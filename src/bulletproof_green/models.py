@@ -145,14 +145,47 @@ class NarrativeResponse(BaseModel):
     task_id: str | None = None
 
 
-class LLMJudgeConfig(BaseModel):
-    """Configuration for LLM-as-Judge evaluation."""
+def _get_llm_alpha() -> float:
+    from bulletproof_green.settings import settings
 
-    alpha: float = 0.7
-    beta: float = 0.3
-    temperature: float = 0
-    model: str = "gpt-4"
-    timeout: float = 30.0
+    return settings.llm_alpha
+
+
+def _get_llm_beta() -> float:
+    from bulletproof_green.settings import settings
+
+    return settings.llm_beta
+
+
+def _get_llm_temperature() -> float:
+    from bulletproof_green.settings import settings
+
+    return settings.llm_temperature
+
+
+def _get_llm_model() -> str:
+    from bulletproof_green.settings import settings
+
+    return settings.llm_model
+
+
+def _get_llm_timeout() -> float:
+    from bulletproof_green.settings import settings
+
+    return settings.llm_timeout
+
+
+class LLMJudgeConfig(BaseModel):
+    """Configuration for LLM-as-Judge evaluation.
+
+    Defaults are loaded from settings.
+    """
+
+    alpha: float = Field(default_factory=_get_llm_alpha)
+    beta: float = Field(default_factory=_get_llm_beta)
+    temperature: float = Field(default_factory=_get_llm_temperature)
+    model: str = Field(default_factory=_get_llm_model)
+    timeout: float = Field(default_factory=_get_llm_timeout)
 
 
 class LLMScoreResult(BaseModel):

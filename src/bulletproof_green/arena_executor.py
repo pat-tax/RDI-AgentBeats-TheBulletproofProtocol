@@ -6,6 +6,7 @@ and provides critique for iterative refinement until quality threshold is reache
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,17 +14,31 @@ from bulletproof_green.a2a_client import A2AClient, NarrativeRequest
 from bulletproof_green.evaluator import RuleBasedEvaluator
 
 
+def _get_arena_max_iterations() -> int:
+    from bulletproof_green.settings import settings
+
+    return settings.arena_max_iterations
+
+
+def _get_arena_target_risk_score() -> int:
+    from bulletproof_green.settings import settings
+
+    return settings.arena_target_risk_score
+
+
 @dataclass
 class ArenaConfig:
     """Configuration for Arena Mode execution.
 
     Attributes:
-        max_iterations: Maximum number of iterations before stopping (default: 5).
-        target_risk_score: Target risk score threshold for success (default: 20).
+        max_iterations: Maximum number of iterations before stopping.
+        target_risk_score: Target risk score threshold for success.
+
+    Defaults are loaded from settings.
     """
 
-    max_iterations: int = 5
-    target_risk_score: int = 20
+    max_iterations: int = dataclasses.field(default_factory=_get_arena_max_iterations)
+    target_risk_score: int = dataclasses.field(default_factory=_get_arena_target_risk_score)
 
 
 @dataclass

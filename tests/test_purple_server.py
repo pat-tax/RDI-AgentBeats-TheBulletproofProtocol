@@ -262,12 +262,6 @@ class TestJSONRPCErrorHandling:
 class TestTimeoutConfiguration:
     """Test task timeout handling."""
 
-    def test_default_timeout_is_300_seconds(self):
-        """Test default timeout configuration is 300 seconds."""
-        from bulletproof_purple.server import DEFAULT_TIMEOUT
-
-        assert DEFAULT_TIMEOUT == 300
-
     @pytest.mark.asyncio
     async def test_server_respects_timeout_configuration(self):
         """Test server accepts timeout configuration."""
@@ -285,12 +279,6 @@ class TestServerConfiguration:
         assert app is not None
         # Should have ASGI interface
         assert callable(app)
-
-    def test_default_port_is_8000(self):
-        """Test default port configuration is 8000."""
-        from bulletproof_purple.server import DEFAULT_PORT
-
-        assert DEFAULT_PORT == 8000
 
     @pytest.mark.asyncio
     async def test_server_handles_concurrent_requests(self):

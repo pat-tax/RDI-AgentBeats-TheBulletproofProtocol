@@ -1,6 +1,6 @@
 """Green Agent - IRS Section 41 narrative evaluator."""
 
-from bulletproof_green import a2a_client, agent_card, arena_executor, llm_judge, messenger
+from bulletproof_green import a2a_client, agent_card, arena_executor, llm_judge, messenger, settings
 from bulletproof_green.a2a_client import A2AClient, A2AClientError
 from bulletproof_green.agent_card import (
     AGENT_CARD_SCHEMA,
@@ -54,6 +54,7 @@ __all__ = [
     "arena_executor",
     "llm_judge",
     "messenger",
+    "settings",
     "Messenger",
     "MessengerError",
     "create_message",
