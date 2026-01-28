@@ -21,14 +21,6 @@ PROJECT_ROOT = Path(__file__).parent.parent
 WORKFLOW_FILE = PROJECT_ROOT / ".github" / "workflows" / "docker-build-push.yml"
 
 
-class TestWorkflowFileExists:
-    """Test that the workflow file exists."""
-
-    def test_workflow_file_exists(self) -> None:
-        """Test .github/workflows/docker-build-push.yml exists."""
-        assert WORKFLOW_FILE.exists(), ".github/workflows/docker-build-push.yml must exist"
-
-
 class TestWorkflowValidYaml:
     """Test that the workflow file is valid YAML."""
 
@@ -62,13 +54,6 @@ def _get_on_config(workflow: dict[str, Any]) -> dict[str, Any]:
 class TestWorkflowTriggers:
     """Test workflow triggers on push/tag."""
 
-    def test_on_key_exists(self) -> None:
-        """Test 'on' key exists for workflow triggers."""
-        workflow = _load_workflow()
-        # YAML parses 'on' as boolean True, so check both
-        has_on = "on" in workflow or True in workflow
-        assert has_on, "Workflow must have 'on' triggers"
-
     def test_triggers_on_push(self) -> None:
         """Test workflow triggers on push events."""
         workflow = _load_workflow()
@@ -97,15 +82,6 @@ class TestWorkflowTriggers:
 class TestWorkflowPermissions:
     """Test workflow has correct permissions."""
 
-    def test_permissions_key_exists(self) -> None:
-        """Test 'permissions' key exists."""
-        workflow = _load_workflow()
-        # Permissions can be at top level or job level
-        has_top_level = "permissions" in workflow
-        jobs = workflow.get("jobs", {})
-        has_job_level = any("permissions" in job for job in jobs.values() if isinstance(job, dict))
-        assert has_top_level or has_job_level, "Workflow must have permissions defined"
-
     def test_packages_write_permission(self) -> None:
         """Test workflow has packages:write permission for GHCR push."""
         _load_workflow()
@@ -118,11 +94,6 @@ class TestWorkflowPermissions:
 
 class TestWorkflowJobs:
     """Test workflow job configuration."""
-
-    def test_jobs_key_exists(self) -> None:
-        """Test 'jobs' key exists."""
-        workflow = _load_workflow()
-        assert "jobs" in workflow, "Workflow must have 'jobs' key"
 
     def test_has_build_job(self) -> None:
         """Test workflow has a build-related job."""

@@ -20,18 +20,6 @@ DOCKERFILE_PURPLE = PROJECT_ROOT / "Dockerfile.purple"
 DOCKERFILE_GREEN = PROJECT_ROOT / "Dockerfile.green"
 
 
-class TestDockerfilesExist:
-    """Test that both Dockerfiles exist."""
-
-    def test_dockerfile_purple_exists(self):
-        """Test Dockerfile.purple exists in project root."""
-        assert DOCKERFILE_PURPLE.exists(), "Dockerfile.purple must exist"
-
-    def test_dockerfile_green_exists(self):
-        """Test Dockerfile.green exists in project root."""
-        assert DOCKERFILE_GREEN.exists(), "Dockerfile.green must exist"
-
-
 class TestDockerfilePurple:
     """Test Dockerfile.purple meets all acceptance criteria."""
 

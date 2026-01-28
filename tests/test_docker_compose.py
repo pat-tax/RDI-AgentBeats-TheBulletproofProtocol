@@ -19,14 +19,6 @@ PROJECT_ROOT = Path(__file__).parent.parent
 DOCKER_COMPOSE_FILE = PROJECT_ROOT / "docker-compose.yml"
 
 
-class TestDockerComposeExists:
-    """Test that docker-compose.yml exists."""
-
-    def test_docker_compose_yml_exists(self) -> None:
-        """Test docker-compose.yml exists in project root."""
-        assert DOCKER_COMPOSE_FILE.exists(), "docker-compose.yml must exist"
-
-
 class TestDockerComposeValidYaml:
     """Test that docker-compose.yml is valid YAML."""
 
@@ -51,11 +43,6 @@ def _load_compose() -> dict[str, Any]:
 
 class TestServiceDefinitions:
     """Test that both purple and green services are defined."""
-
-    def test_services_key_exists(self) -> None:
-        """Test 'services' key exists in docker-compose.yml."""
-        compose = _load_compose()
-        assert "services" in compose, "docker-compose.yml must have 'services' key"
 
     def test_purple_service_defined(self) -> None:
         """Test purple service is defined."""
