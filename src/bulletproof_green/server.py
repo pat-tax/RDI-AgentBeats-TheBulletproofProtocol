@@ -169,17 +169,33 @@ class GreenAgentExecutor:
         """
         mode_params: dict[str, Any] = {"mode": "single-shot"}
 
-        if params.message and params.message.parts:
-            for part in params.message.parts:
-                data = self._extract_data_from_part(part)
-                if data:
-                    # Extract mode and arena configuration parameters
-                    for key in ["mode", "context", "max_iterations", "target_risk_score"]:
-                        if key in data:
-                            mode_params[key] = data[key]
-                    break
+        # Get data from first part with data content
+        data = self._get_first_data_part(params)
+        if data:
+            # Extract mode and arena configuration parameters
+            param_keys = ["mode", "context", "max_iterations", "target_risk_score"]
+            mode_params.update({k: data[k] for k in param_keys if k in data})
 
         return mode_params
+
+    def _get_first_data_part(self, params: MessageSendParams) -> dict[str, Any] | None:
+        """Get data from first message part that contains data.
+
+        Args:
+            params: Message parameters from the request.
+
+        Returns:
+            Data dict from first data part, or None if no data part found.
+        """
+        if not params.message or not params.message.parts:
+            return None
+
+        for part in params.message.parts:
+            data = self._extract_data_from_part(part)
+            if data:
+                return data
+
+        return None
 
     async def execute(
         self, params: MessageSendParams, task: Task
