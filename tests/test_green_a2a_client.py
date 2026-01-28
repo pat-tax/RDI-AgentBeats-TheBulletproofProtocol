@@ -358,7 +358,6 @@ class TestTimeoutHandling:
         request = NarrativeRequest(template_type="qualifying")
 
         with patch.object(client, "_send_jsonrpc", new_callable=AsyncMock) as mock_send:
-
             mock_send.side_effect = TimeoutError()
 
             with pytest.raises(A2AClientError) as exc_info:
