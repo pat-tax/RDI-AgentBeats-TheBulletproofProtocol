@@ -2,12 +2,6 @@
 
 from bulletproof_green import a2a_client, agent_card, arena_executor, llm_judge, messenger
 from bulletproof_green.a2a_client import A2AClient, A2AClientError
-from bulletproof_green.messenger import (
-    Messenger,
-    MessengerError,
-    create_message,
-    send_message,
-)
 from bulletproof_green.agent_card import (
     AGENT_CARD_SCHEMA,
     AgentCardCache,
@@ -25,6 +19,12 @@ from bulletproof_green.arena_executor import (
 )
 from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.llm_judge import LLMJudge
+from bulletproof_green.messenger import (
+    Messenger,
+    MessengerError,
+    create_message,
+    send_message,
+)
 from bulletproof_green.models import (
     EvaluationResult,
     HybridScoreResult,
