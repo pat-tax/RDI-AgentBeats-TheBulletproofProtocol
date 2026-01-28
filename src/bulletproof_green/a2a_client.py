@@ -228,10 +228,12 @@ class A2AClient:
                 data = part["data"]
                 narrative = data.get("narrative")
                 if narrative:
-                    return NarrativeResponse(
-                        narrative=narrative,
-                        metadata=data.get("metadata"),
-                        task_id=result.get("id"),
-                    )
+                    # Validate response from A2A protocol
+                    response_data = {
+                        "narrative": narrative,
+                        "metadata": data.get("metadata"),
+                        "task_id": result.get("id"),
+                    }
+                    return NarrativeResponse.model_validate(response_data)
 
         raise A2AClientError("No narrative found in response")
