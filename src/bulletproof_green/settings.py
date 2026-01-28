@@ -13,6 +13,7 @@ Usage:
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -53,6 +54,63 @@ class GreenSettings(BaseSettings):
     # Arena mode settings
     arena_max_iterations: int = 5
     arena_target_risk_score: int = 20
+
+    # Validators
+    @field_validator("port")
+    @classmethod
+    def validate_port(cls, v: int) -> int:
+        """Validate port is in valid range (1-65535)."""
+        if not 1 <= v <= 65535:
+            raise ValueError("port must be between 1 and 65535")
+        return v
+
+    @field_validator("timeout", "agent_card_timeout", "agent_card_cache_ttl")
+    @classmethod
+    def validate_positive_int(cls, v: int) -> int:
+        """Validate integer values are positive."""
+        if v <= 0:
+            raise ValueError("value must be positive")
+        return v
+
+    @field_validator("llm_alpha", "llm_beta")
+    @classmethod
+    def validate_weight(cls, v: float) -> float:
+        """Validate weight is in valid range (0-1)."""
+        if not 0 <= v <= 1:
+            raise ValueError("weight must be between 0 and 1")
+        return v
+
+    @field_validator("llm_temperature")
+    @classmethod
+    def validate_temperature(cls, v: float) -> float:
+        """Validate temperature is in valid range (0-2)."""
+        if not 0 <= v <= 2:
+            raise ValueError("temperature must be between 0 and 2")
+        return v
+
+    @field_validator("llm_timeout")
+    @classmethod
+    def validate_positive_float(cls, v: float) -> float:
+        """Validate float values are positive."""
+        if v <= 0:
+            raise ValueError("timeout must be positive")
+        return v
+
+    @field_validator("arena_max_iterations")
+    @classmethod
+    def validate_max_iterations(cls, v: int) -> int:
+        """Validate max iterations is positive."""
+        if v <= 0:
+            raise ValueError("max_iterations must be positive")
+        return v
+
+    @field_validator("arena_target_risk_score")
+    @classmethod
+    def validate_risk_score(cls, v: int) -> int:
+        """Validate risk score is in valid range (0-100)."""
+        if not 0 <= v <= 100:
+            raise ValueError("risk_score must be between 0 and 100")
+        return v
 
 
 @lru_cache

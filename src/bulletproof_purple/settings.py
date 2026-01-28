@@ -13,6 +13,7 @@ Usage:
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,6 +35,23 @@ class PurpleSettings(BaseSettings):
     port: int = 8001
     host: str = "0.0.0.0"
     timeout: int = 300
+
+    # Validators
+    @field_validator("port")
+    @classmethod
+    def validate_port(cls, v: int) -> int:
+        """Validate port is in valid range (1-65535)."""
+        if not 1 <= v <= 65535:
+            raise ValueError("port must be between 1 and 65535")
+        return v
+
+    @field_validator("timeout")
+    @classmethod
+    def validate_positive_int(cls, v: int) -> int:
+        """Validate timeout is positive."""
+        if v <= 0:
+            raise ValueError("timeout must be positive")
+        return v
 
 
 @lru_cache

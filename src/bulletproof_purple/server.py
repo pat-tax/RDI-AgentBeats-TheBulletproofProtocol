@@ -274,9 +274,19 @@ def create_app(timeout: int | None = None) -> Any:
 
 def main() -> None:
     """Run the Purple Agent A2A server."""
+    import sys
+
     import uvicorn
+    from pydantic import ValidationError
 
     from bulletproof_purple.settings import settings
+
+    # Validate settings on startup (fail fast)
+    try:
+        _ = settings.model_dump()
+    except ValidationError as e:
+        print(f"Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
 
     app = create_app()
     uvicorn.run(app, host=settings.host, port=settings.port)

@@ -447,7 +447,17 @@ def create_app(
 
 def main() -> None:
     """Run the Green Agent A2A server."""
+    import sys
+
     import uvicorn
+    from pydantic import ValidationError
+
+    # Validate settings on startup (fail fast)
+    try:
+        _ = settings.model_dump()
+    except ValidationError as e:
+        print(f"Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
 
     app = create_app()
     uvicorn.run(app, host=settings.host, port=settings.port)
