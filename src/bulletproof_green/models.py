@@ -151,11 +151,14 @@ class LLMJudgeConfig(BaseModel):
 
 
 class LLMScoreResult(BaseModel):
-    """Result from LLM evaluation."""
+    """Result from LLM evaluation.
 
-    score: float
-    reasoning: str
-    categories: dict[str, float]
+    Defaults are provided for graceful degradation when LLM returns incomplete responses.
+    """
+
+    score: float = 0.5
+    reasoning: str = ""
+    categories: dict[str, float] = Field(default_factory=dict)
 
 
 class HybridScoreResult(BaseModel):

@@ -67,13 +67,8 @@ class LLMJudge:
         """
         response = await self._call_llm(narrative)
 
-        # Validate response with defaults for missing fields
-        response_with_defaults = {
-            "score": response.get("score", 0.5),
-            "reasoning": response.get("reasoning", ""),
-            "categories": response.get("categories", {}),
-        }
-        return LLMScoreResult.model_validate(response_with_defaults)
+        # Validate response - model provides defaults for missing fields
+        return LLMScoreResult.model_validate(response)
 
     async def hybrid_score(
         self,
