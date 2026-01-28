@@ -259,17 +259,11 @@ class GreenAgentExecutor:
             timeout=self.timeout,
         )
 
-        # Apply hybrid scoring using LLM judge
-        # Compute rule-based overall score first
-        rule_based_overall_score = score_result.overall_score
-
-        # Get hybrid score (combines rule-based + LLM)
+        # Apply hybrid scoring using LLM judge (combines rule-based + LLM)
         hybrid_result = await asyncio.wait_for(
-            self.llm_judge.hybrid_score(narrative, rule_based_overall_score),
+            self.llm_judge.hybrid_score(narrative, score_result.overall_score),
             timeout=self.timeout,
         )
-
-        # Use hybrid score as the final overall score
         final_overall_score = hybrid_result.final_score
 
         # Calculate task rewards (1.0 if score > 0.5, else 0.0)
