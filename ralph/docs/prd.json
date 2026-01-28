@@ -469,8 +469,8 @@
         "Backwards compatibility with legacy fields"
       ],
       "files": [],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-28T00:48:18Z",
       "content_hash": "bbce5e542eff0d53dcca7a30c345f9637df658d49bb62c3e5ca3d87233a8c7a8",
       "depends_on": [
         "STORY-020"
