@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff ruff_tests test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -63,9 +63,13 @@ setup_devc_template:  ## Devcontainer: Template editing env (sandbox + Claude Co
 # MARK: Sanity
 
 
-ruff:  ## Lint: Format and check with ruff
-	uv run ruff format --exclude tests --exclude .claude --exclude _archive
-	uv run ruff check --fix --exclude tests --exclude .claude --exclude _archive
+ruff:  ## Lint: Format and check with ruff (src only)
+	uv run ruff format --exclude tests
+	uv run ruff check --fix --exclude tests
+
+ruff_tests:  ## Lint: Format and fix tests with ruff
+	uv run ruff format tests
+	uv run ruff check tests --fix
 
 complexity:  ## Check cognitive complexity with complexipy
 	uv run complexipy
@@ -87,6 +91,7 @@ validate:  ## Complete pre-commit validation sequence
 	set -e
 	echo "Running complete validation sequence..."
 	$(MAKE) -s ruff
+	$(MAKE) -s ruff_tests
 	$(MAKE) -s type_check
 	$(MAKE) -s complexity
 	$(MAKE) -s test_coverage
