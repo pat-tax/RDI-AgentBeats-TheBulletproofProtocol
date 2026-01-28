@@ -30,6 +30,7 @@ from a2a.utils import new_agent_parts_message, new_task
 
 from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
 from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.llm_judge import LLMJudge
 from bulletproof_green.models import GreenAgentOutput
 from bulletproof_green.scorer import AgentBeatsScorer
 
@@ -88,6 +89,7 @@ class GreenAgentExecutor:
     ):
         self.evaluator = RuleBasedEvaluator()
         self.scorer = AgentBeatsScorer()
+        self.llm_judge = LLMJudge()  # Initialize LLM judge for hybrid scoring
         self.timeout = timeout
         self.purple_agent_url = purple_agent_url or os.getenv(
             "PURPLE_AGENT_URL", DEFAULT_PURPLE_AGENT_URL
@@ -234,7 +236,7 @@ class GreenAgentExecutor:
     async def _execute_single_shot(
         self, params: MessageSendParams, task: Task
     ) -> AsyncGenerator[Message | Task]:
-        """Execute single-shot narrative evaluation.
+        """Execute single-shot narrative evaluation with hybrid scoring.
 
         Args:
             params: Message parameters from the request.
@@ -257,6 +259,19 @@ class GreenAgentExecutor:
             timeout=self.timeout,
         )
 
+        # Apply hybrid scoring using LLM judge
+        # Compute rule-based overall score first
+        rule_based_overall_score = score_result.overall_score
+
+        # Get hybrid score (combines rule-based + LLM)
+        hybrid_result = await asyncio.wait_for(
+            self.llm_judge.hybrid_score(narrative, rule_based_overall_score),
+            timeout=self.timeout,
+        )
+
+        # Use hybrid score as the final overall score
+        final_overall_score = hybrid_result.final_score
+
         # Calculate task rewards (1.0 if score > 0.5, else 0.0)
         task_rewards = {
             "0": 1.0 if score_result.correctness > 0.5 else 0.0,
@@ -278,8 +293,8 @@ class GreenAgentExecutor:
                 "pass_rate": pass_rate,
                 "task_rewards": task_rewards,
                 "time_used": eval_result.evaluation_time_ms / 1000,
-                # Evaluation metrics
-                "overall_score": score_result.overall_score,
+                # Evaluation metrics (using hybrid scoring)
+                "overall_score": final_overall_score,  # Hybrid score
                 "correctness": score_result.correctness,
                 "safety": score_result.safety,
                 "specificity": score_result.specificity,
