@@ -5,16 +5,16 @@ the Green Agent evaluator on each narrative and computing accuracy metrics.
 """
 
 import json
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from pydantic import BaseModel
 
 from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.scorer import AgentBeatsScorer
 
 
-@dataclass
-class ValidationResult:
+class ValidationResult(BaseModel):
     """Result of validating a single narrative entry."""
 
     entry_id: str
@@ -27,8 +27,7 @@ class ValidationResult:
     difficulty: str
 
 
-@dataclass
-class DifficultyTierResult:
+class DifficultyTierResult(BaseModel):
     """Pass/fail results for a difficulty tier."""
 
     tier: str
@@ -38,8 +37,7 @@ class DifficultyTierResult:
     pass_rate: float
 
 
-@dataclass
-class BenchmarkReport:
+class BenchmarkReport(BaseModel):
     """Complete benchmark validation report."""
 
     validation_results: list[ValidationResult]

@@ -158,10 +158,10 @@ class TestAccuracyMetrics:
     def test_compute_metrics_perfect_classification(self) -> None:
         """Metrics are perfect when all classifications match."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("Q2", 15, 18, "QUALIFYING", "QUALIFYING", True, 3, "easy"),
-            ValidationResult("NQ1", 50, 55, "NON_QUALIFYING", "NON_QUALIFYING", True, 5, "easy"),
-            ValidationResult("NQ2", 60, 65, "NON_QUALIFYING", "NON_QUALIFYING", True, 5, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=18, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=3, difficulty="easy"),
+            ValidationResult(entry_id="NQ1", expected_score=50, actual_score=55, expected_classification="NON_QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=True, score_delta=5, difficulty="easy"),
+            ValidationResult(entry_id="NQ2", expected_score=60, actual_score=65, expected_classification="NON_QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=True, score_delta=5, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -175,8 +175,8 @@ class TestAccuracyMetrics:
     def test_compute_metrics_with_false_positives(self) -> None:
         """Metrics handle false positives (classified QUALIFYING when should be NON_QUALIFYING)."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("NQ1", 50, 15, "NON_QUALIFYING", "QUALIFYING", False, -35, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="NQ1", expected_score=50, actual_score=15, expected_classification="NON_QUALIFYING", actual_classification="QUALIFYING", classification_match=False, score_delta=-35, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -191,9 +191,9 @@ class TestAccuracyMetrics:
     def test_compute_metrics_with_false_negatives(self) -> None:
         """Metrics handle false negatives (classified NON_QUALIFYING when should be QUALIFYING)."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("Q2", 15, 50, "QUALIFYING", "NON_QUALIFYING", False, 35, "easy"),
-            ValidationResult("NQ1", 50, 55, "NON_QUALIFYING", "NON_QUALIFYING", True, 5, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=50, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=35, difficulty="easy"),
+            ValidationResult(entry_id="NQ1", expected_score=50, actual_score=55, expected_classification="NON_QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=True, score_delta=5, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -208,9 +208,9 @@ class TestAccuracyMetrics:
     def test_compute_f1_score(self) -> None:
         """F1 score is harmonic mean of precision and recall."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("Q2", 15, 50, "QUALIFYING", "NON_QUALIFYING", False, 35, "easy"),
-            ValidationResult("NQ1", 50, 15, "NON_QUALIFYING", "QUALIFYING", False, -35, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=50, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=35, difficulty="easy"),
+            ValidationResult(entry_id="NQ1", expected_score=50, actual_score=15, expected_classification="NON_QUALIFYING", actual_classification="QUALIFYING", classification_match=False, score_delta=-35, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -225,7 +225,7 @@ class TestAccuracyMetrics:
     def test_compute_metrics_handles_edge_cases(self) -> None:
         """Metrics handle edge case with no true positives."""
         results = [
-            ValidationResult("NQ1", 50, 55, "NON_QUALIFYING", "NON_QUALIFYING", True, 5, "easy"),
+            ValidationResult(entry_id="NQ1", expected_score=50, actual_score=55, expected_classification="NON_QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=True, score_delta=5, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -243,10 +243,10 @@ class TestPerTierReporting:
     def test_generate_tier_results(self) -> None:
         """Generate pass/fail results per difficulty tier."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("Q2", 15, 50, "QUALIFYING", "NON_QUALIFYING", False, 35, "easy"),
-            ValidationResult("Q3", 12, 14, "QUALIFYING", "QUALIFYING", True, 2, "medium"),
-            ValidationResult("Q4", 8, 10, "QUALIFYING", "QUALIFYING", True, 2, "hard"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=50, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=35, difficulty="easy"),
+            ValidationResult(entry_id="Q3", expected_score=12, actual_score=14, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="medium"),
+            ValidationResult(entry_id="Q4", expected_score=8, actual_score=10, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="hard"),
         ]
         validator = BenchmarkValidator()
 
@@ -272,7 +272,7 @@ class TestPerTierReporting:
     def test_tier_results_include_all_tiers(self) -> None:
         """Tier results include easy, medium, hard even if empty."""
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
         ]
         validator = BenchmarkValidator()
 
@@ -342,8 +342,8 @@ class TestGapIdentification:
         """Gaps include entries where classification doesn't match."""
         validator = BenchmarkValidator()
         results = [
-            ValidationResult("Q1", 10, 50, "QUALIFYING", "NON_QUALIFYING", False, 40, "easy"),
-            ValidationResult("Q2", 15, 18, "QUALIFYING", "QUALIFYING", True, 3, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=50, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=40, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=18, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=3, difficulty="easy"),
         ]
 
         gaps = validator.identify_gaps(results)
@@ -356,8 +356,8 @@ class TestGapIdentification:
         """Gaps include entries with large score deltas."""
         validator = BenchmarkValidator()
         results = [
-            ValidationResult("Q1", 10, 12, "QUALIFYING", "QUALIFYING", True, 2, "easy"),
-            ValidationResult("Q2", 15, 45, "QUALIFYING", "NON_QUALIFYING", False, 30, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=12, expected_classification="QUALIFYING", actual_classification="QUALIFYING", classification_match=True, score_delta=2, difficulty="easy"),
+            ValidationResult(entry_id="Q2", expected_score=15, actual_score=45, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=30, difficulty="easy"),
         ]
 
         gaps = validator.identify_gaps(results)
@@ -370,7 +370,7 @@ class TestGapIdentification:
         """Each gap includes a suggestion for improvement."""
         validator = BenchmarkValidator()
         results = [
-            ValidationResult("Q1", 10, 50, "QUALIFYING", "NON_QUALIFYING", False, 40, "easy"),
+            ValidationResult(entry_id="Q1", expected_score=10, actual_score=50, expected_classification="QUALIFYING", actual_classification="NON_QUALIFYING", classification_match=False, score_delta=40, difficulty="easy"),
         ]
 
         gaps = validator.identify_gaps(results)
