@@ -533,8 +533,8 @@
         "src/bulletproof_green/server.py",
         "tests/integration/test_arena_mode.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-28T01:00:34Z",
       "content_hash": "03f4b9df8fda961b9c4e79e63cfb831696dcebe06c05be8bd8ff41089a8f0eac",
       "depends_on": [
         "STORY-022",
