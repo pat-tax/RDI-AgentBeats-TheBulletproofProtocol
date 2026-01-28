@@ -173,14 +173,10 @@ class GreenAgentExecutor:
             for part in params.message.parts:
                 data = self._extract_data_from_part(part)
                 if data:
-                    if "mode" in data:
-                        mode_params["mode"] = data["mode"]
-                    if "context" in data:
-                        mode_params["context"] = data["context"]
-                    if "max_iterations" in data:
-                        mode_params["max_iterations"] = data["max_iterations"]
-                    if "target_risk_score" in data:
-                        mode_params["target_risk_score"] = data["target_risk_score"]
+                    # Extract mode and arena configuration parameters
+                    for key in ["mode", "context", "max_iterations", "target_risk_score"]:
+                        if key in data:
+                            mode_params[key] = data[key]
                     break
 
         return mode_params
