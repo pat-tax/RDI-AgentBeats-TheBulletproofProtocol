@@ -66,3 +66,20 @@ def get_settings() -> PurpleSettings:
 
 # Convenience singleton for direct import
 settings = get_settings()
+
+
+if __name__ == "__main__":
+    """Debug command to dump current settings.
+
+    Usage:
+        python -m bulletproof_purple.settings
+    """
+    import json
+    import sys
+
+    try:
+        settings_dict = settings.model_dump()
+        print(json.dumps(settings_dict, indent=2))
+    except Exception as e:
+        print(f"Error loading settings: {e}", file=sys.stderr)
+        sys.exit(1)
