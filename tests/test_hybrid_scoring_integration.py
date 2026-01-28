@@ -67,9 +67,7 @@ class TestHybridScoringIntegration:
             mock_create = AsyncMock(return_value=mock_response)
             mock_client.chat.completions.create = mock_create
 
-            with patch(
-                "openai.AsyncOpenAI", return_value=mock_client
-            ):
+            with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
                     transport=ASGITransport(app=app), base_url="http://test"
@@ -145,9 +143,7 @@ class TestHybridScoringIntegration:
             mock_client.chat.completions = MagicMock()
             mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
-            with patch(
-                "openai.AsyncOpenAI", return_value=mock_client
-            ):
+            with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
                     transport=ASGITransport(app=app), base_url="http://test"
@@ -182,9 +178,7 @@ class TestHybridScoringIntegration:
     async def test_response_contains_standardized_output_format(self):
         """Test response follows Green-Agent-Metrics-Specification.md format."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_message_send_request(
@@ -221,13 +215,9 @@ class TestHybridScoringIntegration:
             mock_client = MagicMock()
             mock_client.chat = MagicMock()
             mock_client.chat.completions = MagicMock()
-            mock_client.chat.completions.create = AsyncMock(
-                side_effect=Exception("API error")
-            )
+            mock_client.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
 
-            with patch(
-                "openai.AsyncOpenAI", return_value=mock_client
-            ):
+            with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
                     transport=ASGITransport(app=app), base_url="http://test"
@@ -251,9 +241,7 @@ class TestHybridScoringIntegration:
     async def test_hybrid_scoring_preserves_component_scores(self):
         """Test hybrid scoring preserves individual component scores."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_message_send_request(

@@ -68,9 +68,7 @@ class TestArenaModeParameter:
     async def test_server_accepts_mode_arena_parameter(self):
         """Test server accepts mode=arena in DataPart without error."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -86,9 +84,7 @@ class TestArenaModeParameter:
     async def test_server_routes_to_arena_executor_for_arena_mode(self):
         """Test server routes to ArenaExecutor when mode=arena."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -104,9 +100,7 @@ class TestArenaModeParameter:
     async def test_server_accepts_max_iterations_parameter(self):
         """Test server accepts max_iterations parameter for arena mode."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -123,9 +117,7 @@ class TestArenaModeParameter:
     async def test_server_accepts_target_risk_score_parameter(self):
         """Test server accepts target_risk_score parameter for arena mode."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -146,9 +138,7 @@ class TestArenaResultResponse:
     async def test_arena_mode_returns_arena_result_structure(self):
         """Test arena mode response contains ArenaResult fields."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -175,9 +165,7 @@ class TestArenaResultResponse:
     async def test_arena_result_contains_iteration_history(self):
         """Test arena result contains full iteration history."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -208,9 +196,7 @@ class TestArenaResultResponse:
     async def test_arena_result_contains_termination_reason(self):
         """Test arena result includes termination_reason."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -242,9 +228,7 @@ class TestBackwardCompatibility:
     async def test_server_handles_requests_without_mode_parameter(self):
         """Test server works with requests that don't have mode parameter (single-shot)."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # Traditional request without mode parameter
             response = await client.post(
                 "/",
@@ -269,9 +253,7 @@ class TestBackwardCompatibility:
     async def test_single_shot_mode_returns_traditional_response(self):
         """Test single-shot mode (no mode param) returns traditional evaluation response."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json={
@@ -309,9 +291,7 @@ class TestArenaConfiguration:
     async def test_arena_mode_respects_max_iterations(self):
         """Test arena mode respects max_iterations configuration."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(
@@ -336,9 +316,7 @@ class TestArenaConfiguration:
     async def test_arena_mode_uses_default_config_when_not_specified(self):
         """Test arena mode uses default configuration when parameters not specified."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_arena_mode_request(

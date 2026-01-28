@@ -39,16 +39,14 @@ class TestDockerfilePurple:
         """Test Dockerfile uses Python 3.13-slim base image."""
         content = DOCKERFILE_PURPLE.read_text()
         # Should have a FROM with python:3.13-slim (may include --platform flag)
-        assert re.search(
-            r"FROM\s+.*python:3\.13-slim", content
-        ), "Must use python:3.13-slim base image"
+        assert re.search(r"FROM\s+.*python:3\.13-slim", content), (
+            "Must use python:3.13-slim base image"
+        )
 
     def test_exposes_port_8000(self):
         """Test Dockerfile exposes port 8000."""
         content = DOCKERFILE_PURPLE.read_text()
-        assert re.search(
-            r"EXPOSE\s+8000", content
-        ), "Must expose port 8000"
+        assert re.search(r"EXPOSE\s+8000", content), "Must expose port 8000"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""
@@ -78,9 +76,9 @@ class TestDockerfilePurple:
             r"GITHUB_TOKEN\s*=\s*['\"][^'\"]+['\"]",
         ]
         for pattern in secret_patterns:
-            assert not re.search(
-                pattern, content, re.IGNORECASE
-            ), f"Must not contain hardcoded secrets matching {pattern}"
+            assert not re.search(pattern, content, re.IGNORECASE), (
+                f"Must not contain hardcoded secrets matching {pattern}"
+            )
 
     def test_uses_multi_stage_build(self):
         """Test Dockerfile uses multi-stage build for smaller images."""
@@ -126,16 +124,14 @@ class TestDockerfileGreen:
         """Test Dockerfile uses Python 3.13-slim base image."""
         content = DOCKERFILE_GREEN.read_text()
         # Should have a FROM with python:3.13-slim (may include --platform flag)
-        assert re.search(
-            r"FROM\s+.*python:3\.13-slim", content
-        ), "Must use python:3.13-slim base image"
+        assert re.search(r"FROM\s+.*python:3\.13-slim", content), (
+            "Must use python:3.13-slim base image"
+        )
 
     def test_exposes_port_8000(self):
         """Test Dockerfile exposes port 8000."""
         content = DOCKERFILE_GREEN.read_text()
-        assert re.search(
-            r"EXPOSE\s+8000", content
-        ), "Must expose port 8000"
+        assert re.search(r"EXPOSE\s+8000", content), "Must expose port 8000"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""
@@ -162,9 +158,9 @@ class TestDockerfileGreen:
             r"GITHUB_TOKEN\s*=\s*['\"][^'\"]+['\"]",
         ]
         for pattern in secret_patterns:
-            assert not re.search(
-                pattern, content, re.IGNORECASE
-            ), f"Must not contain hardcoded secrets matching {pattern}"
+            assert not re.search(pattern, content, re.IGNORECASE), (
+                f"Must not contain hardcoded secrets matching {pattern}"
+            )
 
     def test_uses_multi_stage_build(self):
         """Test Dockerfile uses multi-stage build for smaller images."""

@@ -193,9 +193,7 @@ class TestEnvironmentVariables:
         # Check for common secret value patterns (not env var references)
         # API keys typically look like long alphanumeric strings
         # We're checking the raw content, not env var references like ${VAR}
-        assert "password=" not in content or "${" in content, (
-            "Must not hardcode passwords"
-        )
+        assert "password=" not in content or "${" in content, "Must not hardcode passwords"
 
 
 class TestCleanStateOnRun:
@@ -278,13 +276,9 @@ class TestBuildContext:
         build = purple.get("build", {})
         if isinstance(build, dict):
             context = build.get("context", ".")
-            assert context in [".", "./"], (
-                "purple build context should be project root"
-            )
+            assert context in [".", "./"], "purple build context should be project root"
         elif isinstance(build, str):
-            assert build in [".", "./"], (
-                "purple build context should be project root"
-            )
+            assert build in [".", "./"], "purple build context should be project root"
 
     def test_green_build_context_is_project_root(self) -> None:
         """Test green service builds from project root context."""
@@ -293,10 +287,6 @@ class TestBuildContext:
         build = green.get("build", {})
         if isinstance(build, dict):
             context = build.get("context", ".")
-            assert context in [".", "./"], (
-                "green build context should be project root"
-            )
+            assert context in [".", "./"], "green build context should be project root"
         elif isinstance(build, str):
-            assert build in [".", "./"], (
-                "green build context should be project root"
-            )
+            assert build in [".", "./"], "green build context should be project root"

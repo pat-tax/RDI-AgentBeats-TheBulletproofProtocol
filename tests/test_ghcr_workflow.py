@@ -26,9 +26,7 @@ class TestWorkflowFileExists:
 
     def test_workflow_file_exists(self) -> None:
         """Test .github/workflows/docker-build-push.yml exists."""
-        assert WORKFLOW_FILE.exists(), (
-            ".github/workflows/docker-build-push.yml must exist"
-        )
+        assert WORKFLOW_FILE.exists(), ".github/workflows/docker-build-push.yml must exist"
 
 
 class TestWorkflowValidYaml:
@@ -93,9 +91,7 @@ class TestWorkflowTriggers:
                 tags = push_config.get("tags", [])
                 # Should have tag trigger pattern like v*
                 has_tag_trigger = bool(tags)
-                assert has_tag_trigger, (
-                    "Workflow must trigger on tags for semantic versioning"
-                )
+                assert has_tag_trigger, "Workflow must trigger on tags for semantic versioning"
 
 
 class TestWorkflowPermissions:
@@ -107,18 +103,12 @@ class TestWorkflowPermissions:
         # Permissions can be at top level or job level
         has_top_level = "permissions" in workflow
         jobs = workflow.get("jobs", {})
-        has_job_level = any(
-            "permissions" in job
-            for job in jobs.values()
-            if isinstance(job, dict)
-        )
-        assert has_top_level or has_job_level, (
-            "Workflow must have permissions defined"
-        )
+        has_job_level = any("permissions" in job for job in jobs.values() if isinstance(job, dict))
+        assert has_top_level or has_job_level, "Workflow must have permissions defined"
 
     def test_packages_write_permission(self) -> None:
         """Test workflow has packages:write permission for GHCR push."""
-        workflow = _load_workflow()
+        _load_workflow()
         content = WORKFLOW_FILE.read_text()
         # Check for packages: write in the content
         assert "packages: write" in content or "packages:write" in content, (
@@ -148,9 +138,9 @@ class TestDockerBuildPushAction:
         """Test workflow uses docker/build-push-action@v5."""
         content = WORKFLOW_FILE.read_text()
         # Should use v5 as specified in acceptance criteria
-        assert re.search(
-            r"docker/build-push-action@v5", content
-        ), "Workflow must use docker/build-push-action@v5"
+        assert re.search(r"docker/build-push-action@v5", content), (
+            "Workflow must use docker/build-push-action@v5"
+        )
 
 
 class TestDockerBuildxSetup:
@@ -159,9 +149,7 @@ class TestDockerBuildxSetup:
     def test_uses_buildx_action(self) -> None:
         """Test workflow sets up Docker Buildx."""
         content = WORKFLOW_FILE.read_text()
-        assert "docker/setup-buildx-action" in content, (
-            "Workflow must set up Docker Buildx"
-        )
+        assert "docker/setup-buildx-action" in content, "Workflow must set up Docker Buildx"
 
 
 class TestGHCRLogin:
@@ -170,9 +158,7 @@ class TestGHCRLogin:
     def test_uses_login_action(self) -> None:
         """Test workflow uses docker/login-action for GHCR."""
         content = WORKFLOW_FILE.read_text()
-        assert "docker/login-action" in content, (
-            "Workflow must use docker/login-action for GHCR"
-        )
+        assert "docker/login-action" in content, "Workflow must use docker/login-action for GHCR"
 
     def test_logs_into_ghcr(self) -> None:
         """Test workflow logs into ghcr.io registry."""
@@ -193,30 +179,22 @@ class TestImageBuilds:
     def test_builds_green_image(self) -> None:
         """Test workflow builds bulletproof-green image."""
         content = WORKFLOW_FILE.read_text()
-        assert "bulletproof-green" in content, (
-            "Workflow must build bulletproof-green image"
-        )
+        assert "bulletproof-green" in content, "Workflow must build bulletproof-green image"
 
     def test_builds_purple_image(self) -> None:
         """Test workflow builds bulletproof-purple image."""
         content = WORKFLOW_FILE.read_text()
-        assert "bulletproof-purple" in content, (
-            "Workflow must build bulletproof-purple image"
-        )
+        assert "bulletproof-purple" in content, "Workflow must build bulletproof-purple image"
 
     def test_uses_dockerfile_green(self) -> None:
         """Test workflow references Dockerfile.green."""
         content = WORKFLOW_FILE.read_text()
-        assert "Dockerfile.green" in content, (
-            "Workflow must use Dockerfile.green"
-        )
+        assert "Dockerfile.green" in content, "Workflow must use Dockerfile.green"
 
     def test_uses_dockerfile_purple(self) -> None:
         """Test workflow references Dockerfile.purple."""
         content = WORKFLOW_FILE.read_text()
-        assert "Dockerfile.purple" in content, (
-            "Workflow must use Dockerfile.purple"
-        )
+        assert "Dockerfile.purple" in content, "Workflow must use Dockerfile.purple"
 
 
 class TestSemanticVersionTags:
@@ -233,9 +211,7 @@ class TestSemanticVersionTags:
             or "type=ref" in content
             or "type=semver" in content
         )
-        assert has_semver_support, (
-            "Workflow must support semantic version tags"
-        )
+        assert has_semver_support, "Workflow must support semantic version tags"
 
     def test_latest_tag_support(self) -> None:
         """Test workflow supports 'latest' tag."""
@@ -260,9 +236,7 @@ class TestLinuxAmd64Platform:
     def test_builds_for_linux_amd64(self) -> None:
         """Test workflow builds for linux/amd64 platform."""
         content = WORKFLOW_FILE.read_text()
-        assert "linux/amd64" in content, (
-            "Workflow must build for linux/amd64 platform"
-        )
+        assert "linux/amd64" in content, "Workflow must build for linux/amd64 platform"
 
 
 class TestCheckoutAction:
@@ -271,9 +245,7 @@ class TestCheckoutAction:
     def test_uses_checkout_action(self) -> None:
         """Test workflow checks out repository."""
         content = WORKFLOW_FILE.read_text()
-        assert "actions/checkout" in content, (
-            "Workflow must use actions/checkout"
-        )
+        assert "actions/checkout" in content, "Workflow must use actions/checkout"
 
 
 class TestNoHardcodedSecrets:

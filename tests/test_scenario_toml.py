@@ -75,9 +75,9 @@ class TestGreenAgentConfiguration:
         agentbeats_id = green_agent.get("agentbeats_id", "")
         # AgentBeats IDs are typically alphanumeric with underscores or hyphens
         # Format: agent_xyz123abc456 or similar UUID-like patterns
-        assert re.match(
-            r"^[a-zA-Z0-9_-]+$", agentbeats_id
-        ), f"green_agent agentbeats_id has invalid format: {agentbeats_id}"
+        assert re.match(r"^[a-zA-Z0-9_-]+$", agentbeats_id), (
+            f"green_agent agentbeats_id has invalid format: {agentbeats_id}"
+        )
 
     def test_green_agent_has_env_config(self) -> None:
         """Test green_agent has env configuration."""
@@ -132,9 +132,9 @@ class TestParticipantsConfiguration:
         assert len(participants) >= 1, "participants must have at least one entry"
         purple_participant = participants[0]
         agentbeats_id = purple_participant.get("agentbeats_id", "")
-        assert re.match(
-            r"^[a-zA-Z0-9_-]+$", agentbeats_id
-        ), f"participant agentbeats_id has invalid format: {agentbeats_id}"
+        assert re.match(r"^[a-zA-Z0-9_-]+$", agentbeats_id), (
+            f"participant agentbeats_id has invalid format: {agentbeats_id}"
+        )
 
     def test_purple_participant_has_name(self) -> None:
         """Test purple participant has name field."""

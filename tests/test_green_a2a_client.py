@@ -12,7 +12,6 @@ This test module validates the acceptance criteria for STORY-006:
 from __future__ import annotations
 
 import uuid
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -297,9 +296,7 @@ class TestTaskLifecycle:
             mock_send.return_value = mock_response
             # Should poll for completion
             with patch.object(client, "_poll_task", new_callable=AsyncMock) as mock_poll:
-                mock_poll.return_value = {
-                    "parts": [{"data": {"narrative": "Final narrative"}}]
-                }
+                mock_poll.return_value = {"parts": [{"data": {"narrative": "Final narrative"}}]}
                 response = await client.send_request(request)
                 assert response.narrative == "Final narrative"
 
@@ -328,7 +325,7 @@ class TestTaskLifecycle:
     @pytest.mark.asyncio
     async def test_task_status_failed(self):
         """Test client handles failed task status."""
-        from bulletproof_green.a2a_client import A2AClient, NarrativeRequest, A2AClientError
+        from bulletproof_green.a2a_client import A2AClient, A2AClientError, NarrativeRequest
 
         client = A2AClient(base_url="http://localhost:8001")
         request = NarrativeRequest(template_type="qualifying")
@@ -355,15 +352,14 @@ class TestTimeoutHandling:
     @pytest.mark.asyncio
     async def test_request_timeout(self):
         """Test request raises timeout error when exceeded."""
-        from bulletproof_green.a2a_client import A2AClient, NarrativeRequest, A2AClientError
+        from bulletproof_green.a2a_client import A2AClient, A2AClientError, NarrativeRequest
 
         client = A2AClient(base_url="http://localhost:8001", timeout=1)
         request = NarrativeRequest(template_type="qualifying")
 
         with patch.object(client, "_send_jsonrpc", new_callable=AsyncMock) as mock_send:
-            import asyncio
 
-            mock_send.side_effect = asyncio.TimeoutError()
+            mock_send.side_effect = TimeoutError()
 
             with pytest.raises(A2AClientError) as exc_info:
                 await client.send_request(request)
@@ -376,7 +372,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_connection_error(self):
         """Test client handles connection errors gracefully."""
-        from bulletproof_green.a2a_client import A2AClient, NarrativeRequest, A2AClientError
+        from bulletproof_green.a2a_client import A2AClient, A2AClientError, NarrativeRequest
 
         client = A2AClient(base_url="http://localhost:9999")  # Invalid port
         request = NarrativeRequest(template_type="qualifying")
@@ -391,7 +387,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_jsonrpc_error_response(self):
         """Test client handles JSON-RPC error responses."""
-        from bulletproof_green.a2a_client import A2AClient, NarrativeRequest, A2AClientError
+        from bulletproof_green.a2a_client import A2AClient, A2AClientError, NarrativeRequest
 
         client = A2AClient(base_url="http://localhost:8001")
         request = NarrativeRequest(template_type="qualifying")
@@ -412,7 +408,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_invalid_response_format(self):
         """Test client handles invalid response format."""
-        from bulletproof_green.a2a_client import A2AClient, NarrativeRequest, A2AClientError
+        from bulletproof_green.a2a_client import A2AClient, A2AClientError, NarrativeRequest
 
         client = A2AClient(base_url="http://localhost:8001")
         request = NarrativeRequest(template_type="qualifying")

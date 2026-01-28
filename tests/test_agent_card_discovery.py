@@ -10,7 +10,6 @@ This test module validates the acceptance criteria for STORY-007:
 
 from __future__ import annotations
 
-from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -248,6 +247,7 @@ class TestAgentCardDiscovery:
     async def test_discover_agent_returns_agent_card(self):
         """Test discover_agent returns AgentCard dict."""
         from unittest.mock import MagicMock
+
         from bulletproof_green.agent_card import discover_agent
 
         mock_card = {
@@ -273,6 +273,7 @@ class TestAgentCardDiscovery:
     async def test_discover_agent_fetches_well_known_endpoint(self):
         """Test discover_agent fetches from /.well-known/agent-card.json."""
         from unittest.mock import MagicMock
+
         from bulletproof_green.agent_card import discover_agent
 
         # Must include required fields for validation to pass
@@ -296,7 +297,8 @@ class TestAgentCardDiscovery:
     async def test_discover_agent_validates_response(self):
         """Test discover_agent validates the returned AgentCard."""
         from unittest.mock import MagicMock
-        from bulletproof_green.agent_card import discover_agent, AgentCardValidationError
+
+        from bulletproof_green.agent_card import AgentCardValidationError, discover_agent
 
         invalid_card = {"description": "Missing name and url"}
 
@@ -314,8 +316,9 @@ class TestAgentCardDiscovery:
     @pytest.mark.asyncio
     async def test_discover_agent_handles_connection_error(self):
         """Test discover_agent handles connection errors gracefully."""
-        from bulletproof_green.agent_card import discover_agent, AgentCardDiscoveryError
         import httpx
+
+        from bulletproof_green.agent_card import AgentCardDiscoveryError, discover_agent
 
         with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
@@ -329,8 +332,9 @@ class TestAgentCardDiscovery:
     @pytest.mark.asyncio
     async def test_discover_agent_handles_timeout(self):
         """Test discover_agent handles timeout errors."""
-        from bulletproof_green.agent_card import discover_agent, AgentCardDiscoveryError
         import httpx
+
+        from bulletproof_green.agent_card import AgentCardDiscoveryError, discover_agent
 
         with patch("bulletproof_green.agent_card.httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
@@ -417,7 +421,8 @@ class TestAgentCardCache:
     async def test_discover_agent_uses_cache(self):
         """Test discover_agent uses cache for repeated calls."""
         from unittest.mock import MagicMock
-        from bulletproof_green.agent_card import discover_agent, AgentCardCache
+
+        from bulletproof_green.agent_card import AgentCardCache, discover_agent
 
         mock_card = {
             "name": "Bulletproof Purple Agent",

@@ -189,11 +189,11 @@ class TestComponentScoresObject:
         cs = output["component_scores"]
 
         expected_total = (
-            cs["routine_engineering_penalty"] +
-            cs["vagueness_penalty"] +
-            cs["business_risk_penalty"] +
-            cs["experimentation_penalty"] +
-            cs["specificity_penalty"]
+            cs["routine_engineering_penalty"]
+            + cs["vagueness_penalty"]
+            + cs["business_risk_penalty"]
+            + cs["experimentation_penalty"]
+            + cs["specificity_penalty"]
         )
 
         assert cs["total_penalty"] == expected_total
@@ -451,8 +451,10 @@ class TestBackwardsCompatibility:
         assert "routine_engineering_penalty" in output["component_scores"]
 
         # Values should match
-        assert result.component_scores["routine_engineering_penalty"] == \
-               output["component_scores"]["routine_engineering_penalty"]
+        assert (
+            result.component_scores["routine_engineering_penalty"]
+            == output["component_scores"]["routine_engineering_penalty"]
+        )
 
 
 class TestCompleteSchemaExample:

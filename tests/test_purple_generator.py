@@ -9,7 +9,6 @@ This test module validates the acceptance criteria for STORY-001:
 - Python 3.13 compatible
 """
 
-
 from bulletproof_purple.generator import NarrativeGenerator
 from bulletproof_purple.models import Narrative
 

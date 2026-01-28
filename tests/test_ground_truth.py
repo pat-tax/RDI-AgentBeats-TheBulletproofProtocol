@@ -107,9 +107,7 @@ class TestGroundTruthMixture:
 
     def test_qualifying_and_non_qualifying_mix(self, ground_truth_data: list[dict]) -> None:
         """Dataset must have both qualifying and non-qualifying narratives."""
-        qualifying = [
-            e for e in ground_truth_data if e.get("classification") == "QUALIFYING"
-        ]
+        qualifying = [e for e in ground_truth_data if e.get("classification") == "QUALIFYING"]
         non_qualifying = [
             e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"
         ]
@@ -202,6 +200,7 @@ class TestAnonymization:
     def test_no_email_addresses(self, ground_truth_data: list[dict]) -> None:
         """Narratives must not contain email addresses."""
         import re
+
         email_pattern = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
         for entry in ground_truth_data:
             narrative = entry.get("narrative", "")
@@ -211,6 +210,7 @@ class TestAnonymization:
     def test_no_phone_numbers(self, ground_truth_data: list[dict]) -> None:
         """Narratives must not contain phone numbers."""
         import re
+
         phone_pattern = re.compile(r"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b")
         for entry in ground_truth_data:
             narrative = entry.get("narrative", "")
@@ -220,6 +220,7 @@ class TestAnonymization:
     def test_no_specific_company_names(self, ground_truth_data: list[dict]) -> None:
         """Narratives should use generic references, not specific company names."""
         import re
+
         # Check for common real company names that shouldn't appear (as whole words)
         prohibited = ["google", "amazon", "microsoft", "facebook", "apple", "netflix", "uber"]
         for entry in ground_truth_data:
@@ -275,9 +276,7 @@ class TestPhase2DifficultyDistribution:
                 tier_classifications[tier].add(classification)
 
         for tier, classifications in tier_classifications.items():
-            assert "QUALIFYING" in classifications, (
-                f"Tier '{tier}' missing QUALIFYING entries"
-            )
+            assert "QUALIFYING" in classifications, f"Tier '{tier}' missing QUALIFYING entries"
             assert "NON_QUALIFYING" in classifications, (
                 f"Tier '{tier}' missing NON_QUALIFYING entries"
             )
@@ -335,8 +334,7 @@ class TestPhase2EvaluationScenarios:
         """Dataset should include edge cases near the 20-point threshold."""
         # Count entries with scores near the threshold (15-25 range)
         edge_case_count = sum(
-            1 for e in ground_truth_data
-            if 15 <= e.get("expected_score", 0) <= 25
+            1 for e in ground_truth_data if 15 <= e.get("expected_score", 0) <= 25
         )
         assert edge_case_count >= 3, (
             f"Need at least 3 edge cases near threshold (score 15-25), found {edge_case_count}"
@@ -356,17 +354,13 @@ class TestPhase2EvaluationScenarios:
 
     def test_balanced_qualifying_non_qualifying(self, ground_truth_data: list[dict]) -> None:
         """Phase 2 requires balanced mix of qualifying and non-qualifying."""
-        qualifying = [
-            e for e in ground_truth_data if e.get("classification") == "QUALIFYING"
-        ]
+        qualifying = [e for e in ground_truth_data if e.get("classification") == "QUALIFYING"]
         non_qualifying = [
             e for e in ground_truth_data if e.get("classification") == "NON_QUALIFYING"
         ]
 
         # Both categories should have at least 8 entries
-        assert len(qualifying) >= 8, (
-            f"Need at least 8 qualifying entries, found {len(qualifying)}"
-        )
+        assert len(qualifying) >= 8, f"Need at least 8 qualifying entries, found {len(qualifying)}"
         assert len(non_qualifying) >= 8, (
             f"Need at least 8 non-qualifying entries, found {len(non_qualifying)}"
         )

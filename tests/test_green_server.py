@@ -76,9 +76,7 @@ class TestAgentCard:
     async def test_agent_card_endpoint_exists(self):
         """Test that /.well-known/agent-card.json endpoint exists."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             assert response.status_code == 200
 
@@ -86,9 +84,7 @@ class TestAgentCard:
     async def test_agent_card_returns_valid_json(self):
         """Test AgentCard returns valid JSON."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             data = response.json()
             assert isinstance(data, dict)
@@ -97,9 +93,7 @@ class TestAgentCard:
     async def test_agent_card_contains_required_fields(self):
         """Test AgentCard contains required A2A fields."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             data = response.json()
 
@@ -115,9 +109,7 @@ class TestAgentCard:
     async def test_agent_card_has_correct_name(self):
         """Test AgentCard has correct agent name."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             data = response.json()
             assert data["name"] == "Bulletproof Green Agent"
@@ -126,9 +118,7 @@ class TestAgentCard:
     async def test_agent_card_has_evaluate_narrative_skill(self):
         """Test AgentCard advertises narrative evaluation capability."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             data = response.json()
 
@@ -150,9 +140,7 @@ class TestMessageSendEndpoint:
     async def test_rpc_endpoint_exists(self):
         """Test that JSON-RPC endpoint exists at /."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post("/", json=make_message_send_request("test"))
             # Should not be 404
             assert response.status_code != 404
@@ -161,9 +149,7 @@ class TestMessageSendEndpoint:
     async def test_message_send_returns_jsonrpc_response(self):
         """Test message/send returns valid JSON-RPC response."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/", json=make_message_send_request("Evaluate this narrative")
             )
@@ -176,9 +162,7 @@ class TestMessageSendEndpoint:
     async def test_message_send_returns_result_or_error(self):
         """Test message/send returns result or error field."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/", json=make_message_send_request("Evaluate this narrative")
             )
@@ -190,9 +174,7 @@ class TestMessageSendEndpoint:
     async def test_message_send_evaluates_narrative(self):
         """Test message/send evaluates narrative and returns response."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/", json=make_message_send_request("This is a test narrative to evaluate.")
             )
@@ -207,12 +189,8 @@ class TestDataPartResponse:
     async def test_response_contains_message_with_parts(self):
         """Test response contains message with parts array."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            response = await client.post(
-                "/", json=make_message_send_request("Evaluate narrative")
-            )
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post("/", json=make_message_send_request("Evaluate narrative"))
             data = response.json()
             if "result" in data:
                 result = data["result"]
@@ -223,9 +201,7 @@ class TestDataPartResponse:
     async def test_response_includes_data_part_with_scores(self):
         """Test response includes DataPart containing score data."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/", json=make_message_send_request("This narrative describes our R&D work.")
             )
@@ -246,9 +222,7 @@ class TestEvaluatorScorerIntegration:
     async def test_response_contains_overall_score(self):
         """Test response contains overall_score from scorer."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # Send a narrative to evaluate
             response = await client.post(
                 "/",
@@ -276,9 +250,7 @@ class TestEvaluatorScorerIntegration:
     async def test_response_contains_agentbeats_fields(self):
         """Test response contains all AgentBeats required fields."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json=make_message_send_request(
@@ -307,9 +279,7 @@ class TestEvaluatorScorerIntegration:
     async def test_response_contains_task_rewards(self):
         """Test response contains task_rewards with component scores."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/", json=make_message_send_request("Sample narrative for evaluation.")
             )
@@ -333,9 +303,7 @@ class TestEvaluatorScorerIntegration:
     async def test_qualifying_narrative_gets_high_pass_rate(self):
         """Test a qualifying narrative gets high pass_rate."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # A well-structured qualifying narrative
             qualifying_narrative = (
                 "Our hypothesis was that using a custom B-tree implementation could "
@@ -348,9 +316,7 @@ class TestEvaluatorScorerIntegration:
                 "The technical uncertainty was whether we could maintain ACID guarantees "
                 "while achieving this performance target."
             )
-            response = await client.post(
-                "/", json=make_message_send_request(qualifying_narrative)
-            )
+            response = await client.post("/", json=make_message_send_request(qualifying_narrative))
             data = response.json()
             assert "result" in data
             result = data["result"]
@@ -367,9 +333,7 @@ class TestEvaluatorScorerIntegration:
     async def test_non_qualifying_narrative_gets_low_pass_rate(self):
         """Test a non-qualifying narrative gets low pass_rate."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # A non-qualifying narrative with routine engineering
             non_qualifying_narrative = (
                 "We did routine maintenance on our database. "
@@ -400,9 +364,7 @@ class TestJSONRPCErrorHandling:
     async def test_invalid_json_returns_parse_error(self):
         """Test invalid JSON returns -32700 Parse Error."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 content="not valid json{",
@@ -416,9 +378,7 @@ class TestJSONRPCErrorHandling:
     async def test_invalid_request_returns_error(self):
         """Test invalid request returns -32600 Invalid Request."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json={"not": "valid jsonrpc"},
@@ -431,9 +391,7 @@ class TestJSONRPCErrorHandling:
     async def test_unknown_method_returns_method_not_found(self):
         """Test unknown method returns -32601 Method Not Found."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json={
@@ -451,9 +409,7 @@ class TestJSONRPCErrorHandling:
     async def test_invalid_params_returns_error(self):
         """Test invalid params returns -32602 Invalid Params."""
         app = create_app()
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/",
                 json={
@@ -510,13 +466,9 @@ class TestServerConfiguration:
         app = create_app()
 
         async def make_request(client: AsyncClient, req_id: str):
-            return await client.post(
-                "/", json=make_message_send_request("test", req_id=req_id)
-            )
+            return await client.post("/", json=make_message_send_request("test", req_id=req_id))
 
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             tasks = [make_request(client, f"req-{i}") for i in range(3)]
             responses = await asyncio.gather(*tasks)
 

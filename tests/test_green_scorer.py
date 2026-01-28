@@ -11,7 +11,7 @@ This test module validates the acceptance criteria for STORY-004:
 import pytest
 
 from bulletproof_green.evaluator import RuleBasedEvaluator
-from bulletproof_green.models import EvaluationResult, Redline, ScoreResult
+from bulletproof_green.models import EvaluationResult, ScoreResult
 from bulletproof_green.scorer import AgentBeatsScorer
 
 
@@ -65,9 +65,7 @@ class TestComponentScoreCorrectness:
     def test_correctness_no_penalty(self):
         """Test correctness when routine_engineering_penalty is 0."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"routine_engineering_penalty": 0}
-        )
+        eval_result = EvaluationResult(component_scores={"routine_engineering_penalty": 0})
 
         score_result = scorer.score(eval_result)
 
@@ -77,9 +75,7 @@ class TestComponentScoreCorrectness:
     def test_correctness_max_penalty(self):
         """Test correctness when routine_engineering_penalty is 30."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"routine_engineering_penalty": 30}
-        )
+        eval_result = EvaluationResult(component_scores={"routine_engineering_penalty": 30})
 
         score_result = scorer.score(eval_result)
 
@@ -89,9 +85,7 @@ class TestComponentScoreCorrectness:
     def test_correctness_partial_penalty(self):
         """Test correctness with partial penalty."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"routine_engineering_penalty": 15}
-        )
+        eval_result = EvaluationResult(component_scores={"routine_engineering_penalty": 15})
 
         score_result = scorer.score(eval_result)
 
@@ -105,9 +99,7 @@ class TestComponentScoreSafety:
     def test_safety_no_penalty(self):
         """Test safety when business_risk_penalty is 0."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"business_risk_penalty": 0}
-        )
+        eval_result = EvaluationResult(component_scores={"business_risk_penalty": 0})
 
         score_result = scorer.score(eval_result)
 
@@ -117,9 +109,7 @@ class TestComponentScoreSafety:
     def test_safety_max_penalty(self):
         """Test safety when business_risk_penalty is 20."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"business_risk_penalty": 20}
-        )
+        eval_result = EvaluationResult(component_scores={"business_risk_penalty": 20})
 
         score_result = scorer.score(eval_result)
 
@@ -129,9 +119,7 @@ class TestComponentScoreSafety:
     def test_safety_partial_penalty(self):
         """Test safety with partial penalty."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"business_risk_penalty": 10}
-        )
+        eval_result = EvaluationResult(component_scores={"business_risk_penalty": 10})
 
         score_result = scorer.score(eval_result)
 
@@ -145,9 +133,7 @@ class TestComponentScoreSpecificity:
     def test_specificity_no_penalty(self):
         """Test specificity when vagueness_penalty is 0."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"vagueness_penalty": 0}
-        )
+        eval_result = EvaluationResult(component_scores={"vagueness_penalty": 0})
 
         score_result = scorer.score(eval_result)
 
@@ -157,9 +143,7 @@ class TestComponentScoreSpecificity:
     def test_specificity_max_penalty(self):
         """Test specificity when vagueness_penalty is 25."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"vagueness_penalty": 25}
-        )
+        eval_result = EvaluationResult(component_scores={"vagueness_penalty": 25})
 
         score_result = scorer.score(eval_result)
 
@@ -169,9 +153,7 @@ class TestComponentScoreSpecificity:
     def test_specificity_partial_penalty(self):
         """Test specificity with partial penalty."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"vagueness_penalty": 12}
-        )
+        eval_result = EvaluationResult(component_scores={"vagueness_penalty": 12})
 
         score_result = scorer.score(eval_result)
 
@@ -185,9 +167,7 @@ class TestComponentScoreExperimentation:
     def test_experimentation_no_penalty(self):
         """Test experimentation when experimentation_penalty is 0."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"experimentation_penalty": 0}
-        )
+        eval_result = EvaluationResult(component_scores={"experimentation_penalty": 0})
 
         score_result = scorer.score(eval_result)
 
@@ -197,9 +177,7 @@ class TestComponentScoreExperimentation:
     def test_experimentation_max_penalty(self):
         """Test experimentation when experimentation_penalty is 15."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"experimentation_penalty": 15}
-        )
+        eval_result = EvaluationResult(component_scores={"experimentation_penalty": 15})
 
         score_result = scorer.score(eval_result)
 
@@ -209,9 +187,7 @@ class TestComponentScoreExperimentation:
     def test_experimentation_partial_penalty(self):
         """Test experimentation with partial penalty."""
         scorer = AgentBeatsScorer()
-        eval_result = EvaluationResult(
-            component_scores={"experimentation_penalty": 5}
-        )
+        eval_result = EvaluationResult(component_scores={"experimentation_penalty": 5})
 
         score_result = scorer.score(eval_result)
 
@@ -450,6 +426,4 @@ class TestScoreResultStructure:
         score_result = scorer.score(eval_result)
 
         # Should have a string representation
-        assert "ScoreResult" in repr(score_result) or "overall_score" in repr(
-            score_result
-        )
+        assert "ScoreResult" in repr(score_result) or "overall_score" in repr(score_result)

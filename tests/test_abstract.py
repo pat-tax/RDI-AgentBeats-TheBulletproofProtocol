@@ -11,7 +11,6 @@ This test validates that ABSTRACT.md meets AgentBeats submission requirements:
 
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).parent.parent
 ABSTRACT_PATH = PROJECT_ROOT / "ABSTRACT.md"
 
@@ -51,9 +50,7 @@ def test_abstract_explains_problem():
     # Must describe complexity/challenge
     complexity_terms = ["complex", "challenge", "difficult", "hours", "manual"]
     found = any(term in content for term in complexity_terms)
-    assert found, (
-        f"Abstract must describe evaluation complexity using one of: {complexity_terms}"
-    )
+    assert found, f"Abstract must describe evaluation complexity using one of: {complexity_terms}"
 
 
 def test_abstract_describes_solution():
@@ -83,9 +80,7 @@ def test_abstract_highlights_innovation():
     # Must highlight practical use/impact
     practical_terms = ["practical", "automat", "reduc", "improve", "first"]
     found_practical = any(term in content for term in practical_terms)
-    assert found_practical, (
-        f"Abstract must highlight practical use with one of: {practical_terms}"
-    )
+    assert found_practical, f"Abstract must highlight practical use with one of: {practical_terms}"
 
 
 def test_abstract_references_demo_video():
@@ -93,9 +88,7 @@ def test_abstract_references_demo_video():
     content = ABSTRACT_PATH.read_text().lower()
 
     # Must mention demo video
-    assert "video" in content or "demo" in content, (
-        "Abstract must reference demo video"
-    )
+    assert "video" in content or "demo" in content, "Abstract must reference demo video"
 
     # Should mention duration (3 minutes)
     duration_terms = ["3-minute", "3 minute", "three minute", "3min"]
@@ -111,6 +104,5 @@ def test_abstract_video_demonstrates_functionality():
     demo_terms = ["narrative", "evaluat", "scor", "generat"]
     found = sum(1 for term in demo_terms if term in content)
     assert found >= 2, (
-        f"Abstract must describe video demonstrating at least 2 of: {demo_terms} "
-        f"(found {found})"
+        f"Abstract must describe video demonstrating at least 2 of: {demo_terms} (found {found})"
     )
