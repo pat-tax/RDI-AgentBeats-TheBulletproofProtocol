@@ -11,7 +11,7 @@ This test module validates the acceptance criteria for STORY-022:
 from __future__ import annotations
 
 import uuid
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -136,7 +136,7 @@ class TestSendMessage:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -164,7 +164,7 @@ class TestSendMessage:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -197,7 +197,7 @@ class TestSendMessage:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -228,7 +228,7 @@ class TestSendMessage:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -275,7 +275,7 @@ class TestMessengerClass:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -299,7 +299,7 @@ class TestMessengerClass:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
@@ -376,7 +376,7 @@ class TestErrorHandling:
         with patch("httpx.AsyncClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = {
                 "jsonrpc": "2.0",
                 "id": "1",
