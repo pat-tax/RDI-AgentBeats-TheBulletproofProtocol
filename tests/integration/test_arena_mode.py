@@ -18,8 +18,6 @@ Tests verify that:
 
 from __future__ import annotations
 
-import pytest
-
 from bulletproof_green.evaluator import RuleBasedEvaluator
 
 
