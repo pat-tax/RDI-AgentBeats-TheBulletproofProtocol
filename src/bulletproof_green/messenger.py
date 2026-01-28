@@ -188,8 +188,7 @@ class Messenger:
             >>> messenger = Messenger(base_url="http://localhost:8001")
             >>> response = await messenger.send(text="Generate narrative")
             >>> response = await messenger.send(
-            ...     text="Context",
-            ...     data={"template_type": "qualifying"}
+            ...     text="Context", data={"template_type": "qualifying"}
             ... )
         """
         message = create_message(text=text, data=data, role=role)
