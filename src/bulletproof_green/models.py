@@ -125,9 +125,14 @@ class ScoreResult(BaseModel):
 
 
 class NarrativeRequest(BaseModel):
-    """Request for narrative generation from Purple Agent."""
+    """Request for narrative generation from Purple Agent.
 
-    template_type: str
+    TODO(review): Added default template_type for graceful degradation.
+    Rationale: If A2A request omits template_type, use sensible default
+    instead of failing. Aligns with Purple Agent's default behavior.
+    """
+
+    template_type: str = "qualifying"  # Default: most common use case
     signals: dict[str, Any] | None = None
     context: str | None = None
 

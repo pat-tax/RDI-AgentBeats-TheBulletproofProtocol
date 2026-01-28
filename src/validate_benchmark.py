@@ -14,6 +14,22 @@ from bulletproof_green.evaluator import RuleBasedEvaluator
 from bulletproof_green.scorer import AgentBeatsScorer
 
 
+# TODO(review): New model consolidates ground truth entry defaults (DRY principle)
+# Replaces manual .get() calls with Pydantic validation for type safety
+class GroundTruthEntry(BaseModel):
+    """Ground truth dataset entry with validation.
+
+    Defaults ensure graceful handling of incomplete entries while maintaining
+    worst-case assumptions (high score = non-qualifying).
+    """
+
+    id: str = "unknown"
+    narrative: str = ""
+    expected_score: int = 100  # Worst case: assume non-qualifying
+    classification: str = "NON_QUALIFYING"  # Conservative default
+    difficulty: str = "unknown"
+
+
 class ValidationResult(BaseModel):
     """Result of validating a single narrative entry."""
 
@@ -133,30 +149,28 @@ class BenchmarkValidator:
         Returns:
             ValidationResult with actual vs expected comparison
         """
-        narrative = entry.get("narrative", "")
-        expected_score = entry.get("expected_score", 100)
-        expected_classification = entry.get("classification", "NON_QUALIFYING")
-        difficulty = entry.get("difficulty", "unknown")
-        entry_id = entry.get("id", "unknown")
+        # TODO(review): Pydantic validation replaces manual .get() calls
+        # Benefit: Type safety + automatic defaults from model
+        gt_entry = GroundTruthEntry.model_validate(entry)
 
         # Run Green Agent evaluation
-        eval_result = self.evaluator.evaluate(narrative)
+        eval_result = self.evaluator.evaluate(gt_entry.narrative)
         actual_score = eval_result.risk_score
         actual_classification = eval_result.classification
 
         # Compare results
-        classification_match = expected_classification == actual_classification
-        score_delta = actual_score - expected_score
+        classification_match = gt_entry.classification == actual_classification
+        score_delta = actual_score - gt_entry.expected_score
 
         return ValidationResult(
-            entry_id=entry_id,
-            expected_score=expected_score,
+            entry_id=gt_entry.id,
+            expected_score=gt_entry.expected_score,
             actual_score=actual_score,
-            expected_classification=expected_classification,
+            expected_classification=gt_entry.classification,
             actual_classification=actual_classification,
             classification_match=classification_match,
             score_delta=score_delta,
-            difficulty=difficulty,
+            difficulty=gt_entry.difficulty,
         )
 
     def validate_all(self, data: list[dict[str, Any]]) -> list[ValidationResult]:
