@@ -34,15 +34,20 @@ if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
 
 
-def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
+def get_agent_card(base_url: str | None = None) -> AgentCard:
     """Create the AgentCard for Purple Agent.
 
     Args:
-        base_url: Base URL where the agent is hosted.
+        base_url: Base URL where the agent is hosted (uses settings if not provided).
 
     Returns:
         Configured AgentCard with narrative generation capability.
     """
+    if base_url is None:
+        from bulletproof_purple.settings import settings
+
+        # Use settings method for URL construction (DRY)
+        base_url = settings.get_card_url()
     # Note: a2a-sdk uses camelCase for pydantic model field aliases but pyright
     # doesn't recognize them, hence the type: ignore comments
     return AgentCard(
