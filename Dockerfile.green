@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Dockerfile.green - Green Agent (IRS Section 41 narrative evaluator)
+# Dockerfile.green
 # Platform: linux/amd64
 
 # ============================================================================

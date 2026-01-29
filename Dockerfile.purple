@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Dockerfile.purple - Purple Agent (IRS Section 41 narrative generator)
+# Dockerfile.purple
 # Platform: linux/amd64
 
 # ============================================================================
