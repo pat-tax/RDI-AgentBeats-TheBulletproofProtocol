@@ -68,7 +68,7 @@ class A2AClient:
         """
         url = f"{self.base_url}/.well-known/agent-card.json"
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
+            async with httpx.AsyncClient(timeout=self.timeout, trust_env=False) as client:
                 response = await client.get(url)
                 response.raise_for_status()
                 return response.json()
@@ -145,7 +145,7 @@ class A2AClient:
         }
 
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
+            async with httpx.AsyncClient(timeout=self.timeout, trust_env=False) as client:
                 response = await client.post(
                     self.base_url,
                     json=request_body,
