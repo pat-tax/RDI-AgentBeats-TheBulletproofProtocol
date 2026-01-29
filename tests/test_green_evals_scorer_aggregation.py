@@ -11,8 +11,8 @@ This test module validates the acceptance criteria for STORY-004:
 import pytest
 
 from bulletproof_green.evals.evaluator import RuleBasedEvaluator
-from bulletproof_green.evals.models import EvaluationResult, ScoreResult
 from bulletproof_green.evals.scorer import AgentBeatsScorer
+from bulletproof_green.models import EvaluationResult, ScoreResult
 
 
 class TestOverallScoreCalculation:

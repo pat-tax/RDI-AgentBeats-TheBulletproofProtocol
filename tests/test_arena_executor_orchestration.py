@@ -20,7 +20,7 @@ class TestArenaExecutorRun:
     @pytest.mark.asyncio
     async def test_run_stops_when_target_reached(self):
         """Test run stops when risk_score < target_risk_score."""
-        from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
+        from bulletproof_green.arena import ArenaConfig, ArenaExecutor
 
         config = ArenaConfig(max_iterations=5, target_risk_score=20)
         executor = ArenaExecutor(
@@ -40,7 +40,7 @@ class TestArenaExecutorRun:
     @pytest.mark.asyncio
     async def test_run_stops_at_max_iterations(self):
         """Test run stops when max_iterations reached."""
-        from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
+        from bulletproof_green.arena import ArenaConfig, ArenaExecutor
 
         config = ArenaConfig(max_iterations=3, target_risk_score=20)
         executor = ArenaExecutor(
@@ -60,7 +60,7 @@ class TestArenaExecutorRun:
     @pytest.mark.asyncio
     async def test_run_iterates_until_success(self):
         """Test run iterates until target is reached."""
-        from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
+        from bulletproof_green.arena import ArenaConfig, ArenaExecutor
 
         config = ArenaConfig(max_iterations=5, target_risk_score=20)
         executor = ArenaExecutor(
@@ -86,7 +86,7 @@ class TestArenaExecutorRun:
     @pytest.mark.asyncio
     async def test_run_records_all_iterations(self):
         """Test run records all iteration history."""
-        from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
+        from bulletproof_green.arena import ArenaConfig, ArenaExecutor
 
         config = ArenaConfig(max_iterations=3, target_risk_score=20)
         executor = ArenaExecutor(
@@ -115,7 +115,7 @@ class TestArenaExecutorA2AIntegration:
     @pytest.mark.asyncio
     async def test_sends_critique_on_subsequent_iterations(self):
         """Test executor sends critique to Purple agent on subsequent iterations."""
-        from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
+        from bulletproof_green.arena import ArenaConfig, ArenaExecutor
 
         config = ArenaConfig(max_iterations=3, target_risk_score=20)
         executor = ArenaExecutor(
@@ -152,7 +152,7 @@ class TestArenaExecutorCritiqueGeneration:
 
     def test_generates_critique_from_evaluation(self):
         """Test executor generates actionable critique from evaluation."""
-        from bulletproof_green.arena_executor import ArenaExecutor
+        from bulletproof_green.arena import ArenaExecutor
 
         executor = ArenaExecutor(purple_agent_url="http://localhost:8001")
 

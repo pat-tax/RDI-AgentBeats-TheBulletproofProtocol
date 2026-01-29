@@ -56,8 +56,20 @@ class TestTechnicalVsBusinessRisk:
 
         text_lower = narrative.text.lower()
 
-        technical_terms = ["technical", "algorithm", "architecture", "performance", "implementation"]
-        business_terms = ["market share", "revenue", "profit", "customer acquisition", "sales target"]
+        technical_terms = [
+            "technical",
+            "algorithm",
+            "architecture",
+            "performance",
+            "implementation",
+        ]
+        business_terms = [
+            "market share",
+            "revenue",
+            "profit",
+            "customer acquisition",
+            "sales target",
+        ]
 
         technical_count = sum(1 for t in technical_terms if t in text_lower)
         business_count = sum(1 for t in business_terms if t in text_lower)
@@ -93,7 +105,8 @@ class TestTemplateBasedGeneration:
 
         text_lower = narrative.text.lower()
         found = any(
-            t.lower() in text_lower for t in ["machine learning", "tensorflow", "model", "convergence"]
+            t.lower() in text_lower
+            for t in ["machine learning", "tensorflow", "model", "convergence"]
         )
         assert found, "Signals should influence narrative content"
 

@@ -1,30 +1,80 @@
 #!/bin/bash
+################################################################################
+# DOCKER-BASED E2E SYSTEM INTEGRATION TESTS
+################################################################################
 #
-# End-to-end test script for Purple and Green agents
+# PURPOSE:
+#   Full system integration testing using Docker Compose to deploy both
+#   Purple (generator) and Green (evaluator) agents. Tests complete A2A
+#   workflow, agent communication, and validates against ground truth dataset.
 #
-# Usage: ./scripts/test_e2e.sh [MODE] [OPTIONS]
+#   This is for SYSTEM-WIDE validation (deployment, containers, networking).
+#   For ARENA MODE specific pytest tests, use: ./scripts/test_arena_e2e.sh
 #
-# Modes:
-#   quick (default)      Quick smoke test with 2 narratives
-#   comprehensive/full   Full test with ground truth dataset
+# WHAT THIS TESTS:
+#   ✓ Docker deployment of both agents
+#   ✓ Agent card discovery via HTTP
+#   ✓ Purple agent narrative generation
+#   ✓ Green agent evaluation
+#   ✓ A2A JSON-RPC protocol
+#   ✓ Ground truth dataset validation
 #
-# Options:
+# WHAT THIS DOES NOT TEST:
+#   ✗ Arena mode multi-turn refinement (use test_arena_e2e.sh)
+#   ✗ Detailed pytest assertions (use test_arena_e2e.sh)
+#   ✗ Python-only integration (use test_arena_e2e.sh)
+#
+# USAGE:
+#   ./scripts/test_e2e.sh [MODE] [OPTIONS]
+#
+# MODES:
+#   quick (default)      Quick smoke test with 2 narratives (30-60s)
+#   comprehensive/full   Full ground truth dataset validation (5-10min)
+#
+# OPTIONS:
 #   --build              Rebuild Docker images before starting
 #   --help, -h           Show this help message
 #
-# Environment:
+# ENVIRONMENT:
 #   E2E_MODE=quick|comprehensive   Set test mode
 #   E2E_BUILD=1                    Enable --build flag
 #
-# Prerequisites:
+# FOR ARENA MODE TESTS:
+#   Use: ./scripts/test_arena_e2e.sh (separate pytest-based tests)
+#
+# PREREQUISITES:
 #   - Docker and docker-compose installed
-#   - Ports 8001 and 8002 available
+#   - Ports 8001 (Purple) and 8002 (Green) available
+#   - Ground truth data at: data/ground_truth.json
 #
-# Outputs:
-#   - logs/e2e_YYYYMMDD_HHMMSS/ - Test logs and responses
+# OUTPUTS:
+#   logs/e2e_YYYYMMDD_HHMMSS/
+#   ├── summary.log                    Test results summary
+#   ├── results.json                   Machine-readable results
+#   ├── purple_agent_card.json         Purple agent metadata
+#   ├── green_agent_card.json          Green agent metadata
+#   ├── *_response.json                Individual test responses
 #
+# EXAMPLES:
+#   # Quick smoke test (recommended for CI)
+#   ./scripts/test_e2e.sh quick
+#
+#   # Full validation (pre-release)
+#   ./scripts/test_e2e.sh comprehensive
+#
+#   # Rebuild containers first
+#   ./scripts/test_e2e.sh quick --build
+#
+#   # For arena mode pytest tests (separate script):
+#   ./scripts/test_arena_e2e.sh
+#
+################################################################################
 
 set -e
+
+# Source common utilities (DRY principle)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
 
 # Defaults from environment
 TEST_MODE="${E2E_MODE:-quick}"
@@ -56,6 +106,9 @@ for arg in "$@"; do
             echo "Environment variables:"
             echo "  E2E_MODE=quick|comprehensive"
             echo "  E2E_BUILD=1"
+            echo ""
+            echo "For arena mode pytest tests:"
+            echo "  ./scripts/test_arena_e2e.sh"
             exit 0
             ;;
     esac
@@ -72,16 +125,13 @@ echo "=========================================="
 echo "Mode: $TEST_MODE"
 echo "Logs: $LOG_DIR"
 
-# Colors
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-pass() { echo -e "${GREEN}✓ $1${NC}"; echo "PASS: $1" >> "$LOG_DIR/summary.log"; }
-fail() { echo -e "${RED}✗ $1${NC}"; echo "FAIL: $1" >> "$LOG_DIR/summary.log"; exit 1; }
-warn() { echo -e "${YELLOW}⚠ $1${NC}"; echo "WARN: $1" >> "$LOG_DIR/summary.log"; }
-info() { echo -e "${YELLOW}ℹ $1${NC}"; echo "INFO: $1" >> "$LOG_DIR/summary.log"; }
+# Colors imported from common.sh
+# Helper functions for test logging
+pass() { success "$1"; echo "PASS: $1" >> "$LOG_DIR/summary.log"; }
+fail() { error "$1"; echo "FAIL: $1" >> "$LOG_DIR/summary.log"; exit 1; }
+warn() { warning "$1"; echo "WARN: $1" >> "$LOG_DIR/summary.log"; }
+# info() already defined in common.sh, just add logging
+_info_log() { info "$1"; echo "INFO: $1" >> "$LOG_DIR/summary.log"; }
 
 # Required output fields
 REQUIRED_FIELDS="domain score max_score pass_rate task_rewards time_used overall_score correctness safety specificity experimentation classification risk_score risk_category confidence redline"

@@ -12,7 +12,7 @@ This test module validates the acceptance criteria for STORY-003:
 """
 
 from bulletproof_green.evals.evaluator import RuleBasedEvaluator
-from bulletproof_green.evals.models import EvaluationResult, Issue
+from bulletproof_green.models import EvaluationResult, Issue
 
 
 class TestRoutineEngineeringDetection:
