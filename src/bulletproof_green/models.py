@@ -169,19 +169,19 @@ def _get_llm_beta() -> float:
 def _get_llm_temperature() -> float:
     from bulletproof_green.settings import settings
 
-    return settings.llm_temperature
+    return settings.llm.temperature
 
 
 def _get_llm_model() -> str:
     from bulletproof_green.settings import settings
 
-    return settings.llm_model
+    return settings.llm.model
 
 
 def _get_llm_timeout() -> float:
     from bulletproof_green.settings import settings
 
-    return settings.llm_timeout
+    return settings.llm.timeout
 
 
 class LLMJudgeConfig(BaseModel):

@@ -37,10 +37,11 @@ class LLMJudge:
 
         Args:
             config: Optional configuration (uses defaults if not provided).
-            api_key: Optional OpenAI API key (falls back to settings.openai_api_key).
+            api_key: Optional OpenAI API key (falls back to settings.llm.api_key
+                or settings.openai_api_key).
         """
         self.config = config if config is not None else LLMJudgeConfig()
-        self._api_key = api_key or settings.openai_api_key
+        self._api_key = api_key or settings.llm.api_key or settings.openai_api_key
         self._client: Any = None
 
         # Initialize OpenAI client if API key is available

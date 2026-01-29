@@ -27,7 +27,7 @@ class TestLLMJudgeConstruction:
         """Test judge reads API key from settings."""
         from bulletproof_green.evals.llm_judge import LLMJudge
 
-        with patch("bulletproof_green.settings.settings.openai_api_key", "settings-key"):
+        with patch("bulletproof_green.settings.settings.llm.api_key", "settings-key"):
             judge = LLMJudge()
             assert judge._api_key == "settings-key"
 
@@ -80,7 +80,7 @@ class TestLLMJudgeFallback:
         """Test fallback when no API key is configured."""
         from bulletproof_green.evals.llm_judge import LLMJudge
 
-        with patch("bulletproof_green.settings.settings.openai_api_key", None):
+        with patch("bulletproof_green.settings.settings.llm.api_key", None):
             judge = LLMJudge()
 
             result = await judge.hybrid_score(narrative="Test", rule_score=0.8)

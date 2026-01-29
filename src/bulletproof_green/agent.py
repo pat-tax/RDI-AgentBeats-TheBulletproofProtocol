@@ -32,11 +32,8 @@ def get_agent_card(base_url: str | None = None) -> AgentCard:
         Configured AgentCard with narrative evaluation capability.
     """
     if base_url is None:
-        # Use env var if set, otherwise construct from host:port
-        if settings.agent_card_url:
-            base_url = settings.agent_card_url
-        else:
-            base_url = f"http://{settings.host}:{settings.port}"
+        # Use settings method for URL construction (DRY)
+        base_url = settings.get_card_url()
 
     return AgentCard(
         name="Bulletproof Green Agent",

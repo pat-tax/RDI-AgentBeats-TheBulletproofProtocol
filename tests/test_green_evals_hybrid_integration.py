@@ -65,7 +65,7 @@ class TestHybridScoringIntegration:
         mock_client.chat.completions.create = mock_create
 
         # Patch settings to provide API key (avoids caching issues with os.environ)
-        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
+        with patch("bulletproof_green.settings.settings.llm.api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
@@ -99,7 +99,7 @@ class TestHybridScoringIntegration:
     async def test_server_falls_back_to_rule_only_when_llm_unavailable(self):
         """Test server falls back to rule-only scoring when LLM unavailable."""
         # Ensure no API key via settings
-        with patch("bulletproof_green.settings.settings.openai_api_key", None):
+        with patch("bulletproof_green.settings.settings.llm.api_key", None):
             app = create_app()
             async with AsyncClient(
                 transport=ASGITransport(app=app), base_url="http://test"
@@ -141,7 +141,7 @@ class TestHybridScoringIntegration:
         mock_client.chat.completions = MagicMock()
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
-        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
+        with patch("bulletproof_green.settings.settings.llm.api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
@@ -215,7 +215,7 @@ class TestHybridScoringIntegration:
         mock_client.chat.completions = MagicMock()
         mock_client.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
 
-        with patch("bulletproof_green.settings.settings.openai_api_key", "test-key"):
+        with patch("bulletproof_green.settings.settings.llm.api_key", "test-key"):
             with patch("openai.AsyncOpenAI", return_value=mock_client):
                 app = create_app()
                 async with AsyncClient(
