@@ -4,8 +4,8 @@
 # purple agent (assessee) locally for integration testing.
 #
 # Port Configuration (SOURCE OF TRUTH - settings.py must align to this):
-#   Purple: host 8002 → container 9010
-#   Green:  host 8001 → container 9009
+#   Purple: host 9010 → container 9010
+#   Green:  host 9009 → container 9009
 #
 # Usage:
 #   docker-compose -f docker-compose-local.yml up -d    # Start both agents
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.purple
     platform: linux/amd64
     ports:
-      - "8002:9010"
+      - "9010:9010"
     environment:
       - HOST=0.0.0.0
       - PORT=9010
@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile.green
     platform: linux/amd64
     ports:
-      - "8001:9009"
+      - "9009:9009"
     environment:
       - HOST=0.0.0.0
       - PORT=9009

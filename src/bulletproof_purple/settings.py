@@ -32,7 +32,7 @@ class PurpleSettings(BaseSettings):
     )
 
     # Server settings (aligned with docker-compose-local.yml)
-    port: int = 9010  # Container port (host: 8002)
+    port: int = 9010  # Container port (host: 9010)
     host: str = "0.0.0.0"
     timeout: int = 300
 
