@@ -1,9 +1,9 @@
-"""Tests for docker-compose.yml (STORY-011).
+"""Tests for docker-compose-local.yml (STORY-011).
 
 This test module validates the acceptance criteria for STORY-011:
 - Defines both purple and green services
 - Agents can reach each other via service name
-- Port mapping: 8001 (purple), 8002 (green) to host
+- Port mapping: 9010 (purple), 9009 (green) to host
 - Environment variables for configuration
 - Passes docker-compose up local test
 - Clean state on each run
@@ -14,30 +14,42 @@ from typing import Any
 
 import yaml
 
-# Define path to docker-compose.yml
+# Define path to docker-compose file
 PROJECT_ROOT = Path(__file__).parent.parent
-DOCKER_COMPOSE_FILE = PROJECT_ROOT / "docker-compose.yml"
+DOCKER_COMPOSE_FILE = PROJECT_ROOT / "docker-compose-local.yml"
+
+# Import settings to get correct ports
+try:
+    from bulletproof_green.settings import settings as green_settings
+    from bulletproof_purple.settings import settings as purple_settings
+
+    PURPLE_PORT = purple_settings.port
+    GREEN_PORT = green_settings.port
+except ImportError:
+    # Fallback if settings cannot be imported
+    PURPLE_PORT = 9010
+    GREEN_PORT = 9009
 
 
 class TestDockerComposeValidYaml:
-    """Test that docker-compose.yml is valid YAML."""
+    """Test that docker-compose-local.yml is valid YAML."""
 
     def test_is_valid_yaml(self) -> None:
-        """Test docker-compose.yml is valid YAML syntax."""
-        assert DOCKER_COMPOSE_FILE.exists(), "docker-compose.yml must exist first"
+        """Test docker-compose-local.yml is valid YAML syntax."""
+        assert DOCKER_COMPOSE_FILE.exists(), "docker-compose-local.yml must exist first"
         content = DOCKER_COMPOSE_FILE.read_text()
         # Should parse without error
         data = yaml.safe_load(content)
-        assert data is not None, "docker-compose.yml must contain valid YAML"
-        assert isinstance(data, dict), "docker-compose.yml must be a YAML mapping"
+        assert data is not None, "docker-compose-local.yml must contain valid YAML"
+        assert isinstance(data, dict), "docker-compose-local.yml must be a YAML mapping"
 
 
 def _load_compose() -> dict[str, Any]:
-    """Load and return docker-compose.yml as a dict."""
+    """Load and return docker-compose-local.yml as a dict."""
     content = DOCKER_COMPOSE_FILE.read_text()
     data = yaml.safe_load(content)
     if not isinstance(data, dict):
-        raise TypeError("docker-compose.yml must be a YAML mapping")
+        raise TypeError("docker-compose-local.yml must be a YAML mapping")
     return data
 
 
@@ -92,23 +104,23 @@ class TestPortMappings:
     """Test port mappings for host access."""
 
     def test_purple_port_mapping_8001(self) -> None:
-        """Test purple service maps to host port 8001."""
+        """Test purple service maps to host port matching settings."""
         compose = _load_compose()
         purple = compose.get("services", {}).get("purple", {})
         ports = purple.get("ports", [])
-        # Ports can be strings like "8001:8000" or dicts
+        # Ports can be strings like "9010:9010" or dicts
         port_mappings = [str(p) for p in ports]
-        has_8001_mapping = any("8001" in pm for pm in port_mappings)
-        assert has_8001_mapping, "purple service must map to host port 8001"
+        has_port_mapping = any(str(PURPLE_PORT) in pm for pm in port_mappings)
+        assert has_port_mapping, f"purple service must map to host port {PURPLE_PORT}"
 
     def test_green_port_mapping_8002(self) -> None:
-        """Test green service maps to host port 8002."""
+        """Test green service maps to host port matching settings."""
         compose = _load_compose()
         green = compose.get("services", {}).get("green", {})
         ports = green.get("ports", [])
         port_mappings = [str(p) for p in ports]
-        has_8002_mapping = any("8002" in pm for pm in port_mappings)
-        assert has_8002_mapping, "green service must map to host port 8002"
+        has_port_mapping = any(str(GREEN_PORT) in pm for pm in port_mappings)
+        assert has_port_mapping, f"green service must map to host port {GREEN_PORT}"
 
 
 class TestInterServiceCommunication:
@@ -175,7 +187,7 @@ class TestEnvironmentVariables:
         assert has_env, "green service should have environment configuration"
 
     def test_no_hardcoded_secrets(self) -> None:
-        """Test no hardcoded secrets in docker-compose.yml."""
+        """Test no hardcoded secrets in docker-compose-local.yml."""
         content = DOCKER_COMPOSE_FILE.read_text().lower()
         # Check for common secret value patterns (not env var references)
         # API keys typically look like long alphanumeric strings
@@ -212,10 +224,10 @@ class TestCleanStateOnRun:
 
 
 class TestDockerComposeVersion:
-    """Test docker-compose.yml version compatibility."""
+    """Test docker-compose-local.yml version compatibility."""
 
     def test_uses_modern_compose_format(self) -> None:
-        """Test docker-compose.yml uses modern format (version 3.x or no version).
+        """Test docker-compose-local.yml uses modern format (version 3.x or no version).
 
         Modern docker-compose (v2+) doesn't require the 'version' key.
         If specified, should be 3.x for compatibility.

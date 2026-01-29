@@ -3,7 +3,7 @@
 This test module validates the acceptance criteria for STORY-010:
 - Platform: linux/amd64
 - Base: Python 3.13-slim
-- Exposes port 8000
+- Exposes correct port from settings.py
 - ENTRYPOINT with --host, --port arguments
 - No hardcoded secrets (env vars only)
 - Multi-stage build for smaller images
@@ -19,6 +19,18 @@ PROJECT_ROOT = Path(__file__).parent.parent
 DOCKERFILE_PURPLE = PROJECT_ROOT / "Dockerfile.purple"
 DOCKERFILE_GREEN = PROJECT_ROOT / "Dockerfile.green"
 
+# Import settings to get correct ports
+try:
+    from bulletproof_green.settings import settings as green_settings
+    from bulletproof_purple.settings import settings as purple_settings
+
+    PURPLE_PORT = purple_settings.port
+    GREEN_PORT = green_settings.port
+except ImportError:
+    # Fallback if settings cannot be imported
+    PURPLE_PORT = 9010
+    GREEN_PORT = 9009
+
 
 class TestDockerfilePurple:
     """Test Dockerfile.purple meets all acceptance criteria."""
@@ -32,9 +44,9 @@ class TestDockerfilePurple:
         )
 
     def test_exposes_port_8000(self):
-        """Test Dockerfile exposes port 8000."""
+        """Test Dockerfile exposes correct port from settings."""
         content = DOCKERFILE_PURPLE.read_text()
-        assert re.search(r"EXPOSE\s+8000", content), "Must expose port 8000"
+        assert re.search(rf"EXPOSE\s+{PURPLE_PORT}", content), f"Must expose port {PURPLE_PORT}"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""
@@ -117,9 +129,9 @@ class TestDockerfileGreen:
         )
 
     def test_exposes_port_8000(self):
-        """Test Dockerfile exposes port 8000."""
+        """Test Dockerfile exposes correct port from settings."""
         content = DOCKERFILE_GREEN.read_text()
-        assert re.search(r"EXPOSE\s+8000", content), "Must expose port 8000"
+        assert re.search(rf"EXPOSE\s+{GREEN_PORT}", content), f"Must expose port {GREEN_PORT}"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""
