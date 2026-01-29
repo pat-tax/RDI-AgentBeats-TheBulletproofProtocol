@@ -2,7 +2,8 @@
 
 This module validates the acceptance criteria for STORY-024:
 - Business risk detector: market, revenue, customers, sales, ROI, profit keywords
-- Specificity detector: failure citations (dates, error codes, metrics), hypothesis-test-failure-iteration patterns
+- Specificity detector: failure citations (dates, error codes, metrics),
+  hypothesis-test-failure-iteration patterns
 - Integrated into evaluator scoring pipeline
 - Returns detection counts for diagnostics
 - Modular detector architecture
@@ -37,8 +38,7 @@ class TestBusinessRiskDetector:
 
         # Should have business risk issues in redline
         business_issues = [
-            issue for issue in result.redline.issues
-            if issue.category == "business_risk"
+            issue for issue in result.redline.issues if issue.category == "business_risk"
         ]
         assert len(business_issues) > 0
 
@@ -147,7 +147,10 @@ class TestSpecificityDetector:
         # Specific narrative should have better specificity score
         assert specific_result.specificity_score > vague_result.specificity_score
         # Specific narrative should have lower specificity penalty
-        assert specific_result.component_scores["specificity_penalty"] < vague_result.component_scores["specificity_penalty"]
+        assert (
+            specific_result.component_scores["specificity_penalty"]
+            < vague_result.component_scores["specificity_penalty"]
+        )
 
 
 class TestDetectorIntegration:
@@ -304,8 +307,12 @@ class TestModularDetectorArchitecture:
         routine_issues_many: list = []
         business_issues_many: list = []
 
-        routine_penalty_many, _ = evaluator._detect_routine_engineering(many_routine, routine_issues_many)
-        business_penalty_many, _ = evaluator._detect_business_risk(many_business, business_issues_many)
+        routine_penalty_many, _ = evaluator._detect_routine_engineering(
+            many_routine, routine_issues_many
+        )
+        business_penalty_many, _ = evaluator._detect_business_risk(
+            many_business, business_issues_many
+        )
 
         # Penalties should be capped
         assert routine_penalty_many <= max_routine

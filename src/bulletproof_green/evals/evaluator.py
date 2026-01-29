@@ -7,7 +7,7 @@ detection of disqualifying patterns.
 import re
 import time
 
-from bulletproof_green.models import EvaluationResult, Issue, Redline
+from bulletproof_green.evals.models import EvaluationResult, Issue, Redline
 
 
 class RuleBasedEvaluator:
