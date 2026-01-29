@@ -3,7 +3,7 @@
 # This configuration runs both the green agent (assessor) and
 # purple agent (assessee) locally for integration testing.
 #
-# Port Configuration (SOURCE OF TRUTH - settings.py must align to this):
+# Port Configuration (aligns with settings.py defaults):
 #   Purple: host 9010 → container 9010
 #   Green:  host 9009 → container 9009
 #

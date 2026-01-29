@@ -24,12 +24,12 @@ try:
     from bulletproof_green.settings import settings as green_settings
     from bulletproof_purple.settings import settings as purple_settings
 
-    PURPLE_PORT = purple_settings.port
-    GREEN_PORT = green_settings.port
+    purple_port = purple_settings.port
+    green_port = green_settings.port
 except ImportError:
     # Fallback if settings cannot be imported
-    PURPLE_PORT = 9010
-    GREEN_PORT = 9009
+    purple_port = 9010
+    green_port = 9009
 
 
 class TestDockerfilePurple:
@@ -43,10 +43,10 @@ class TestDockerfilePurple:
             "Must use python:3.13-slim base image"
         )
 
-    def test_exposes_port_8000(self):
+    def test_exposes_correct_port(self):
         """Test Dockerfile exposes correct port from settings."""
         content = DOCKERFILE_PURPLE.read_text()
-        assert re.search(rf"EXPOSE\s+{PURPLE_PORT}", content), f"Must expose port {PURPLE_PORT}"
+        assert re.search(rf"EXPOSE\s+{purple_port}", content), f"Must expose port {purple_port}"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""
@@ -128,10 +128,10 @@ class TestDockerfileGreen:
             "Must use python:3.13-slim base image"
         )
 
-    def test_exposes_port_8000(self):
+    def test_exposes_correct_port(self):
         """Test Dockerfile exposes correct port from settings."""
         content = DOCKERFILE_GREEN.read_text()
-        assert re.search(rf"EXPOSE\s+{GREEN_PORT}", content), f"Must expose port {GREEN_PORT}"
+        assert re.search(rf"EXPOSE\s+{green_port}", content), f"Must expose port {green_port}"
 
     def test_has_entrypoint(self):
         """Test Dockerfile has ENTRYPOINT defined."""

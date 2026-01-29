@@ -23,12 +23,12 @@ try:
     from bulletproof_green.settings import settings as green_settings
     from bulletproof_purple.settings import settings as purple_settings
 
-    PURPLE_PORT = purple_settings.port
-    GREEN_PORT = green_settings.port
+    purple_port = purple_settings.port
+    green_port = green_settings.port
 except ImportError:
     # Fallback if settings cannot be imported
-    PURPLE_PORT = 9010
-    GREEN_PORT = 9009
+    purple_port = 9010
+    green_port = 9009
 
 
 class TestDockerComposeValidYaml:
@@ -110,8 +110,8 @@ class TestPortMappings:
         ports = purple.get("ports", [])
         # Ports can be strings like "9010:9010" or dicts
         port_mappings = [str(p) for p in ports]
-        has_port_mapping = any(str(PURPLE_PORT) in pm for pm in port_mappings)
-        assert has_port_mapping, f"purple service must map to host port {PURPLE_PORT}"
+        has_port_mapping = any(str(purple_port) in pm for pm in port_mappings)
+        assert has_port_mapping, f"purple service must map to host port {purple_port}"
 
     def test_green_port_mapping_8002(self) -> None:
         """Test green service maps to host port matching settings."""
@@ -119,8 +119,8 @@ class TestPortMappings:
         green = compose.get("services", {}).get("green", {})
         ports = green.get("ports", [])
         port_mappings = [str(p) for p in ports]
-        has_port_mapping = any(str(GREEN_PORT) in pm for pm in port_mappings)
-        assert has_port_mapping, f"green service must map to host port {GREEN_PORT}"
+        has_port_mapping = any(str(green_port) in pm for pm in port_mappings)
+        assert has_port_mapping, f"green service must map to host port {green_port}"
 
 
 class TestInterServiceCommunication:
