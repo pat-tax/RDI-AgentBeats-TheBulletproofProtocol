@@ -21,7 +21,7 @@ class PurpleSettings(BaseSettings):
     """Purple Agent configuration settings.
 
     All settings can be overridden via environment variables with PURPLE_ prefix.
-    For example, PURPLE_PORT=9001 will set port to 9001.
+    For example, PURPLE_PORT=9010 will set port to 9010.
     """
 
     model_config = SettingsConfigDict(
@@ -31,8 +31,8 @@ class PurpleSettings(BaseSettings):
         extra="ignore",
     )
 
-    # Server settings
-    port: int = 8001
+    # Server settings (aligned with docker-compose-local.yml)
+    port: int = 9010  # Container port (host: 8002)
     host: str = "0.0.0.0"
     timeout: int = 300
 

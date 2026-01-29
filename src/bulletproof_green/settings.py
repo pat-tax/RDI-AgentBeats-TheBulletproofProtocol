@@ -31,14 +31,14 @@ class GreenSettings(BaseSettings):
         extra="ignore",
     )
 
-    # Server settings
-    port: int = 8000
+    # Server settings (aligned with docker-compose-local.yml)
+    port: int = 9009  # Container port (host: 8001)
     host: str = "0.0.0.0"
     timeout: int = 300
     agent_card_url: str | None = None  # If None, defaults to http://{host}:{port}
 
-    # Purple Agent connection
-    purple_agent_url: str = "http://localhost:8001"
+    # Purple Agent connection (aligned with docker-compose-local.yml)
+    purple_agent_url: str = "http://localhost:9010"  # Purple host port
 
     # Agent card settings
     agent_card_timeout: int = 30
