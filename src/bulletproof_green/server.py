@@ -28,10 +28,10 @@ from a2a.types import (
 from a2a.utils import new_agent_parts_message, new_task
 
 from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
-from bulletproof_green.evaluator import RuleBasedEvaluator
-from bulletproof_green.llm_judge import LLMJudge
-from bulletproof_green.models import GreenAgentOutput
-from bulletproof_green.scorer import AgentBeatsScorer
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.llm_judge import LLMJudge
+from bulletproof_green.evals.models import GreenAgentOutput
+from bulletproof_green.evals.scorer import AgentBeatsScorer
 from bulletproof_green.settings import settings
 
 if TYPE_CHECKING:

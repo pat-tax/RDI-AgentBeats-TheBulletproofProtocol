@@ -10,7 +10,7 @@ from typing import Any
 
 import httpx
 
-from bulletproof_green.models import NarrativeRequest, NarrativeResponse
+from bulletproof_green.evals.models import NarrativeRequest, NarrativeResponse
 from bulletproof_green.settings import settings
 
 

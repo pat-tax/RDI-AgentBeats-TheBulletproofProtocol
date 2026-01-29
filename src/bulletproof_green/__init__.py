@@ -1,6 +1,6 @@
 """Green Agent - IRS Section 41 narrative evaluator."""
 
-from bulletproof_green import a2a_client, agent_card, arena_executor, llm_judge, messenger
+from bulletproof_green import a2a_client, agent_card, arena_executor, evals, messenger
 from bulletproof_green.a2a_client import A2AClient, A2AClientError
 from bulletproof_green.agent_card import (
     AGENT_CARD_SCHEMA,
@@ -17,55 +17,46 @@ from bulletproof_green.arena_executor import (
     ArenaResult,
     IterationRecord,
 )
-from bulletproof_green.evaluator import RuleBasedEvaluator
-from bulletproof_green.llm_judge import LLMJudge
-from bulletproof_green.messenger import (
-    Messenger,
-    MessengerError,
-    create_message,
-    send_message,
-)
-from bulletproof_green.models import (
+from bulletproof_green.evals import (
+    AgentBeatsScorer,
     EvaluationResult,
     HybridScoreResult,
     Issue,
+    LLMJudge,
     LLMJudgeConfig,
     LLMScoreResult,
     NarrativeRequest,
     NarrativeResponse,
     Redline,
+    RuleBasedEvaluator,
     ScoreResult,
 )
-from bulletproof_green.scorer import AgentBeatsScorer
 
 __all__ = [
+    # Evaluation domain
     "RuleBasedEvaluator",
+    "AgentBeatsScorer",
+    "LLMJudge",
     "EvaluationResult",
+    "ScoreResult",
     "Issue",
     "Redline",
-    "AgentBeatsScorer",
-    "ScoreResult",
-    "A2AClient",
-    "A2AClientError",
     "NarrativeRequest",
     "NarrativeResponse",
+    "LLMJudgeConfig",
+    "LLMScoreResult",
+    "HybridScoreResult",
+    "evals",
+    # A2A protocol
+    "A2AClient",
+    "A2AClientError",
     "a2a_client",
     "agent_card",
-    "arena_executor",
-    "llm_judge",
-    "messenger",
     "Messenger",
     "MessengerError",
     "create_message",
     "send_message",
-    "ArenaExecutor",
-    "ArenaConfig",
-    "ArenaResult",
-    "IterationRecord",
-    "LLMJudge",
-    "LLMJudgeConfig",
-    "LLMScoreResult",
-    "HybridScoreResult",
+    "messenger",
     "create_agent_card",
     "validate_agent_card",
     "discover_agent",
@@ -73,4 +64,10 @@ __all__ = [
     "AgentCardDiscoveryError",
     "AgentCardValidationError",
     "AGENT_CARD_SCHEMA",
+    # Arena mode
+    "ArenaExecutor",
+    "ArenaConfig",
+    "ArenaResult",
+    "IterationRecord",
+    "arena_executor",
 ]

@@ -4,7 +4,7 @@ Converts rule-based evaluation results into AgentBeats compatible scores
 in the 0.0-1.0 scale.
 """
 
-from bulletproof_green.models import EvaluationResult, ScoreResult
+from bulletproof_green.evals.models import EvaluationResult, ScoreResult
 
 
 class AgentBeatsScorer:

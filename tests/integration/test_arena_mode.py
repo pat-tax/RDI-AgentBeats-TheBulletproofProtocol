@@ -18,7 +18,7 @@ Tests verify that:
 
 from __future__ import annotations
 
-from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
 
 
 class TestBusinessRiskDetector:

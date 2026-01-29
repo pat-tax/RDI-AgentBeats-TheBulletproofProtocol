@@ -18,14 +18,14 @@ class TestLLMJudgeConstruction:
 
     def test_judge_accepts_api_key(self):
         """Test judge accepts OpenAI API key."""
-        from bulletproof_green.llm_judge import LLMJudge
+        from bulletproof_green.evals.llm_judge import LLMJudge
 
         judge = LLMJudge(api_key="test-key")
         assert judge._api_key == "test-key"
 
     def test_judge_reads_api_key_from_settings(self):
         """Test judge reads API key from settings."""
-        from bulletproof_green.llm_judge import LLMJudge
+        from bulletproof_green.evals.llm_judge import LLMJudge
 
         with patch("bulletproof_green.settings.settings.openai_api_key", "settings-key"):
             judge = LLMJudge()
@@ -38,7 +38,7 @@ class TestLLMJudgeHybridScore:
     @pytest.mark.asyncio
     async def test_hybrid_score_formula(self):
         """Test hybrid_score applies formula: final = α*rule + β*llm."""
-        from bulletproof_green.llm_judge import LLMJudge, LLMJudgeConfig
+        from bulletproof_green.evals.llm_judge import LLMJudge, LLMJudgeConfig
 
         config = LLMJudgeConfig(alpha=0.7, beta=0.3)
         judge = LLMJudge(config=config, api_key="test-key")
@@ -62,7 +62,7 @@ class TestLLMJudgeFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_llm_error(self):
         """Test fallback to rule-only score when LLM fails."""
-        from bulletproof_green.llm_judge import LLMJudge
+        from bulletproof_green.evals.llm_judge import LLMJudge
 
         judge = LLMJudge(api_key="test-key")
 
@@ -78,7 +78,7 @@ class TestLLMJudgeFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_missing_api_key(self):
         """Test fallback when no API key is configured."""
-        from bulletproof_green.llm_judge import LLMJudge
+        from bulletproof_green.evals.llm_judge import LLMJudge
 
         with patch("bulletproof_green.settings.settings.openai_api_key", None):
             judge = LLMJudge()
@@ -94,7 +94,7 @@ class TestLLMJudgeOpenAIIntegration:
 
     def test_prompt_includes_evaluation_criteria(self):
         """Test LLM prompt includes IRS Section 41 evaluation criteria."""
-        from bulletproof_green.llm_judge import LLMJudge
+        from bulletproof_green.evals.llm_judge import LLMJudge
 
         judge = LLMJudge(api_key="test-key")
         system_prompt = judge._get_system_prompt()

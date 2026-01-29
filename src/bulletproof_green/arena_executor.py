@@ -10,8 +10,9 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Any
 
-from bulletproof_green.a2a_client import A2AClient, NarrativeRequest
-from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.a2a_client import A2AClient
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.models import NarrativeRequest
 
 
 def _get_arena_max_iterations() -> int:

@@ -11,7 +11,7 @@ Validates core behavior:
 import json
 import uuid
 
-from bulletproof_green.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
 
 
 class TestCompleteOutputSchema:

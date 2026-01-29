@@ -10,8 +10,8 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from bulletproof_green.evaluator import RuleBasedEvaluator
-from bulletproof_green.scorer import AgentBeatsScorer
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.scorer import AgentBeatsScorer
 
 
 # TODO(review): New model consolidates ground truth entry defaults (DRY principle)
