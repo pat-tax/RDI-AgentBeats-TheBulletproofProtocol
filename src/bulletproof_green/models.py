@@ -232,3 +232,5 @@ class GreenAgentOutput(BaseModel):
     risk_category: str
     confidence: float
     redline: dict[str, Any]
+    # Optional metadata for debugging and compliance
+    metadata: dict[str, Any] | None = None

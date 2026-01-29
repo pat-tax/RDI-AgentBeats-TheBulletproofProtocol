@@ -38,15 +38,24 @@ if TYPE_CHECKING:
     from a2a.server.context import ServerCallContext
 
 
-def get_agent_card(base_url: str = "http://localhost:8000") -> AgentCard:
+def get_agent_card(base_url: str | None = None) -> AgentCard:
     """Create the AgentCard for Green Agent.
 
     Args:
-        base_url: Base URL where the agent is hosted.
+        base_url: Base URL where the agent is hosted. If None, uses
+                 GREEN_AGENT_CARD_URL env var or falls back to
+                 http://{host}:{port} from settings.
 
     Returns:
         Configured AgentCard with narrative evaluation capability.
     """
+    if base_url is None:
+        # Use env var if set, otherwise construct from host:port
+        if settings.agent_card_url:
+            base_url = settings.agent_card_url
+        else:
+            base_url = f"http://{settings.host}:{settings.port}"
+
     return AgentCard(
         name="Bulletproof Green Agent",
         description="IRS Section 41 R&D tax credit narrative evaluator. "
@@ -292,6 +301,12 @@ class GreenAgentExecutor:
                 "risk_category": eval_result.risk_category,
                 "confidence": eval_result.confidence,
                 "redline": eval_result.redline.model_dump(),
+                # Metadata for debugging and compliance
+                "metadata": {
+                    "evaluation_time_ms": eval_result.evaluation_time_ms,
+                    "rules_version": eval_result.rules_version,
+                    "irs_citations": eval_result.irs_citations,
+                },
             }
         )
 

@@ -118,15 +118,16 @@ parser.add_argument("--port", default=9009)
 parser.add_argument("--card-url", help="URL to advertise in agent card")
 ```
 
-**Ours**: Relies on uvicorn CLI via Dockerfile ENTRYPOINT. No `--card-url` support.
+**Ours**: Environment variable based configuration via pydantic-settings.
 
 | Argument | Template | Ours |
 |----------|----------|------|
-| `--host` | argparse | uvicorn CLI ✓ |
-| `--port` | argparse | uvicorn CLI ✓ |
-| `--card-url` | argparse | **Missing** |
+| `--host` | argparse | `GREEN_HOST` env var ✓ |
+| `--port` | argparse | `GREEN_PORT` env var ✓ |
+| `--card-url` | argparse | `GREEN_AGENT_CARD_URL` env var ✅ |
 
 **Impact**: `--card-url` is needed when external URL differs from internal (load balancers, proxies).
+**Status**: Implemented via `GREEN_AGENT_CARD_URL` environment variable.
 
 ---
 
@@ -136,9 +137,9 @@ Missing optional metadata fields (not blocking):
 
 | Field | Purpose | Status |
 |-------|---------|--------|
-| `metadata.evaluation_time_ms` | Performance tracking | Missing |
-| `metadata.rules_version` | Reproducibility | Missing |
-| `metadata.irs_citations` | Legal grounding | Missing |
+| `metadata.evaluation_time_ms` | Performance tracking | ✅ DONE |
+| `metadata.rules_version` | Reproducibility | ✅ DONE |
+| `metadata.irs_citations` | Legal grounding | ✅ DONE |
 
 ---
 
@@ -234,8 +235,8 @@ src/bulletproof_green/
 
 | # | Action | Priority | Effort | Status |
 |---|--------|----------|--------|--------|
-| 1 | Add `AGENT_CARD_URL` env var | P2 | 15 min | TODO |
-| 2 | Add metadata to response | P3 | 15 min | TODO |
+| 1 | Add `AGENT_CARD_URL` env var | P2 | 15 min | ✅ DONE |
+| 2 | Add metadata to response | P3 | 15 min | ✅ DONE |
 | 3 | Modular refactor | P2 | 2 hours | DEFERRED |
 
 **Total estimated effort for P2+P3 fixes**: ~30 minutes

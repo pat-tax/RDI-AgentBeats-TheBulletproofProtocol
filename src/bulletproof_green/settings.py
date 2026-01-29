@@ -35,6 +35,7 @@ class GreenSettings(BaseSettings):
     port: int = 8000
     host: str = "0.0.0.0"
     timeout: int = 300
+    agent_card_url: str | None = None  # If None, defaults to http://{host}:{port}
 
     # Purple Agent connection
     purple_agent_url: str = "http://localhost:8001"
