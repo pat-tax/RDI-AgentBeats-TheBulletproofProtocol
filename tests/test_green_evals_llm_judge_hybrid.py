@@ -108,7 +108,7 @@ class TestRuleBasedRemainsUnchanged:
 
     def test_rule_evaluator_deterministic(self):
         """Test RuleBasedEvaluator produces deterministic results."""
-        from bulletproof_green.evaluator import RuleBasedEvaluator
+        from bulletproof_green.evals.evaluator import RuleBasedEvaluator
 
         evaluator = RuleBasedEvaluator()
         narrative = "The team performed routine maintenance."
