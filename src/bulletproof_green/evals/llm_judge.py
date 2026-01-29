@@ -12,7 +12,7 @@ import json
 import logging
 from typing import Any
 
-from bulletproof_green.evals.models import HybridScoreResult, LLMJudgeConfig, LLMScoreResult
+from bulletproof_green.models import HybridScoreResult, LLMJudgeConfig, LLMScoreResult
 from bulletproof_green.settings import settings
 
 logger = logging.getLogger(__name__)

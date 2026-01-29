@@ -10,9 +10,9 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Any
 
-from bulletproof_green.a2a_client import A2AClient
 from bulletproof_green.evals.evaluator import RuleBasedEvaluator
-from bulletproof_green.evals.models import NarrativeRequest
+from bulletproof_green.messenger import Messenger
+from bulletproof_green.models import NarrativeResponse
 
 
 def _get_arena_max_iterations() -> int:
@@ -108,7 +108,7 @@ class ArenaExecutor:
         """
         self.purple_agent_url = purple_agent_url
         self.config = config if config is not None else ArenaConfig()
-        self._a2a_client = A2AClient(base_url=purple_agent_url)
+        self._messenger = Messenger(base_url=purple_agent_url)
         self._evaluator = RuleBasedEvaluator()
 
     async def run(self, initial_context: str) -> ArenaResult:
@@ -205,18 +205,23 @@ class ArenaExecutor:
 
         Returns:
             Generated narrative text.
+
+        Raises:
+            MessengerError: If Purple Agent call fails.
         """
         # Build context with critique if provided
         full_context = context
         if critique:
             full_context = f"{context}\n\nCritique from previous iteration:\n{critique}"
 
-        request = NarrativeRequest(
-            template_type="qualifying",
-            context=full_context,
+        # Send message to Purple Agent using messenger
+        response_data = await self._messenger.send(
+            text=full_context,
+            data={"template_type": "qualifying"},
         )
 
-        response = await self._a2a_client.send_request(request)
+        # Validate response with Pydantic model
+        response = NarrativeResponse.model_validate(response_data)
         return response.narrative
 
     def _evaluate_narrative(self, narrative: str) -> tuple[int, dict[str, Any]]:

@@ -1,17 +1,15 @@
 """Green Agent - IRS Section 41 narrative evaluator."""
 
-from bulletproof_green import a2a_client, agent_card, arena_executor, evals, executor, messenger
-from bulletproof_green.a2a_client import A2AClient, A2AClientError
-from bulletproof_green.agent_card import (
-    AGENT_CARD_SCHEMA,
-    AgentCardCache,
-    AgentCardDiscoveryError,
-    AgentCardValidationError,
-    create_agent_card,
-    discover_agent,
-    validate_agent_card,
+from bulletproof_green import (
+    agent,
+    arena,
+    evals,
+    executor,
+    messenger,
+    models,
 )
-from bulletproof_green.arena_executor import (
+from bulletproof_green.agent import get_agent_card
+from bulletproof_green.arena import (
     ArenaConfig,
     ArenaExecutor,
     ArenaResult,
@@ -20,6 +18,7 @@ from bulletproof_green.arena_executor import (
 from bulletproof_green.evals import (
     AgentBeatsScorer,
     EvaluationResult,
+    GreenAgentOutput,
     HybridScoreResult,
     Issue,
     LLMJudge,
@@ -39,6 +38,8 @@ __all__ = [
     "RuleBasedEvaluator",
     "AgentBeatsScorer",
     "LLMJudge",
+    "evals",
+    # Models
     "EvaluationResult",
     "ScoreResult",
     "Issue",
@@ -48,31 +49,24 @@ __all__ = [
     "LLMJudgeConfig",
     "LLMScoreResult",
     "HybridScoreResult",
-    "evals",
-    # A2A protocol
-    "A2AClient",
-    "A2AClientError",
-    "a2a_client",
-    "agent_card",
+    "GreenAgentOutput",
+    "models",
+    # Messaging
     "Messenger",
     "MessengerError",
     "create_message",
     "send_message",
     "messenger",
-    "create_agent_card",
-    "validate_agent_card",
-    "discover_agent",
-    "AgentCardCache",
-    "AgentCardDiscoveryError",
-    "AgentCardValidationError",
-    "AGENT_CARD_SCHEMA",
     # Arena mode
     "ArenaExecutor",
     "ArenaConfig",
     "ArenaResult",
     "IterationRecord",
-    "arena_executor",
+    "arena",
     # Execution
     "GreenAgentExecutor",
     "executor",
+    # Agent
+    "get_agent_card",
+    "agent",
 ]

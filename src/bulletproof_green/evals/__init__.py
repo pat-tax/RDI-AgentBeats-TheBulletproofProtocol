@@ -2,7 +2,8 @@
 
 from bulletproof_green.evals.evaluator import RuleBasedEvaluator
 from bulletproof_green.evals.llm_judge import LLMJudge
-from bulletproof_green.evals.models import (
+from bulletproof_green.evals.scorer import AgentBeatsScorer
+from bulletproof_green.models import (
     EvaluationResult,
     GreenAgentOutput,
     HybridScoreResult,
@@ -14,7 +15,6 @@ from bulletproof_green.evals.models import (
     Redline,
     ScoreResult,
 )
-from bulletproof_green.evals.scorer import AgentBeatsScorer
 
 __all__ = [
     "RuleBasedEvaluator",

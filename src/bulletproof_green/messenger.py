@@ -1,9 +1,12 @@
-"""A2A messaging utilities for Green Agent to Purple Agent communication.
+"""Green Agent messenger - "How agents talk" (communication layer)
 
-This module provides simple utilities for constructing and sending A2A protocol messages:
-- create_message(): Construct A2A-compliant message structures
-- send_message(): Send HTTP POST requests to purple agents via A2A protocol
-- Messenger: High-level class for agent-to-agent communication
+Responsibilities:
+- A2A messaging utilities (create_message, send_message)
+- Inter-agent communication (Green → Purple, Purple → Green)
+- Session/context management for multi-turn conversations
+
+Pattern: messenger.py = Communication utilities, used by agent.py for A2A
+         protocol messaging
 """
 
 from __future__ import annotations

@@ -1,4 +1,13 @@
-"""Pydantic models for Green Agent A2A server."""
+"""Pydantic models for Green Agent - All data validation.
+
+This module contains all Pydantic models used throughout the Green Agent:
+- Request/Response models (A2A protocol)
+- Evaluation models (rule-based evaluator)
+- Score models (AgentBeats scoring)
+- LLM judge models (hybrid scoring)
+
+All models use model_validate() for incoming data validation from external sources.
+"""
 
 from __future__ import annotations
 
