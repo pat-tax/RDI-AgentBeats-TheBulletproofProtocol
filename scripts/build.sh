@@ -6,10 +6,9 @@
 
 set -e
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Source common utilities (DRY principle)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
 
 echo ""
 echo "Building Docker Images for GHCR"
@@ -20,38 +19,38 @@ echo ""
 GH_USERNAME="${GH_USERNAME:-}"
 
 if [ -z "$GH_USERNAME" ]; then
-  echo "GH_USERNAME not set, using 'local' as default"
+  info "GH_USERNAME not set, using 'local' as default"
   GH_USERNAME="local"
 fi
 
-echo -e "${BLUE}Building for platform:${NC} linux/amd64"
-echo -e "${BLUE}GitHub username:${NC} $GH_USERNAME"
+info "Building for platform: linux/amd64"
+info "GitHub username: $GH_USERNAME"
 echo ""
 
 # Build Green Agent
-echo -e "${GREEN}[1/2] Building Bulletproof Green Agent...${NC}"
+info "[1/2] Building Bulletproof Green Agent..."
 docker build \
   --platform linux/amd64 \
   -f Dockerfile.green \
   -t ghcr.io/${GH_USERNAME}/bulletproof-green:latest \
   .
 
-echo -e "${GREEN}✓ Green agent built successfully${NC}"
+success "Green agent built successfully"
 echo ""
 
 # Build Purple Agent
-echo -e "${GREEN}[2/2] Building Bulletproof Purple Agent...${NC}"
+info "[2/2] Building Bulletproof Purple Agent..."
 docker build \
   --platform linux/amd64 \
   -f Dockerfile.purple \
   -t ghcr.io/${GH_USERNAME}/bulletproof-purple:latest \
   .
 
-echo -e "${GREEN}✓ Purple agent built successfully${NC}"
+success "Purple agent built successfully"
 echo ""
 
 # Display summary
-echo -e "${GREEN}Build Complete!${NC}"
+success "Build Complete!"
 echo ""
 echo "Images built:"
 echo "  - ghcr.io/${GH_USERNAME}/bulletproof-green:latest"

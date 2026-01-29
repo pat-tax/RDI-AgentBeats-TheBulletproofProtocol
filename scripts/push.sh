@@ -15,11 +15,9 @@
 
 set -e
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Source common utilities (DRY principle)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
 
 echo ""
 echo "Pushing Docker Images to GHCR"
@@ -31,7 +29,7 @@ GH_USERNAME="${GH_USERNAME:-}"
 GHCR_PAT="${GHCR_PAT:-}"
 
 if [ -z "$GH_USERNAME" ]; then
-  echo -e "${RED}Error: GH_USERNAME environment variable is not set${NC}"
+  error "GH_USERNAME environment variable is not set"
   echo ""
   echo "Usage:"
   echo "  export GH_USERNAME=<your-github-username>"
@@ -42,7 +40,7 @@ if [ -z "$GH_USERNAME" ]; then
 fi
 
 if [ -z "$GHCR_PAT" ]; then
-  echo -e "${RED}Error: GHCR_PAT environment variable is not set${NC}"
+  error "GHCR_PAT environment variable is not set"
   echo ""
   echo "The GHCR_PAT token is required for GHCR authentication."
   echo ""
@@ -60,33 +58,33 @@ if [ -z "$GHCR_PAT" ]; then
   exit 1
 fi
 
-echo -e "${BLUE}GitHub username:${NC} $GH_USERNAME"
-echo -e "${BLUE}Registry:${NC} ghcr.io"
+info "GitHub username: $GH_USERNAME"
+info "Registry: ghcr.io"
 echo ""
 
 # Authenticate with GHCR
-echo -e "${GREEN}[1/3] Authenticating with GitHub Container Registry...${NC}"
+info "[1/3] Authenticating with GitHub Container Registry..."
 echo "$GHCR_PAT" | docker login ghcr.io -u "$GH_USERNAME" --password-stdin
 
-echo -e "${GREEN}✓ Authentication successful${NC}"
+success "Authentication successful"
 echo ""
 
 # Push Green Agent
-echo -e "${GREEN}[2/3] Pushing Bulletproof Green Agent...${NC}"
+info "[2/3] Pushing Bulletproof Green Agent..."
 docker push ghcr.io/${GH_USERNAME}/bulletproof-green:latest
 
-echo -e "${GREEN}✓ Green agent pushed successfully${NC}"
+success "Green agent pushed successfully"
 echo ""
 
 # Push Purple Agent
-echo -e "${GREEN}[3/3] Pushing Bulletproof Purple Agent...${NC}"
+info "[3/3] Pushing Bulletproof Purple Agent..."
 docker push ghcr.io/${GH_USERNAME}/bulletproof-purple:latest
 
-echo -e "${GREEN}✓ Purple agent pushed successfully${NC}"
+success "Purple agent pushed successfully"
 echo ""
 
 # Display summary
-echo -e "${GREEN}Push Complete!${NC}"
+success "Push Complete!"
 echo ""
 echo "Images pushed to GHCR:"
 echo "  - ghcr.io/${GH_USERNAME}/bulletproof-green:latest"
