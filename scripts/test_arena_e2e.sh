@@ -30,16 +30,17 @@
 # TECHNOLOGY:
 #   - pytest for test execution
 #   - FastAPI TestClient (no HTTP server needed for Green)
-#   - Real Purple agent (must be running at localhost:8001)
+#   - Real Purple agent (auto-started via Docker or manual)
 #   - Configuration from settings.py (not hardcoded)
 #
 # PREREQUISITES:
-#   1. Purple agent running at configured host:port:
-#      cd src && python -m bulletproof_purple.server
-#      (Uses settings from bulletproof_purple.settings)
-#
-#   2. Python environment with dependencies:
+#   1. Python environment with dependencies:
 #      pip install -e .[dev]
+#
+#   2. Purple agent (auto-started by script):
+#      Option A: docker-compose (preferred, automatic)
+#      Option B: Manual - cd src && python -m bulletproof_purple.server
+#      Option C: External - start before running script
 #
 #   3. Optional: OpenAI API key (if Purple uses LLMs)
 #      export OPENAI_API_KEY=your-key
@@ -78,16 +79,21 @@
 #   - Parallelization: Tests run sequentially (pytest -n not recommended)
 #
 # EXAMPLES:
-#   # Standard usage (recommended)
+#   # Standard usage (auto-detects docker-compose)
 #   ./scripts/test_arena_e2e.sh
+#
+#   # Force Docker usage
+#   docker-compose -f docker-compose-local.yml up -d purple
+#   ./scripts/test_arena_e2e.sh
+#
+#   # Force manual usage (no Docker)
+#   cd src && python -m bulletproof_purple.server &
+#   cd .. && ./scripts/test_arena_e2e.sh
 #
 #   # With custom Purple port
 #   PURPLE_PORT=9001 ./scripts/test_arena_e2e.sh
 #
-#   # With custom Purple host and port
-#   PURPLE_HOST=192.168.1.100 PURPLE_PORT=9001 ./scripts/test_arena_e2e.sh
-#
-#   # Run via pytest directly
+#   # Run via pytest directly (requires Purple running)
 #   pytest tests/test_arena_integration.py -v
 #
 #   # Run specific test
@@ -115,8 +121,17 @@ PURPLE_AGENT_URL=${PURPLE_AGENT_URL:-${DEFAULT_PURPLE_URL}}
 TEST_TIMEOUT=300  # 5 minutes total timeout for pytest execution
 PURPLE_STARTUP_WAIT=5  # Seconds to wait for Purple agent to start (if started by script)
 
+# Unified cleanup function
+cleanup() {
+    if [ ! -z "$PURPLE_DOCKER" ]; then
+        cleanup_purple_docker "docker-compose-local.yml"
+    elif [ ! -z "$PURPLE_PID" ]; then
+        cleanup_purple_agent
+    fi
+}
+
 # Set trap to cleanup on exit
-trap cleanup_purple_agent EXIT
+trap cleanup EXIT
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  E2E Integration Test Runner${NC}"
@@ -137,26 +152,38 @@ fi
 # Step 2: Start Purple agent if not already running
 if [ "$EXTERNAL_PURPLE" = false ]; then
     echo ""
-    echo -e "${YELLOW}Starting Purple agent server...${NC}"
 
-    # Start Purple agent in background
-    cd src
-    python -m bulletproof_purple.server &
-    PURPLE_PID=$!
-    cd ..
-
-    success "Purple agent started (PID: $PURPLE_PID)"
-
-    # Wait for Purple agent to be ready
-    info "Waiting ${PURPLE_STARTUP_WAIT}s for Purple agent to start..."
-    sleep $PURPLE_STARTUP_WAIT
-
-    # Verify Purple agent is responding with retries
-    if wait_for_purple_agent "${PURPLE_AGENT_URL}" 10 1; then
-        success "Purple agent ready!"
+    # Prefer docker-compose if available (KISS principle)
+    if is_docker_available; then
+        info "Docker available, using docker-compose..."
+        if start_purple_docker "${PURPLE_AGENT_URL}" "docker-compose-local.yml"; then
+            PURPLE_DOCKER=true
+        else
+            error "Failed to start Purple agent via Docker"
+            exit 1
+        fi
     else
-        error "Purple agent failed to start"
-        exit 1
+        # Fallback to manual startup
+        info "Docker not available, starting Purple agent manually..."
+
+        cd src
+        python -m bulletproof_purple.server &
+        PURPLE_PID=$!
+        cd ..
+
+        success "Purple agent started (PID: $PURPLE_PID)"
+
+        # Wait for Purple agent to be ready
+        info "Waiting ${PURPLE_STARTUP_WAIT}s for Purple agent to start..."
+        sleep $PURPLE_STARTUP_WAIT
+
+        # Verify Purple agent is responding with retries
+        if wait_for_purple_agent "${PURPLE_AGENT_URL}" 10 1; then
+            success "Purple agent ready!"
+        else
+            error "Purple agent failed to start"
+            exit 1
+        fi
     fi
 fi
 

@@ -105,3 +105,46 @@ error() {
 warning() {
     echo -e "${YELLOW}⚠ $1${NC}"
 }
+
+#
+# Docker Compose utilities
+#
+
+# Check if docker-compose is available
+is_docker_available() {
+    command -v docker-compose >/dev/null 2>&1
+}
+
+# Start Purple agent via docker-compose
+# Returns: 0 on success, 1 on failure
+start_purple_docker() {
+    local purple_url="$1"
+    local compose_file="${2:-docker-compose-local.yml}"
+
+    info "Starting Purple agent via docker-compose..."
+    docker-compose -f "$compose_file" up -d purple || return 1
+
+    info "Waiting for Purple agent to be ready..."
+    if wait_for_purple_agent "$purple_url" 20 2; then
+        success "Purple agent ready (Docker)"
+        return 0
+    else
+        error "Purple agent failed to start (Docker)"
+        return 1
+    fi
+}
+
+# Stop Purple agent via docker-compose
+stop_purple_docker() {
+    local compose_file="${1:-docker-compose-local.yml}"
+    info "Stopping Purple agent (Docker)..."
+    docker-compose -f "$compose_file" stop purple
+}
+
+# Cleanup Docker containers
+cleanup_purple_docker() {
+    local compose_file="${1:-docker-compose-local.yml}"
+    if [ ! -z "$PURPLE_DOCKER" ]; then
+        stop_purple_docker "$compose_file"
+    fi
+}
