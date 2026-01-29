@@ -58,8 +58,10 @@ def generate_html(data: dict, stats: dict, output: Path) -> None:
     }
     lang_bars = "".join(
         f'<div class="bar-row"><span class="bar-label">{ext}</span>'
-        f'<div class="bar" style="width:{(size / total_size) * 100}%;background:{colors.get(ext, "#6b7280")}"></div>'
-        f'<span class="bar-pct">{(size / total_size) * 100:.1f}%</span></div>'
+        f'<div class="bar" style="width:{(size / total_size) * 100}%;'
+        f'background:{colors.get(ext, "#6b7280")}"></div>'
+        f'<span class="bar-pct">{(size / total_size) * 100:.1f}%</span>'
+        f'</div>'
         for ext, size in sorted_exts
     )
 
@@ -76,11 +78,14 @@ def generate_html(data: dict, stats: dict, output: Path) -> None:
   <style>
     body {{ font: 14px/1.5 system-ui, sans-serif; margin: 0; background: #1a1a2e; color: #eee; }}
     .container {{ display: flex; height: 100vh; }}
-    .sidebar {{ width: 280px; background: #252542; padding: 20px; border-right: 1px solid #3d3d5c; overflow-y: auto; flex-shrink: 0; }}
+    .sidebar {{ width: 280px; background: #252542; padding: 20px;
+      border-right: 1px solid #3d3d5c; overflow-y: auto;
+      flex-shrink: 0; }}
     .main {{ flex: 1; padding: 20px; overflow-y: auto; }}
     h1 {{ margin: 0 0 10px 0; font-size: 18px; }}
     h2 {{ margin: 20px 0 10px 0; font-size: 14px; color: #888; text-transform: uppercase; }}
-    .stat {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #3d3d5c; }}
+    .stat {{ display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid #3d3d5c; }}
     .stat-value {{ font-weight: bold; }}
     .bar-row {{ display: flex; align-items: center; margin: 6px 0; }}
     .bar-label {{ width: 55px; font-size: 12px; color: #aaa; }}
@@ -100,10 +105,14 @@ def generate_html(data: dict, stats: dict, output: Path) -> None:
   <div class="container">
     <div class="sidebar">
       <h1>📊 Summary</h1>
-      <div class="stat"><span>Files</span><span class="stat-value">{stats["files"]:,}</span></div>
-      <div class="stat"><span>Directories</span><span class="stat-value">{stats["dirs"]:,}</span></div>
-      <div class="stat"><span>Total size</span><span class="stat-value">{fmt(data["size"])}</span></div>
-      <div class="stat"><span>File types</span><span class="stat-value">{len(stats["extensions"])}</span></div>
+      <div class="stat"><span>Files</span>
+        <span class="stat-value">{stats["files"]:,}</span></div>
+      <div class="stat"><span>Directories</span>
+        <span class="stat-value">{stats["dirs"]:,}</span></div>
+      <div class="stat"><span>Total size</span>
+        <span class="stat-value">{fmt(data["size"])}</span></div>
+      <div class="stat"><span>File types</span>
+        <span class="stat-value">{len(stats["extensions"])}</span></div>
       <h2>By file type</h2>
       {lang_bars}
     </div>
@@ -115,20 +124,39 @@ def generate_html(data: dict, stats: dict, output: Path) -> None:
   <script>
     const data = {json.dumps(data)};
     const colors = {json.dumps(colors)};
-    function fmt(b) {{ if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }}
+    function fmt(b) {{
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+      return (b/1048576).toFixed(1) + ' MB';
+    }}
     function render(node, parent) {{
       if (node.children) {{
         const det = document.createElement('details');
         det.open = parent === document.getElementById('root');
-        det.innerHTML = `<summary><span class="folder">📁 ${{node.name}}</span><span class="size">${{fmt(node.size)}}</span></summary>`;
-        const ul = document.createElement('ul'); ul.className = 'tree';
-        node.children.sort((a,b) => (b.children?1:0)-(a.children?1:0) || a.name.localeCompare(b.name));
+        det.innerHTML = (
+          `<summary><span class="folder">📁 ${{node.name}}</span>` +
+          `<span class="size">${{fmt(node.size)}}</span></summary>`
+        );
+        const ul = document.createElement('ul');
+        ul.className = 'tree';
+        node.children.sort((a, b) =>
+          (b.children ? 1 : 0) - (a.children ? 1 : 0) ||
+          a.name.localeCompare(b.name)
+        );
         node.children.forEach(c => render(c, ul));
         det.appendChild(ul);
-        const li = document.createElement('li'); li.appendChild(det); parent.appendChild(li);
+        const li = document.createElement('li');
+        li.appendChild(det);
+        parent.appendChild(li);
       }} else {{
-        const li = document.createElement('li'); li.className = 'file';
-        li.innerHTML = `<span class="dot" style="background:${{colors[node.ext]||'#6b7280'}}"></span>${{node.name}}<span class="size">${{fmt(node.size)}}</span>`;
+        const li = document.createElement('li');
+        li.className = 'file';
+        li.innerHTML = (
+          `<span class="dot" style="background:` +
+          `${{colors[node.ext]||'#6b7280'}}"></span>` +
+          `${{node.name}}<span class="size">` +
+          `${{fmt(node.size)}}</span>`
+        );
         parent.appendChild(li);
       }}
     }}
