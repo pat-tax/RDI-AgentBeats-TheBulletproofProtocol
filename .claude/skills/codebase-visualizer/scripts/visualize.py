@@ -61,7 +61,7 @@ def generate_html(data: dict, stats: dict, output: Path) -> None:
         f'<div class="bar" style="width:{(size / total_size) * 100}%;'
         f'background:{colors.get(ext, "#6b7280")}"></div>'
         f'<span class="bar-pct">{(size / total_size) * 100:.1f}%</span>'
-        f'</div>'
+        f"</div>"
         for ext, size in sorted_exts
     )
 
