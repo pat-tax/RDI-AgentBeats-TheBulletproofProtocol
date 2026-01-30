@@ -118,7 +118,7 @@
 | Principle | Requirement | Bulletproof Protocol Status |
 |-----------|-------------|----------------------------|
 | **Real-world** | Realistic scenarios, not toy problems | ✓ Actual IRS compliance use case |
-| **Difficulty Levels** | Easy/medium/hard tasks | ⚠ **TODO**: Create 3 difficulty tiers |
+| **Difficulty Levels** | Easy/medium/hard tasks | ✓ Defined in PRD Feature 6 & Feature 13 (STORY-029, STORY-030) |
 | **Contamination-Resistant** | Not easily gamed or saturated | ✓ Legal knowledge + technical understanding required |
 | **Not Too Easy** | Requires genuine agentic capabilities | ✓ Must distinguish business vs technical risk |
 | **Baseline Provided** | Reference implementation | ✓ Agent A (purple) serves as baseline |

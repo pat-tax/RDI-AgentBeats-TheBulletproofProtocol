@@ -3,7 +3,7 @@
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
   "scope": "Phase 1 complete (STORY-001 to STORY-021): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
   "source": "docs/PRD.md",
-  "generated": "2026-01-27 19:38:20",
+  "generated": "2026-01-30 22:54:09",
   "stories": [
     {
       "id": "STORY-001",
@@ -564,7 +564,7 @@
     },
     {
       "id": "STORY-026",
-      "title": "Statistical rigor (Cohen's κ, 95% CI)",
+      "title": "Statistical rigor (Cohen's \u03ba, 95% CI)",
       "description": "Integrate LLM judge with rule-based scoring to create hybrid evaluation system",
       "acceptance": [
         "Evaluator uses both rule-based and LLM scoring",
@@ -587,8 +587,8 @@
       "title": "Create held-out test set",
       "description": "Test benchmark with trivial agents (empty response, random text) to establish baseline scores and ensure they score >80 (high risk = failing)",
       "acceptance": [
-        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
-        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
+        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
+        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
         "Held-out test set (separate from training/validation data)",
         "Documented limitations and edge cases",
         "scipy or statsmodels for statistical calculations",
@@ -603,10 +603,10 @@
     {
       "id": "STORY-028",
       "title": "Document benchmark limitations",
-      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's κ)",
+      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's \u03ba)",
       "acceptance": [
-        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
-        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
+        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
+        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
         "Held-out test set (separate from training/validation data)",
         "Documented limitations and edge cases",
         "scipy or statsmodels for statistical calculations",
@@ -811,6 +811,157 @@
       "completed_at": null,
       "content_hash": "b58f726cd8740d8d49799c10467dc0ff0829bc4a76c588d381fcf23b38fe2a65",
       "depends_on": []
+    },
+    {
+      "id": "STORY-039",
+      "title": "Create GreenAgent orchestrator class",
+      "description": "Create GreenAgent class that orchestrates RuleBasedEvaluator, AgentBeatsScorer, and LLMJudge (follows debate_judge pattern per agent.py:66 TODO)",
+      "acceptance": [
+        "GreenAgent class with __init__ method instantiating evaluator, scorer, llm_judge",
+        "run(params: MessageSendParams) -> GreenAgentOutput method",
+        "Coordinates evaluation flow: evaluator -> scorer -> optional LLM judge",
+        "Returns AgentBeats-compatible output schema",
+        "Used by executor.py instead of direct component instantiation"
+      ],
+      "files": [
+        "src/bulletproof_green/agent.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "abc1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": [
+        "STORY-003",
+        "STORY-004"
+      ]
+    },
+    {
+      "id": "STORY-040",
+      "title": "Create routine_engineering_detector.py",
+      "description": "Extract routine engineering detection patterns from evaluator.py into standalone detector module",
+      "acceptance": [
+        "Implements detect(text: str) -> tuple[int, float] interface",
+        "Detects: routine maintenance, debugging, patches, standard procedures, predictable outcomes",
+        "Returns (penalty_points, detection_confidence)",
+        "Independently testable with unit tests",
+        "Maintains backwards compatibility with existing component scores"
+      ],
+      "files": [
+        "src/bulletproof_green/evals/detectors/routine_engineering_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "def1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-041",
+      "title": "Create vagueness_detector.py",
+      "description": "Extract vagueness detection patterns from evaluator.py into standalone detector module",
+      "acceptance": [
+        "Implements detect(text: str) -> tuple[int, float] interface",
+        "Detects: significant, greatly, substantial, better, very successful, much improved",
+        "Returns (penalty_points, detection_confidence)",
+        "Independently testable with unit tests",
+        "Maintains backwards compatibility with existing component scores"
+      ],
+      "files": [
+        "src/bulletproof_green/evals/detectors/vagueness_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "ghi1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-042",
+      "title": "Create experimentation_detector.py",
+      "description": "Extract experimentation evidence detection patterns from evaluator.py into standalone detector module",
+      "acceptance": [
+        "Implements detect(text: str) -> tuple[int, float] interface",
+        "Detects: hypothesis, iteration, failures, alternatives, uncertainty, unsuccessful attempts",
+        "Returns (penalty_points, experimentation_evidence_score)",
+        "Independently testable with unit tests",
+        "Maintains backwards compatibility with existing component scores"
+      ],
+      "files": [
+        "src/bulletproof_green/evals/detectors/experimentation_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "jkl1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-043",
+      "title": "Extract existing detectors from evaluator",
+      "description": "Extract business_risk and specificity detection logic into proper standalone detector modules",
+      "acceptance": [
+        "business_risk_detector.py implements detect() interface",
+        "specificity_detector.py implements detect() interface",
+        "Both detectors independently testable",
+        "Maintains backwards compatibility",
+        "Note: STORY-022 and STORY-023 titles say 'Create business_risk_detector.py' and 'Create specificity_detector.py' but were actually implemented as messenger.py and arena_executor.py"
+      ],
+      "files": [
+        "src/bulletproof_green/evals/detectors/business_risk_detector.py",
+        "src/bulletproof_green/evals/detectors/specificity_detector.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "mno1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": [
+        "STORY-040",
+        "STORY-041",
+        "STORY-042"
+      ]
+    },
+    {
+      "id": "STORY-044",
+      "title": "Refactor evaluator to orchestrate all detectors",
+      "description": "Refactor RuleBasedEvaluator to use composition pattern, delegating to detector modules instead of embedding detection logic",
+      "acceptance": [
+        "Evaluator instantiates all 5 detector modules in __init__",
+        "evaluate() method delegates to detectors via detect() calls",
+        "No embedded pattern matching logic remains in evaluator.py",
+        "Maintains exact same output schema (backwards compatibility)",
+        "All existing tests pass without modification"
+      ],
+      "files": [
+        "src/bulletproof_green/evals/evaluator.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "pqr1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": [
+        "STORY-022",
+        "STORY-023",
+        "STORY-043"
+      ]
+    },
+    {
+      "id": "STORY-045",
+      "title": "Update tests for modular detectors",
+      "description": "Create comprehensive test suite for modular detector architecture",
+      "acceptance": [
+        "Each detector has unit tests covering edge cases",
+        "Integration tests verify evaluator orchestration",
+        "Test coverage >= 90% for detector modules",
+        "All existing tests continue to pass"
+      ],
+      "files": [
+        "tests/test_routine_engineering_detector.py",
+        "tests/test_business_risk_detector.py",
+        "tests/test_vagueness_detector.py",
+        "tests/test_experimentation_detector.py",
+        "tests/test_specificity_detector.py",
+        "tests/test_evaluator.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "stu1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": [
+        "STORY-044"
+      ]
     }
   ]
 }

@@ -1,9 +1,9 @@
 ---
-title: Product Requirements Document
+title: Product Requirements Document - The Bulletproof Protocol
 version: 3.0
+created: 2026-01-22
+updated: 2026-01-30
 ---
-
-# Product Requirements Document: The Bulletproof Protocol
 
 ## Project Overview
 
@@ -46,7 +46,7 @@ The Bulletproof Protocol is an adversarial agent benchmark for IRS Section 41 R&
 
 #### Feature 2: Green Agent - Evaluation Engine
 
-**Description**: A2A-compatible benchmark agent that evaluates narratives against IRS Section 41 audit standards using rule-based detection.
+**Description**: A2A-compatible benchmark agent that evaluates narratives against IRS Section 41 audit standards using rule-based detection. Includes orchestrator class that coordinates evaluator, scorer, and LLM judge components.
 
 **Acceptance Criteria**:
 - [ ] Receives narrative via A2A `tasks/send`
@@ -233,19 +233,31 @@ target_risk_score = 20
 
 ---
 
-#### Feature 11: Advanced Pattern Detectors [Phase 2]
+#### Feature 11: Modular Pattern Detectors [Phase 2]
 
-**Description**: Additional rule-based detectors for comprehensive IRS Section 41 compliance.
+**Description**: Extract all rule-based detectors into separate modules for testability, maintainability, and independent evolution.
 
 **Acceptance Criteria**:
-- [ ] Business risk detector: market, revenue, customers, sales, ROI, profit keywords
-- [ ] Specificity detector: failure citations (dates, error codes, metrics), hypothesis-test-failure-iteration patterns
-- [ ] Integrated into evaluator scoring pipeline
+- [ ] Routine engineering detector (`routine_engineering_detector.py`): routine maintenance, debugging, patches, standard procedures, predictable outcomes
+- [ ] Business risk detector (`business_risk_detector.py`): market share, revenue, customers, sales, profit, competitive positioning
+- [ ] Vagueness detector (`vagueness_detector.py`): vague language patterns (significant, greatly, substantial, better, very successful)
+- [ ] Experimentation detector (`experimentation_detector.py`): hypothesis, iteration, failures, alternatives, uncertainty, unsuccessful attempts
+- [ ] Specificity detector (`specificity_detector.py`): metrics, numbers, dates, error codes, measurements (ms, %, GB, req/s)
+- [ ] Evaluator refactored to orchestrate detectors (no embedded detection logic)
+- [ ] Each detector independently testable with unit tests
 - [ ] Returns detection counts for diagnostics
+- [ ] Maintains backwards compatibility with existing component scores
 
 **Technical Requirements**:
-- Modular detector architecture
-- Pattern weight configuration
+- Directory structure: `src/bulletproof_green/evals/detectors/`
+- Each detector exposes `detect(text: str) -> tuple[int, float]` interface
+- Pattern weight configuration per detector
+- Evaluator delegates to detectors via composition pattern
+
+**Rationale**:
+- Current monolithic evaluator embeds all 5 detection methods
+- Modular architecture enables independent testing/extension
+- Aligns with Feature 12 (ABC Benchmark Rigor) requirement for transparent scoring
 
 ---
 
@@ -428,19 +440,122 @@ target_risk_score = 20
 **Submission**:
 - STORY-014: Write abstract and demo video (depends: STORY-013)
 
-### Story Breakdown - Phase 2 (21 stories total)
+### Story Breakdown - Phase 2 (31 stories total)
 
 - **Feature 4** (Arena Mode orchestration) → STORY-015: Implement Arena Mode orchestration (depends: STORY-006)
 - **Feature 5** (Hybrid Evaluation) → STORY-016: Implement LLM-as-Judge (depends: STORY-003)
 - **Feature 6** (Expanded Ground Truth) → STORY-017: Expand ground truth to 20+ narratives (depends: STORY-008)
 - **Feature 10** (Enhanced Output Schema) → STORY-018: Wire server to accept mode=arena (depends: STORY-020), STORY-019: Integrate hybrid scoring into server (depends: STORY-020), STORY-020: Update output schema per specification, STORY-021: Update tests for new output schema (depends: STORY-020)
-- **Feature 11** (Advanced Pattern Detectors) → STORY-022: Create business_risk_detector.py, STORY-023: Create specificity_detector.py, STORY-024: Integrate new detectors into evaluator (depends: STORY-022, STORY-023)
+- **Feature 11** (Modular Pattern Detectors) → STORY-022: Create business_risk_detector.py, STORY-023: Create specificity_detector.py, STORY-024: Integrate new detectors into evaluator (depends: STORY-022, STORY-023), STORY-040: Create routine_engineering_detector.py, STORY-041: Create vagueness_detector.py, STORY-042: Create experimentation_detector.py, STORY-043: Extract existing detectors from evaluator (depends: STORY-040, STORY-041, STORY-042), STORY-044: Refactor evaluator to orchestrate all detectors (depends: STORY-022, STORY-023, STORY-043), STORY-045: Update tests for modular detectors (depends: STORY-044)
 - **Feature 12** (ABC Benchmark Rigor) → STORY-025: Trivial agent baseline tests, STORY-026: Statistical rigor (Cohen's κ, 95% CI), STORY-027: Create held-out test set, STORY-028: Document benchmark limitations
 - **Feature 13** (Difficulty-Based Evaluation) → STORY-029: Add difficulty tags to ground truth, STORY-030: Report accuracy by difficulty tier (depends: STORY-029)
 - **Feature 14** (Anti-Gaming Measures) → STORY-031: Create adversarial test narratives, STORY-032: LLM reward hacking tests
 - **Feature 15** (SSE Task Updates) → STORY-033: A2A task updates (SSE streaming)
 - **Feature 16** (ART Fine-tuning Pipeline) → STORY-034: Verify Docker ENTRYPOINT parameters, STORY-035: Task isolation tests, STORY-036: ART trainer integration, STORY-037: Trajectory store, STORY-038: Reward function
+- **Feature 2** (GreenAgent Orchestrator) → STORY-039: Create GreenAgent orchestrator class (depends: STORY-003, STORY-004)
 
 **Deferred to Phase 3**:
 - Real Git/Jira data ingestion
 - Fine-tune on SVT historical data
+
+---
+
+### New Story Details (Phase 2 Additions)
+
+**STORY-039: Create GreenAgent orchestrator class**
+- **Feature**: Feature 2 (Green Agent - Evaluation Engine)
+- **File**: `src/bulletproof_green/agent.py`
+- **Description**: Create GreenAgent class that orchestrates RuleBasedEvaluator, AgentBeatsScorer, and LLMJudge (follows debate_judge pattern per agent.py:66 TODO)
+- **Acceptance Criteria**:
+  - [ ] GreenAgent class with __init__ method instantiating evaluator, scorer, llm_judge
+  - [ ] run(params: MessageSendParams) -> GreenAgentOutput method
+  - [ ] Coordinates evaluation flow: evaluator → scorer → optional LLM judge
+  - [ ] Returns AgentBeats-compatible output schema
+  - [ ] Used by executor.py instead of direct component instantiation
+- **Dependencies**: STORY-003 (evaluator), STORY-004 (scorer)
+- **Effort**: Small (architecture extraction, ~50 lines)
+
+**STORY-040: Create routine_engineering_detector.py**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **File**: `src/bulletproof_green/evals/detectors/routine_engineering_detector.py`
+- **Description**: Extract routine engineering detection patterns from evaluator.py into standalone detector module
+- **Acceptance Criteria**:
+  - [ ] Implements detect(text: str) -> tuple[int, float] interface
+  - [ ] Detects: routine maintenance, debugging, patches, standard procedures, predictable outcomes
+  - [ ] Returns (penalty_points, detection_confidence)
+  - [ ] Independently testable with unit tests
+  - [ ] Maintains backwards compatibility with existing component scores
+- **Dependencies**: None
+- **Effort**: Small (extraction, ~100 lines)
+
+**STORY-041: Create vagueness_detector.py**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **File**: `src/bulletproof_green/evals/detectors/vagueness_detector.py`
+- **Description**: Extract vagueness detection patterns from evaluator.py into standalone detector module
+- **Acceptance Criteria**:
+  - [ ] Implements detect(text: str) -> tuple[int, float] interface
+  - [ ] Detects: significant, greatly, substantial, better, very successful, much improved
+  - [ ] Returns (penalty_points, detection_confidence)
+  - [ ] Independently testable with unit tests
+  - [ ] Maintains backwards compatibility with existing component scores
+- **Dependencies**: None
+- **Effort**: Small (extraction, ~80 lines)
+
+**STORY-042: Create experimentation_detector.py**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **File**: `src/bulletproof_green/evals/detectors/experimentation_detector.py`
+- **Description**: Extract experimentation evidence detection patterns from evaluator.py into standalone detector module
+- **Acceptance Criteria**:
+  - [ ] Implements detect(text: str) -> tuple[int, float] interface
+  - [ ] Detects: hypothesis, iteration, failures, alternatives, uncertainty, unsuccessful attempts
+  - [ ] Returns (penalty_points, experimentation_evidence_score)
+  - [ ] Independently testable with unit tests
+  - [ ] Maintains backwards compatibility with existing component scores
+- **Dependencies**: None
+- **Effort**: Small (extraction, ~100 lines)
+
+**STORY-043: Extract existing detectors from evaluator**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **Files**:
+  - `src/bulletproof_green/evals/detectors/business_risk_detector.py`
+  - `src/bulletproof_green/evals/detectors/specificity_detector.py`
+- **Description**: Extract business_risk and specificity detection logic that was "integrated" in STORY-024 into proper standalone detector modules
+- **Acceptance Criteria**:
+  - [ ] business_risk_detector.py implements detect() interface
+  - [ ] specificity_detector.py implements detect() interface
+  - [ ] Both detectors independently testable
+  - [ ] Maintains backwards compatibility
+- **Dependencies**: STORY-040, STORY-041, STORY-042 (ensures consistent interface)
+- **Effort**: Small (extraction of already-written logic, ~150 lines)
+- **Note**: STORY-022 and STORY-023 titles say "Create business_risk_detector.py" and "Create specificity_detector.py" but were actually implemented as messenger.py and arena_executor.py. This story creates the actual detector modules.
+
+**STORY-044: Refactor evaluator to orchestrate all detectors**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **File**: `src/bulletproof_green/evals/evaluator.py`
+- **Description**: Refactor RuleBasedEvaluator to use composition pattern, delegating to detector modules instead of embedding detection logic
+- **Acceptance Criteria**:
+  - [ ] Evaluator instantiates all 5 detector modules in __init__
+  - [ ] evaluate() method delegates to detectors via detect() calls
+  - [ ] No embedded pattern matching logic remains in evaluator.py
+  - [ ] Maintains exact same output schema (backwards compatibility)
+  - [ ] All existing tests pass without modification
+- **Dependencies**: STORY-022, STORY-023, STORY-043 (all 5 detector modules exist)
+- **Effort**: Medium (refactoring existing class, ~200 lines)
+
+**STORY-045: Update tests for modular detectors**
+- **Feature**: Feature 11 (Modular Pattern Detectors)
+- **Files**:
+  - `tests/test_routine_engineering_detector.py`
+  - `tests/test_business_risk_detector.py`
+  - `tests/test_vagueness_detector.py`
+  - `tests/test_experimentation_detector.py`
+  - `tests/test_specificity_detector.py`
+  - `tests/test_evaluator.py` (updated for new architecture)
+- **Description**: Create comprehensive test suite for modular detector architecture
+- **Acceptance Criteria**:
+  - [ ] Each detector has unit tests covering edge cases
+  - [ ] Integration tests verify evaluator orchestration
+  - [ ] Test coverage ≥ 90% for detector modules
+  - [ ] All existing tests continue to pass
+- **Dependencies**: STORY-044 (evaluator refactored)
+- **Effort**: Medium (test suite creation, ~500 lines)

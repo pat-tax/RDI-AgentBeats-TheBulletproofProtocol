@@ -174,6 +174,7 @@ ralph/
 
 ## TODO
 
-- [ ] Adopt devcontainer firewall from Claude Code reference implementation
-- [ ] Document sandbox usage patterns for Ralph execution
+- [x] Adopt devcontainer firewall from Claude Code reference implementation (see `.claude/settings.json` sandbox config)
+- [x] Document sandbox usage patterns for Ralph execution (configured in `.claude/settings.json`)
 - [ ] Use `!` dynamic content in skills for live context injection (git status, test results)
+- [ ] Implement STORY-039: GreenAgent orchestrator class (agent.py:66 TODO)
