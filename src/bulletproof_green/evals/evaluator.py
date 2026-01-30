@@ -101,12 +101,68 @@ class RuleBasedEvaluator:
         Supports hybrid evaluation (STORY-026) when llm_judge is provided.
         Falls back to rule-only evaluation when llm_judge is None or unavailable.
 
+        Note: This is a synchronous method. LLM judge is not used even if provided.
+        Use evaluate_async() for hybrid evaluation with LLM.
+
+        Args:
+            narrative: The narrative text to evaluate
+            llm_judge: Optional LLM judge (ignored in sync mode)
+
+        Returns:
+            EvaluationResult with risk score, classification, and redline markup
+        """
+        return self._evaluate_core(narrative, hybrid_used=False, llm_score=None, llm_reasoning=None)
+
+    async def evaluate_async(
+        self, narrative: str, llm_judge: LLMJudge | None = None
+    ) -> EvaluationResult:
+        """Async version of evaluate() supporting LLM hybrid evaluation.
+
+        This method enables async LLM calls when llm_judge is provided.
+        Falls back to synchronous rule-only evaluation when llm_judge is None.
+
         Args:
             narrative: The narrative text to evaluate
             llm_judge: Optional LLM judge for hybrid evaluation
 
         Returns:
-            EvaluationResult with risk score, classification, and redline markup
+            EvaluationResult with risk score, classification, and hybrid scores
+        """
+        # Hybrid evaluation (STORY-026)
+        hybrid_used = False
+        llm_score = None
+        llm_reasoning = None
+
+        if llm_judge is not None:
+            try:
+                # Get LLM evaluation
+                llm_result = await llm_judge.evaluate(narrative)
+                llm_score = llm_result.score
+                llm_reasoning = llm_result.reasoning
+                hybrid_used = True
+            except Exception:
+                # Silently fall back to rule-only evaluation
+                pass
+
+        return self._evaluate_core(narrative, hybrid_used, llm_score, llm_reasoning)
+
+    def _evaluate_core(
+        self,
+        narrative: str,
+        hybrid_used: bool,
+        llm_score: float | None,
+        llm_reasoning: str | None,
+    ) -> EvaluationResult:
+        """Core evaluation logic shared by sync and async methods.
+
+        Args:
+            narrative: The narrative text to evaluate
+            hybrid_used: Whether LLM evaluation was used
+            llm_score: Optional LLM score (0.0-1.0)
+            llm_reasoning: Optional LLM reasoning text
+
+        Returns:
+            EvaluationResult with risk score, classification, and hybrid fields
         """
         # Track evaluation time
         start_time = time.perf_counter()
@@ -170,120 +226,6 @@ class RuleBasedEvaluator:
         # Calculate evaluation time
         end_time = time.perf_counter()
         evaluation_time_ms = (end_time - start_time) * 1000
-
-        # Hybrid evaluation fields - always include, even if not used
-        result = EvaluationResult(
-            classification=classification,
-            confidence=confidence,
-            risk_score=risk_score,
-            risk_category=risk_category,
-            component_scores=component_scores,
-            redline=redline,
-            predicted_audit_outcome=predicted_audit_outcome,
-            routine_patterns_detected=routine_count,
-            vague_phrases_detected=vague_count,
-            business_keywords_detected=business_count,
-            experimentation_evidence_score=exp_score,
-            specificity_score=spec_score,
-            evaluation_time_ms=evaluation_time_ms,
-            hybrid_used=False,
-            llm_score=None,
-            llm_reasoning=None,
-        )
-
-        return result
-
-    async def evaluate_async(
-        self, narrative: str, llm_judge: LLMJudge | None = None
-    ) -> EvaluationResult:
-        """Async version of evaluate() supporting LLM hybrid evaluation.
-
-        This method enables async LLM calls when llm_judge is provided.
-        Falls back to synchronous rule-only evaluation when llm_judge is None.
-
-        Args:
-            narrative: The narrative text to evaluate
-            llm_judge: Optional LLM judge for hybrid evaluation
-
-        Returns:
-            EvaluationResult with risk score, classification, and hybrid scores
-        """
-        # Track evaluation time
-        start_time = time.perf_counter()
-
-        issues: list[Issue] = []
-        text_lower = narrative.lower()
-
-        # Calculate component penalties using pattern-based detection
-        routine_penalty, routine_count = self._detect_routine_engineering(text_lower, issues)
-        business_penalty, business_count = self._detect_business_risk(text_lower, issues)
-        vagueness_penalty, vague_count = self._detect_vagueness(text_lower, issues)
-        experimentation_penalty, exp_score = self._detect_missing_experimentation(
-            text_lower, issues
-        )
-        specificity_penalty, spec_score = self._detect_lack_of_specificity(narrative, issues)
-
-        # Calculate total risk score (sum of penalties, capped at 100)
-        risk_score = min(
-            100,
-            routine_penalty
-            + business_penalty
-            + vagueness_penalty
-            + experimentation_penalty
-            + specificity_penalty,
-        )
-
-        # Determine classification and category
-        classification = "QUALIFYING" if risk_score < 20 else "NON_QUALIFYING"
-        risk_category = self._get_risk_category(risk_score)
-
-        # Calculate confidence based on pattern matches
-        total_patterns = len(issues)
-        confidence = min(0.95, 0.5 + (total_patterns * 0.05))
-
-        component_scores = {
-            "routine_engineering_penalty": routine_penalty,
-            "business_risk_penalty": business_penalty,
-            "vagueness_penalty": vagueness_penalty,
-            "experimentation_penalty": experimentation_penalty,
-            "specificity_penalty": specificity_penalty,
-        }
-
-        # Calculate severity counts
-        critical_count = sum(1 for issue in issues if issue.severity == "critical")
-        high_count = sum(1 for issue in issues if issue.severity == "high")
-        medium_count = sum(1 for issue in issues if issue.severity == "medium")
-
-        redline = Redline(
-            total_issues=len(issues),
-            issues=issues,
-            critical=critical_count,
-            high=high_count,
-            medium=medium_count,
-        )
-
-        # Determine audit outcome
-        predicted_audit_outcome = "PASS_AUDIT" if risk_score < 20 else "FAIL_AUDIT"
-
-        # Calculate evaluation time
-        end_time = time.perf_counter()
-        evaluation_time_ms = (end_time - start_time) * 1000
-
-        # Hybrid evaluation (STORY-026)
-        hybrid_used = False
-        llm_score = None
-        llm_reasoning = None
-
-        if llm_judge is not None:
-            try:
-                # Get LLM evaluation
-                llm_result = await llm_judge.evaluate(narrative)
-                llm_score = llm_result.score
-                llm_reasoning = llm_result.reasoning
-                hybrid_used = True
-            except Exception:
-                # Silently fall back to rule-only evaluation
-                pass
 
         return EvaluationResult(
             classification=classification,
