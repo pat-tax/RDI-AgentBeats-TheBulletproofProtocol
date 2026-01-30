@@ -1,7 +1,7 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-  "scope": "Phase 1 complete (STORY-001 to STORY-021): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
+  "scope": "Phase 1 complete (STORY-001 to STORY-014): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-015 to STORY-046): Arena mode, Hybrid evaluation, Modular detectors, Benchmark rigor, A2A compliance.",
   "source": "docs/PRD.md",
   "generated": "2026-01-30 22:54:09",
   "stories": [
@@ -962,6 +962,23 @@
       "depends_on": [
         "STORY-044"
       ]
+    },
+    {
+      "id": "STORY-046",
+      "title": "Add kind field to messenger parts",
+      "description": "Add 'kind' field to message parts in messenger.py for strict A2A protocol compliance",
+      "acceptance": [
+        "TextPart includes kind: 'text' field",
+        "DataPart includes kind: 'data' field",
+        "Existing tests continue to pass"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py"
+      ],
+      "passes": false,
+      "completed_at": null,
+      "content_hash": "a2a1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+      "depends_on": []
     }
   ]
 }

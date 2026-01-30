@@ -440,8 +440,9 @@ target_risk_score = 20
 **Submission**:
 - STORY-014: Write abstract and demo video (depends: STORY-013)
 
-### Story Breakdown - Phase 2 (31 stories total)
+### Story Breakdown - Phase 2 (32 stories total)
 
+- **Feature 3** (A2A Protocol Compliance) → STORY-046: Add kind field to messenger parts
 - **Feature 4** (Arena Mode orchestration) → STORY-015: Implement Arena Mode orchestration (depends: STORY-006)
 - **Feature 5** (Hybrid Evaluation) → STORY-016: Implement LLM-as-Judge (depends: STORY-003)
 - **Feature 6** (Expanded Ground Truth) → STORY-017: Expand ground truth to 20+ narratives (depends: STORY-008)
