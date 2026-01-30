@@ -43,6 +43,9 @@ class TestLLMJudgeHybridScore:
         config = LLMJudgeConfig(alpha=0.7, beta=0.3)
         judge = LLMJudge(config=config, api_key="test-key")
 
+        # Mock the client to simulate OpenAI being available
+        judge._client = AsyncMock()
+
         with patch.object(judge, "_call_llm", new_callable=AsyncMock) as mock_llm:
             mock_llm.return_value = {"score": 0.5, "reasoning": "", "categories": {}}
 
@@ -65,6 +68,8 @@ class TestLLMJudgeFallback:
         from bulletproof_green.evals.llm_judge import LLMJudge
 
         judge = LLMJudge(api_key="test-key")
+        # Mock the client to simulate OpenAI being available
+        judge._client = AsyncMock()
 
         with patch.object(judge, "_call_llm", new_callable=AsyncMock) as mock_llm:
             mock_llm.side_effect = Exception("LLM API error")

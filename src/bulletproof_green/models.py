@@ -68,6 +68,11 @@ class EvaluationResult(BaseModel):
         default_factory=lambda: ["IRS Section 41(d)(1)", "26 CFR § 1.41-4"]
     )
 
+    # Hybrid evaluation fields (STORY-026)
+    hybrid_used: bool = False
+    llm_score: float | None = None
+    llm_reasoning: str | None = None
+
     def to_dict(self) -> dict[str, Any]:
         """Convert evaluation result to dictionary format per specification."""
         # Calculate total_penalty
@@ -131,6 +136,11 @@ class ScoreResult(BaseModel):
     safety: float
     specificity: float
     experimentation: float
+
+    # Hybrid score (STORY-026)
+    # When LLM is used, this is the weighted combination: α*rule + β*llm
+    # Otherwise, equals overall_score
+    hybrid_score: float | None = None
 
 
 class NarrativeRequest(BaseModel):

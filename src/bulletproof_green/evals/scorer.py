@@ -2,9 +2,11 @@
 
 Converts rule-based evaluation results into AgentBeats compatible scores
 in the 0.0-1.0 scale.
+
+Supports hybrid scoring (STORY-026) combining rule-based and LLM scores.
 """
 
-from bulletproof_green.models import EvaluationResult, ScoreResult
+from bulletproof_green.models import EvaluationResult, LLMJudgeConfig, ScoreResult
 
 
 class AgentBeatsScorer:
@@ -31,6 +33,9 @@ class AgentBeatsScorer:
 
     def score(self, eval_result: EvaluationResult) -> ScoreResult:
         """Convert an EvaluationResult to AgentBeats scores.
+
+        Supports hybrid scoring (STORY-026) when eval_result contains LLM scores.
+        Falls back to rule-only scoring when LLM is unavailable.
 
         Args:
             eval_result: The evaluation result from RuleBasedEvaluator
@@ -64,12 +69,16 @@ class AgentBeatsScorer:
             self.MAX_EXPERIMENTATION_PENALTY,
         )
 
+        # Hybrid scoring (STORY-026)
+        hybrid_score = self._compute_hybrid_score(eval_result, overall_score)
+
         return ScoreResult(
             overall_score=overall_score,
             correctness=correctness,
             safety=safety,
             specificity=specificity,
             experimentation=experimentation,
+            hybrid_score=hybrid_score,
         )
 
     def _compute_overall_score(self, risk_score: int) -> float:
@@ -89,3 +98,35 @@ class AgentBeatsScorer:
         """
         clamped_penalty = max(0, min(max_penalty, penalty))
         return (max_penalty - clamped_penalty) / max_penalty
+
+    def _compute_hybrid_score(
+        self, eval_result: EvaluationResult, rule_score: float
+    ) -> float:
+        """Compute hybrid score combining rule and LLM evaluations.
+
+        Formula: final_score = α*rule_score + β*llm_score
+        Falls back to rule_score when LLM is unavailable.
+
+        REVIEW/FIXME: Custom hybrid scoring (STORY-026)
+
+        Args:
+            eval_result: Evaluation result potentially containing LLM scores
+            rule_score: The rule-based overall score
+
+        Returns:
+            Hybrid score in [0.0, 1.0] range
+        """
+        # If no LLM score available, return rule score
+        if not eval_result.hybrid_used or eval_result.llm_score is None:
+            return rule_score
+
+        # Get weights from config (default: α=0.7, β=0.3)
+        config = LLMJudgeConfig()
+        alpha = config.alpha
+        beta = config.beta
+
+        # Compute weighted combination
+        hybrid = alpha * rule_score + beta * eval_result.llm_score
+
+        # Ensure result is in valid range
+        return max(0.0, min(1.0, hybrid))
