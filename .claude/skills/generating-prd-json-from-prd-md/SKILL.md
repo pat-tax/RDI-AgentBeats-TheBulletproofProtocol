@@ -12,10 +12,12 @@ Hybrid approach: Python script parses, AI validates and corrects.
 ## Workflow
 
 1. **Run parser** (Bash tool)
-   ```bash
-   python ralph/scripts/generate_prd_json.py
-   ```
-   Script handles: PRD.md parsing, `(depends: ...)` extraction, content hashing, state preservation.
+
+```bash
+python ralph/scripts/generate_prd_json.py
+```
+
+Script handles: PRD.md parsing, `(depends: ...)` extraction, content hashing, state preservation.
 
 2. **Validate** (Read tool)
    - Read `ralph/docs/prd.json` (script output)
@@ -53,7 +55,7 @@ Cross-reference with PRD.md:
 ## Common Issues to Correct
 
 | Issue | Correction |
-|-------|------------|
+| ------- | ------------ |
 | Empty acceptance | Extract from description or PRD.md feature |
 | Invalid depends_on reference | Remove non-existent story IDs |
 | Circular dependency | Remove one direction |

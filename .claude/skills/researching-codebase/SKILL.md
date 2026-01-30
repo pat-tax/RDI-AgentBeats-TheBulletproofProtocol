@@ -65,6 +65,7 @@ files_examined: <count>
 ## Evidence Requirements
 
 Every claim must include:
+
 - **File path**: Exact location (`src/auth/login.ts`)
 - **Line numbers**: Specific lines (`L42-58` or `L127`)
 - **Code reference**: Function/class name when relevant

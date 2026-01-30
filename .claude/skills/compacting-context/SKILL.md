@@ -4,6 +4,7 @@ description: Compacts verbose context into structured summary. Use after polluti
 argument-hint: [compaction-name]
 context: fork
 agent: Explore
+model: sonnet
 allowed-tools: Read, Grep, Glob
 ---
 

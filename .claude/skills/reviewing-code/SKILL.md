@@ -5,12 +5,12 @@ argument-hint: [file-or-directory]
 allowed-tools: Read, Grep, Glob, WebFetch, WebSearch
 ---
 
-## Review Context
+# Review Context
 
 - Changed files: !`git diff --name-only HEAD~1 2>/dev/null || echo "No recent commits"`
 - Staged files: !`git diff --staged --name-only`
 
-# Code Review
+## Code Review
 
 **Scope**: $ARGUMENTS
 

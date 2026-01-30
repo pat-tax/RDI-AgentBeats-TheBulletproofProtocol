@@ -1,394 +1,256 @@
-# Testing Strategy: Deterministic + Property-Based
-
-## Executive Summary
-
-**Completed:** Centralized configuration with pydantic-settings + test suite optimization
-**Result:** 35% fewer tests, 78% faster runtime, maintained 100% pass rate
-**Next:** Implement property-based testing with Hypothesis for edge cases
-
+---
+title: Testing Strategy
+version: 5.0
+applies-to: Agents and humans
+purpose: High-level testing strategy aligned with KISS/DRY/YAGNI
+see-also: tdd-best-practices.md, bdd-best-practices.md
 ---
 
-## Completed Work
+**Purpose**: What to test, when to use TDD/BDD/Hypothesis, test organization, running commands.
 
-### 1. Pydantic Settings Implementation
+## Core Principles
 
-**Problem:** Configuration scattered across 6+ files, duplicated defaults, no validation
+| Principle | Testing Application |
+| ----------- | --------------------- |
+| **KISS** | Test behavior, not implementation details |
+| **DRY** | No duplicate coverage across tests |
+| **YAGNI** | Don't test library behavior (Pydantic, FastAPI, etc.) |
 
-**Solution:** Centralized settings with automatic `.env` loading
+## What to Test
+
+**High-Value** (Test these):
+
+1. Business logic - Core algorithms, calculations, decision rules
+2. Integration points - API handling, external service interactions
+3. Edge cases with real impact - Empty inputs, error propagation, boundary conditions
+4. Contracts - API response formats, model transformations
+
+**Low-Value** (Avoid these):
+
+1. Library behavior - Pydantic validation, `os.environ` reading, framework internals
+2. Trivial assertions - `x is not None`, `isinstance(x, SomeClass)`, `hasattr()`, `callable()`
+3. Default values - Unless defaults encode business rules
+4. Documentation content - String contains checks
+
+### Patterns to Remove (Test Suite Optimization)
+
+| Pattern | Why Remove | Example |
+| --------- | ------------ | --------- |
+| Import/existence | Python/imports handle this | `test_module_exists()` |
+| Field existence | Pydantic validates at instantiation | `test_model_has_field_x()` |
+| Default constants | Testing `300 == 300` | `assert DEFAULT_TIMEOUT == 300` |
+| Over-granular | Consolidate into schema validation | 8 tests for one model |
+| Type checks | Type checker (pyright) handles | `assert isinstance(result, dict)` |
+
+**Rule**: If the test wouldn't catch a real bug, remove it.
+
+## Testing Approach
+
+### Current Focus: TDD (with pytest + Hypothesis)
+
+**Primary methodology**: Test-Driven Development (TDD)
+
+**Tools** (see `tdd-best-practices.md`):
+
+- **pytest**: Core tool for all TDD tests (specific test cases)
+- **Hypothesis**: Optional extension for property-based edge case testing (generative tests)
+
+**When to use each**:
+
+- **pytest**: Known cases (specific inputs, API contracts, known edge cases)
+- **Hypothesis**: Unknown edge cases (any string, any number, invariants for ALL inputs)
+
+### Hypothesis Test Priorities (Edge Cases within TDD)
+
+| Priority | Area | Why | Example |
+| ---------- | ------ | ----- | --------- |
+| **CRITICAL** | Scoring/math formulas | Math must work for ALL inputs | `test_score_always_in_bounds()` |
+| **CRITICAL** | Loop termination | Must terminate for ANY input | `test_processor_always_terminates()` |
+| **HIGH** | Input validation | Handle arbitrary text safely | `test_parser_never_crashes()` |
+| **HIGH** | Output serialization | Must always produce valid JSON | `test_output_always_serializable()` |
+| **MEDIUM** | Invariant sums | Total equals component sum | `test_total_equals_sum()` |
+
+See [Hypothesis documentation](https://hypothesis.readthedocs.io/) for usage patterns.
+
+### BDD: Stakeholder Collaboration (Optional)
+
+**BDD** (see `bdd-best-practices.md`) - Different approach from TDD:
+
+- **TDD**: Developer-driven, Red-Green-Refactor, all test levels
+- **BDD**: Stakeholder-driven, Given-When-Then, acceptance criteria in plain language
+
+**When to use BDD**:
+
+- User-facing features requiring stakeholder validation
+- Complex acceptance criteria needing plain-language documentation
+- Collaboration between technical and non-technical team members
+
+### Test Levels: Unit vs Integration
+
+**Unit Tests**:
+
+- Test single component in isolation
+- Fast execution (<10ms per test)
+- No external dependencies (databases, APIs, file I/O)
+- Use mocks/fakes for dependencies
+- Most common TDD use case
+
+**Integration Tests**:
+
+- Test multiple components working together
+- Slower execution (may involve I/O)
+- Use real or in-memory services
+- Validate component interactions
+- Fewer tests, broader coverage
+
+**When to use each**:
 
 ```python
-# Green Agent: GREEN_* prefix
-from bulletproof_green.settings import settings
-settings.port              # 8000
-settings.timeout           # 300
-settings.openai_api_key    # None (from env)
+# UNIT TEST - Component in isolation
+def test_order_calculator_computes_total():
+    calculator = OrderCalculator()
+    items = [Item(10), Item(15)]
+    assert calculator.total(items) == 25  # Pure logic, no I/O
 
-# Purple Agent: PURPLE_* prefix
-from bulletproof_purple.settings import settings
-settings.port              # 8001
-settings.timeout           # 300
+# INTEGRATION TEST - Components + external service
+async def test_order_service_saves_to_database(db_session):
+    service = OrderService(db_session)  # Real or in-memory DB
+    order = await service.create_order(items=[Item(10)])
+    saved = await service.get_order(order.id)
+    assert saved.total == 10  # Tests service + DB interaction
 ```
 
-**Files Created:**
-- `src/bulletproof_green/settings.py` - 11 settings
-- `src/bulletproof_purple/settings.py` - 3 settings
+### Mocking Strategy
 
-**Benefits:**
-- Single source of truth for defaults
-- Automatic type validation (Pydantic)
-- Environment variable support (`.env` files)
-- No more `DEFAULT_TIMEOUT` duplication
+**When to use mocks**:
 
----
+- ✅ External APIs you don't control (payment gateways, third-party services)
+- ✅ Slow operations (file I/O, network calls) in unit tests
+- ✅ Non-deterministic dependencies (time, random, UUIDs)
+- ✅ Error scenarios hard to reproduce (network timeouts, API rate limits)
 
-### 2. Test Suite Optimization
+**When to use real services**:
 
-**Metrics:**
+- ✅ In-memory alternatives exist (SQLite for PostgreSQL, Redis mock)
+- ✅ Integration tests validating actual behavior
+- ✅ Your own services/components (test real interactions)
+- ✅ Testing the integration itself (verifying protocols, serialization)
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Tests | 532 | 348 | **-35%** |
-| Runtime | 16.5s | 3.7s | **-78%** |
-| Pass Rate | 100% | 100% | Maintained |
+**Mocking libraries**:
 
-**Removed Patterns (184 tests):**
-
-1. **Import/existence tests** - "test X module exists"
-   - Python/Pydantic handles this
-   - If imports fail, other tests fail
-
-2. **Field existence tests** - "test Y has Z field"
-   - Pydantic validates at instantiation
-   - Redundant with behavior tests
-
-3. **Default value tests** - "test default is 300"
-   - Testing constants (300 == 300)
-   - Settings handle this now
-
-4. **Over-granular tests** - 8 tests for one AgentCard
-   - Consolidated into schema validation
-
-5. **Type checks** - "test returns dict"
-   - Type checker (pyright) handles this
-
-**Files Cleaned:**
-
-```
-test_llm_judge.py:              64 → 8  tests (-87%)
-test_arena_executor.py:         56 → 7  tests (-88%)
-test_agent_card_discovery.py:   50 → 11 tests (-78%)
-test_output_schema.py:          29 → 8  tests (-72%)
-test_purple_generator.py:       21 → 6  tests (-71%)
-test_messenger.py:              24 → 11 tests (-54%)
-test_green_a2a_client.py:       27 → 11 tests (-59%)
-```
-
----
-
-## Testing Philosophy
-
-### Core Principles
-
-**Pytest for Deterministic Behavior**
-- Known inputs → expected outputs
-- Algorithm correctness
-- Protocol compliance
-- Error handling
-
-**Hypothesis for Edge Cases**
-- Unknown/random inputs
-- Boundary conditions
-- Invariant properties
-- Input validation
-
----
-
-## Recommended Hypothesis Tests
-
-### High-Value Property Tests
-
-#### 1. **Scoring Formulas (CRITICAL)**
-
-**Why:** Math must work for ALL inputs, not just examples
+- `unittest.mock` - Standard library, use `patch()` and `MagicMock`
+- `pytest-mock` - Pytest fixtures for mocking
+- `responses` - Mock HTTP requests
+- `freezegun` - Mock time/dates
 
 ```python
-from hypothesis import given, strategies as st
-from bulletproof_green.scorer import AgentBeatsScorer
+# MOCK external API
+from unittest.mock import patch
 
-@given(
-    routine=st.integers(min_value=0, max_value=100),
-    vagueness=st.integers(min_value=0, max_value=100),
-    business=st.integers(min_value=0, max_value=100),
-)
-def test_risk_score_invariants(routine, vagueness, business):
-    """Property: risk_score always between 0-100."""
-    scorer = AgentBeatsScorer()
+def test_payment_processor_handles_api_failure():
+    with patch('stripe.Charge.create') as mock_charge:
+        mock_charge.side_effect = stripe.APIError("Rate limited")
+        processor = PaymentProcessor()
+        result = processor.charge(100)
+        assert result.status == "failed"
 
-    # Simulate penalty calculation
-    total_penalty = routine + vagueness + business
-    risk_score = min(100, total_penalty)
-
-    assert 0 <= risk_score <= 100
-    assert isinstance(risk_score, int)
-
-
-@given(
-    rule_score=st.floats(min_value=0.0, max_value=1.0),
-    llm_score=st.floats(min_value=0.0, max_value=1.0),
-    alpha=st.floats(min_value=0.0, max_value=1.0),
-)
-def test_hybrid_score_properties(rule_score, llm_score, alpha):
-    """Property: final_score = α*rule + β*llm always in [0,1]."""
-    beta = 1.0 - alpha
-    final = alpha * rule_score + beta * llm_score
-
-    assert 0.0 <= final <= 1.0
-
-    # Weighted average property
-    assert final >= min(rule_score, llm_score)
-    assert final <= max(rule_score, llm_score)
+# REAL service (in-memory)
+def test_order_repository_saves_order(tmp_path):
+    db = SQLite(":memory:")  # Real SQLite, in-memory
+    repo = OrderRepository(db)
+    order = repo.save(Order(total=100))
+    assert repo.get(order.id).total == 100
 ```
 
----
+### Priority Test Areas
 
-#### 2. **Narrative Validation (HIGH)**
+1. **Core business logic** - Algorithms, calculations, decision rules (unit tests)
+2. **API contracts** - Request/response formats, protocol handling (unit + integration)
+3. **Edge cases** - Empty/null inputs, boundary values, numeric stability (unit with Hypothesis)
+4. **Integration points** - External services, database operations (integration tests)
 
-**Why:** Must handle arbitrary text inputs safely
+## Test Organization
 
-```python
-from hypothesis import given, strategies as st
-from bulletproof_green.evaluator import RuleBasedEvaluator
+**Flat structure** (small projects):
 
-@given(narrative=st.text(min_size=0, max_size=10000))
-def test_evaluator_never_crashes(narrative):
-    """Property: evaluator handles any text without crashing."""
-    evaluator = RuleBasedEvaluator()
-
-    result = evaluator.evaluate(narrative)
-
-    # Should always return valid result
-    assert result is not None
-    assert hasattr(result, 'risk_score')
-    assert 0 <= result.risk_score <= 100
-
-
-@given(
-    narrative=st.text(alphabet=st.characters(blacklist_categories=('Cs',)), min_size=1, max_size=5000)
-)
-def test_output_always_serializable(narrative):
-    """Property: output always JSON-serializable."""
-    import json
-    evaluator = RuleBasedEvaluator()
-
-    result = evaluator.evaluate(narrative)
-    output = result.to_dict()
-
-    # Should never raise
-    json_str = json.dumps(output)
-    assert isinstance(json_str, str)
+```text
+tests/
+├── test_*.py             # TDD unit tests
+└── conftest.py           # Shared fixtures
 ```
 
----
+**Organized structure** (larger projects):
 
-#### 3. **Component Score Invariants (CRITICAL)**
-
-**Why:** Total must equal sum (math consistency)
-
-```python
-@given(narrative=st.text(min_size=10, max_size=1000))
-def test_total_penalty_equals_sum_property(narrative):
-    """Property: total_penalty always equals sum of components."""
-    evaluator = RuleBasedEvaluator()
-    result = evaluator.evaluate(narrative)
-
-    cs = result.component_scores
-
-    expected = (
-        cs['routine_engineering_penalty'] +
-        cs['vagueness_penalty'] +
-        cs['business_risk_penalty'] +
-        cs['experimentation_penalty'] +
-        cs['specificity_penalty']
-    )
-
-    assert cs['total_penalty'] == expected
+```text
+tests/
+├── unit/                  # TDD unit tests (pytest)
+│   ├── test_services.py
+│   └── test_models.py
+├── properties/            # Property tests (hypothesis)
+│   ├── test_math_props.py
+│   └── test_validation_props.py
+├── acceptance/            # BDD scenarios (optional)
+│   ├── features/*.feature
+│   └── step_defs/
+└── conftest.py           # Shared fixtures
 ```
 
----
-
-#### 4. **Redline Severity Counts (MEDIUM)**
-
-```python
-@given(narrative=st.text(min_size=10, max_size=2000))
-def test_severity_counts_match_issues(narrative):
-    """Property: severity counts always match issues array."""
-    evaluator = RuleBasedEvaluator()
-    result = evaluator.evaluate(narrative)
-
-    redline = result.to_dict()['redline']
-
-    critical = sum(1 for i in redline['issues'] if i['severity'] == 'critical')
-    high = sum(1 for i in redline['issues'] if i['severity'] == 'high')
-    medium = sum(1 for i in redline['issues'] if i['severity'] == 'medium')
-
-    assert redline['critical'] == critical
-    assert redline['high'] == high
-    assert redline['medium'] == medium
-    assert redline['total_issues'] == len(redline['issues'])
-```
-
----
-
-#### 5. **Arena Loop Termination (CRITICAL)**
-
-**Why:** Must terminate for ALL inputs (no infinite loops)
-
-```python
-@given(
-    max_iterations=st.integers(min_value=1, max_value=10),
-    target=st.integers(min_value=0, max_value=100),
-)
-def test_arena_always_terminates(max_iterations, target):
-    """Property: arena loop always terminates."""
-    from unittest.mock import AsyncMock, patch
-    from bulletproof_green.arena_executor import ArenaConfig, ArenaExecutor
-
-    config = ArenaConfig(max_iterations=max_iterations, target_risk_score=target)
-    executor = ArenaExecutor(purple_agent_url="http://test", config=config)
-
-    # Mock to prevent network calls
-    with patch.object(executor, '_run_iteration', new_callable=AsyncMock) as mock:
-        mock.return_value = ("narrative", 50, {})  # Never qualifies
-
-        result = await executor.run(initial_context="test")
-
-        # Must terminate at max_iterations
-        assert result.total_iterations <= max_iterations
-        assert result.termination_reason in ["target_reached", "max_iterations_reached"]
-```
-
----
-
-#### 6. **Settings Validation (MEDIUM)**
-
-```python
-@given(
-    port=st.integers(),
-    timeout=st.integers(),
-)
-def test_settings_validation(port, timeout):
-    """Property: settings reject invalid values."""
-    from pydantic import ValidationError
-    from bulletproof_green.settings import GreenSettings
-
-    try:
-        settings = GreenSettings(port=port, timeout=timeout)
-
-        # If accepted, must be valid
-        assert 1 <= settings.port <= 65535
-        assert settings.timeout > 0
-    except ValidationError:
-        # Invalid inputs should raise
-        assert port < 1 or port > 65535 or timeout <= 0
-```
-
----
-
-## Implementation Plan
-
-### Phase 1: Critical Math (Week 1)
-- [ ] Hybrid scoring formula
-- [ ] Component score totals
-- [ ] Risk score boundaries
-
-### Phase 2: Input Validation (Week 2)
-- [ ] Narrative text handling
-- [ ] JSON serialization
-- [ ] Settings validation
-
-### Phase 3: Control Flow (Week 3)
-- [ ] Arena loop termination
-- [ ] Severity count consistency
-
----
-
-## Expected Benefits
-
-### Before Hypothesis
-```python
-def test_risk_score_range():
-    result = evaluator.evaluate("test")
-    assert 0 <= result.risk_score <= 100
-```
-✗ Only tests one input
-✗ Misses edge cases
-✗ False confidence
-
-### After Hypothesis
-```python
-@given(narrative=st.text())
-def test_risk_score_range(narrative):
-    result = evaluator.evaluate(narrative)
-    assert 0 <= result.risk_score <= 100
-```
-✓ Tests 100+ random inputs per run
-✓ Finds edge cases automatically
-✓ Shrinks failures to minimal examples
-
----
-
-## Installation
+## Running Tests
 
 ```bash
-uv add --dev hypothesis
+# Make recipes (project standard)
+make test_all              # All tests
+make test_quick            # Rerun failed tests only (fast iteration)
+make test_coverage         # Tests with coverage gate (70% threshold)
+
+# Direct pytest (for specific suites)
+pytest tests/unit/         # Unit tests only
+pytest tests/integration/  # Integration tests only
+pytest -k pattern          # Filter by name
+pytest -m marker           # Filter by marker
 ```
 
-## Running Hypothesis Tests
+See `Makefile` for all recipes or `pytest --help` for full CLI reference.
+
+## Pre-Commit Validation
 
 ```bash
-# Run all tests (pytest + hypothesis)
-uv run pytest
-
-# Run only hypothesis tests
-uv run pytest -m hypothesis
-
-# Increase examples for CI
-uv run pytest --hypothesis-show-statistics
+make validate              # Full validation (ruff, pyright, complexity, tests)
+make quick_validate        # Fast validation (ruff, pyright only - no tests)
 ```
 
----
+Run `make validate` before committing to ensure all quality gates pass.
+
+## Naming Conventions
+
+**Format**: `test_{module}_{component}_{behavior}`
+
+```python
+# Unit tests
+test_user_service_creates_new_user()
+test_order_processor_validates_items()
+
+# Property tests
+test_score_always_in_bounds()
+test_percentile_ordering()
+```
+
+**Benefits**: Clear ownership, easier filtering (`pytest -k test_user_`), better organization
+
+## Decision Checklist
+
+Before writing a test, ask:
+
+1. Does this test **behavior** (keep) or **implementation** (skip)?
+2. Would this catch a **real bug** (keep) or is it **trivial** (skip)?
+3. Is this testing **our code** (keep) or **a library** (skip)?
+4. Which approach:
+   - **TDD** (default) - Unit tests, business logic, known edge cases
+   - **Hypothesis** - Unknown edge cases (any input), numeric invariants
+   - **BDD** (optional) - Acceptance criteria, stakeholder communication
 
 ## References
 
+- TDD practices: `docs/best-practices/tdd-best-practices.md`
+- BDD practices: `docs/best-practices/bdd-best-practices.md`
 - [Hypothesis Documentation](https://hypothesis.readthedocs.io/)
-- [Hypothesis for Scientific Code](https://hypothesis.readthedocs.io/en/latest/numpy.html)
-- [Property-Based Testing Patterns](https://hypothesis.works/articles/what-is-property-based-testing/)
-
----
-
-## Appendix: Current Test Coverage
-
-### High-Value Tests (Kept)
-
-**Behavior Tests:**
-- Hybrid scoring formula correctness
-- Arena loop termination conditions
-- Protocol compliance (JSON-RPC, A2A)
-
-**Integration Tests:**
-- End-to-end server request handling
-- Agent-to-agent communication
-- Error handling (timeouts, validation)
-
-**Edge Cases:**
-- LLM fallback behavior
-- Empty/malformed inputs
-- Boundary conditions
-
-### Removed Tests (Low ROI)
-
-- Import existence checks
-- Pydantic field validation
-- Default constant values
-- Return type assertions
-- Over-granular field checks

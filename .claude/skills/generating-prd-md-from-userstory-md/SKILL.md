@@ -44,12 +44,15 @@ Bridges the gap between user-focused stories and implementation-ready requiremen
 ## Conversion Examples
 
 **User Story → Functional Requirement**:
+
 - "As a developer, I want to add tasks from CLI" → "CLI command: `task add "description"`"
 
 **Success Criteria → Non-Functional**:
+
 - "Operations in < 5 seconds" → "Performance: All CLI operations complete in < 5 seconds"
 
 **Constraints → Non-Functional**:
+
 - "Must work on Linux, macOS, Windows" → "Platform Support: Cross-platform compatibility"
 
 ## Usage
