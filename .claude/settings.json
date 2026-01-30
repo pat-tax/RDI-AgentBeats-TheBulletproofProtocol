@@ -12,13 +12,19 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "excludedCommands": ["git", "make", "uv"],
-    "allowUnsandboxedCommands": true,
+    "allowUnsandboxedCommands": false,
     "network": {
       "allowLocalBinding": true,
       "allowedHosts": ["api.github.com"]
     },
-    "enableWeakerNestedSandbox": false
+    "enableWeakerNestedSandbox": false,
+    "filesystem": {
+      "write": {
+        "allowOnly": [
+          "/tmp/claude-1000"
+        ]
+      }
+    }  
   },
   "permissions": {
     "allow": [
