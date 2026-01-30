@@ -5,7 +5,7 @@
 
 .SILENT:
 .ONESHELL:
-.PHONY: setup_dev setup_claude_code setup_sandbox setup_project setup_devc_project setup_devc_template run_markdownlint ruff ruff_tests test_all type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
+.PHONY: setup_dev setup_claude_code setup_sandbox setup_project setup_devc_project setup_devc_template markdownlint ruff ruff_tests complexity test_all test_quick test_coverage type_check validate quick_validate ralph_userstory ralph_prd_md ralph_prd_json ralph_init ralph_run ralph_status ralph_clean ralph_reorganize help
 .DEFAULT_GOAL := help
 
 
@@ -105,7 +105,7 @@ quick_validate:  ## Fast development cycle validation
 
 markdownlint:  ## Fix markdown files. Usage: make run_markdownlint [INPUT_FILES="docs/**/*.md"] (default: docs/)
 	INPUT=$${INPUT_FILES:-docs/}
-	echo $$INPUT
+	echo "Running markdownlint on $$INPUT ..."
 	uv run pymarkdown fix --recurse $$INPUT
 	uv run pymarkdown scan --recurse $$INPUT
 
