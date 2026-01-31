@@ -157,6 +157,27 @@ For enhanced network security, adopt Claude Code's [reference devcontainer](http
 PRD.md → prd.json → Ralph Loop → src/ + tests/ → progress.txt
 ```
 
+### Phase-Specific PRD Management
+
+**Project uses phase-specific PRDs:**
+- `docs/GreenAgent-PRD.md` - Phase 1 (Green Agent benchmark)
+- `docs/PurpleAgent-PRD.md` - Phase 2 (Purple Agent competition)
+
+**Ralph tooling expects `docs/PRD.md`:**
+- `docs/PRD.md` is a **symlink** to the currently active phase PRD
+- `generate_prd_json.py` parses only `PRD.md` (no changes needed)
+
+**Switching phases:**
+```bash
+# Switch to Phase 1 (Green Agent)
+cd docs && ln -sf GreenAgent-PRD.md PRD.md
+
+# Switch to Phase 2 (Purple Agent)
+cd docs && ln -sf PurpleAgent-PRD.md PRD.md
+```
+
+**Current:** `PRD.md` → `GreenAgent-PRD.md` (Phase 1 active)
+
 ## Structure
 
 ```text

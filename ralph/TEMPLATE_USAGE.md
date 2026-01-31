@@ -46,6 +46,30 @@ In `docs/PRD.md` story breakdown, use `(depends: STORY-XXX)` syntax:
 
 The parser generates `prd.json` with dependency tracking. Ralph skips stories with unmet dependencies until prerequisites complete.
 
+### Phase-Specific PRD Management
+
+**This project uses phase-specific PRDs:**
+- `docs/GreenAgent-PRD.md` - Phase 1 (Green Agent benchmark)
+- `docs/PurpleAgent-PRD.md` - Phase 2 (Purple Agent competition)
+
+**Ralph expects `docs/PRD.md`:**
+- `docs/PRD.md` is a **symlink** to the currently active phase
+- `generate_prd_json.py` parses only `PRD.md` (no multi-file parsing needed)
+
+**To switch phases:**
+```bash
+# Phase 1 (Green Agent benchmark)
+cd docs && ln -sf GreenAgent-PRD.md PRD.md && cd ..
+
+# Phase 2 (Purple Agent competition)
+cd docs && ln -sf PurpleAgent-PRD.md PRD.md && cd ..
+
+# Regenerate prd.json after switching
+make ralph_prd_json
+```
+
+**Current active phase:** Phase 1 (`PRD.md` → `GreenAgent-PRD.md`)
+
 ### Monitoring
 
 ```bash
