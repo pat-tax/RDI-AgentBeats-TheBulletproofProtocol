@@ -18,7 +18,7 @@ class TestLimitationsDocumentation:
     @pytest.fixture
     def limitations_file(self) -> Path:
         """Return path to LIMITATIONS.md."""
-        return Path(__file__).parent.parent / "docs" / "LIMITATIONS.md"
+        return Path(__file__).parent.parent / "docs" / "AgentBeats" / "LIMITATIONS.md"
 
     def test_limitations_file_exists(self, limitations_file: Path):
         """Test that LIMITATIONS.md exists."""
