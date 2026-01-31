@@ -20,7 +20,7 @@ The system outputs a Risk Score (0-100) and binary classification (QUALIFYING if
 
 ## Validation Results
 
-Validation against a 20-case ground truth dataset labeled by tax professionals demonstrates:
+Validation against a 30-case ground truth dataset labeled by tax professionals demonstrates:
 
 - **Accuracy: 100%** (target: ≥70%, IRS baseline: 61.2%)
 - **F1 Score: 1.0** (target: ≥0.72, IRS baseline: 0.42)
