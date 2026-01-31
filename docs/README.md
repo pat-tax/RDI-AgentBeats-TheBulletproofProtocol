@@ -184,7 +184,7 @@ pytest tests/test_llm_judge.py -v
 
 ### AgentBeats Platform Registration
 
-**See:** [`docs/AgentBeats/AGENTBEATS_REGISTRATION.md`](AgentBeats/AGENTBEATS_REGISTRATION.md)
+**See:** [`docs/AgentBeats/SUBMISSION-GUIDE.md`](AgentBeats/SUBMISSION-GUIDE.md)
 
 ### Quick Registration Guide
 
@@ -518,11 +518,8 @@ src/bulletproof_green/
 ## Additional Documentation
 
 ### AgentBeats Platform
-- [Registration Guide](AgentBeats/AGENTBEATS_REGISTRATION.md)
-- [Technical Implementation](AgentBeats/Technical-Implementation-Guide.md)
-- [Benchmark Design Principles](AgentBeats/AgentBeats-Benchmark-Design-Principles.md)
-- [Local Testing & Deployment](AgentBeats/Local-Testing-and-Deployment.md)
-- [Resources & Links](AgentBeats/RESOURCES.md)
+- [Submission Guide](AgentBeats/SUBMISSION-GUIDE.md) - Requirements, checklist, deployment
+- [Resources](AgentBeats/RESOURCES.md) - External links
 
 ### Project Documentation
 - [Abstract](Abstract.md) - 500-word benchmark description
