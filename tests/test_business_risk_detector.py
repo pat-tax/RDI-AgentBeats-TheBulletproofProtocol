@@ -105,7 +105,9 @@ class TestBusinessRiskDetector:
         assert penalty >= 5
         assert count >= 1
 
-    def test_multiple_business_risks_cumulative_penalty(self, detector: BusinessRiskDetector) -> None:
+    def test_multiple_business_risks_cumulative_penalty(
+        self, detector: BusinessRiskDetector
+    ) -> None:
         """Should apply cumulative penalty for multiple business risk patterns."""
         text = (
             "This project will increase revenue, improve market share, "
