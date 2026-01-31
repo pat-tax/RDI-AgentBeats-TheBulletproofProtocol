@@ -25,7 +25,7 @@ class TestTrivialAgentBaselines:
         assert result.risk_score > 80, (
             f"Empty narrative should have risk_score > 80, got {result.risk_score}"
         )
-        assert result.compliance_classification == "high_risk"
+        assert result.risk_category in ["CRITICAL", "VERY_HIGH"]
 
     def test_whitespace_only_high_risk_score(self):
         """Whitespace-only response should score > 80 risk."""
@@ -35,7 +35,7 @@ class TestTrivialAgentBaselines:
         result = evaluator.evaluate(whitespace_narrative)
 
         assert result.risk_score > 80
-        assert result.compliance_classification == "high_risk"
+        assert result.risk_category in ["CRITICAL", "VERY_HIGH"]
 
     def test_random_text_high_risk_score(self):
         """Random text (no domain content) should score > 70 risk."""
@@ -53,7 +53,7 @@ class TestTrivialAgentBaselines:
         assert result.risk_score > 70, (
             f"Random text should have risk_score > 70, got {result.risk_score}"
         )
-        assert result.compliance_classification in ["high_risk", "medium_risk"]
+        assert result.risk_category in ["CRITICAL", "VERY_HIGH", "HIGH"]
 
     def test_gibberish_high_risk_score(self):
         """Gibberish text should score > 70 risk."""
@@ -63,7 +63,7 @@ class TestTrivialAgentBaselines:
         result = evaluator.evaluate(gibberish_narrative)
 
         assert result.risk_score > 70
-        assert result.compliance_classification in ["high_risk", "medium_risk"]
+        assert result.risk_category in ["CRITICAL", "VERY_HIGH", "HIGH"]
 
     def test_business_only_text_high_risk_score(self):
         """Text with only business language (no technical content) should score high risk."""

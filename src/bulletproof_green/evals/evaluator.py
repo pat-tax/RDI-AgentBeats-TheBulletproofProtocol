@@ -168,6 +168,9 @@ class RuleBasedEvaluator:
         issues: list[Issue] = []
         text_lower = narrative.lower()
 
+        # STORY-027: Detect trivial/empty content (highest priority check)
+        trivial_penalty = self._detect_trivial_content(narrative, issues)
+
         # REVIEW/FIXME: Custom penalty detection (not using pre-built NLP/ML packages)
         # Calculate component penalties using pattern-based detection
         routine_penalty, routine_count = self._detect_routine_engineering(text_lower, issues)
@@ -180,9 +183,11 @@ class RuleBasedEvaluator:
 
         # REVIEW/FIXME: Custom risk aggregation (intentionally hand-crafted, not ML-based)
         # Calculate total risk score (sum of penalties, capped at 100)
+        # STORY-027: Trivial content takes precedence
         risk_score = min(
             100,
-            routine_penalty
+            trivial_penalty
+            + routine_penalty
             + business_penalty
             + vagueness_penalty
             + experimentation_penalty
@@ -243,6 +248,97 @@ class RuleBasedEvaluator:
             llm_score=llm_score,
             llm_reasoning=llm_reasoning,
         )
+
+    def _detect_trivial_content(self, text: str, issues: list[Issue]) -> int:
+        """Detect trivial/empty content (STORY-027 baseline).
+
+        Trivial agents (empty response, random text) should score >80 risk.
+
+        Returns:
+            int: penalty (0-85 points)
+        """
+        # Strip whitespace to check actual content
+        stripped = text.strip()
+
+        # Empty or whitespace-only content -> maximum penalty (85)
+        if not stripped:
+            issues.append(
+                Issue(
+                    category="trivial_content",
+                    severity="critical",
+                    text="empty or whitespace-only narrative",
+                    suggestion="Provide a complete narrative documenting technical R&D activities.",
+                )
+            )
+            return 85
+
+        # Very short content (< 50 chars) likely trivial -> high penalty (70)
+        if len(stripped) < 50:
+            issues.append(
+                Issue(
+                    category="trivial_content",
+                    severity="critical",
+                    text="narrative too short to evaluate",
+                    suggestion="Expand narrative to at least 500 words documenting "
+                    "technical uncertainty and experimentation.",
+                )
+            )
+            return 70
+
+        # Check for random/gibberish text: no technical or domain keywords
+        technical_keywords = [
+            "algorithm",
+            "code",
+            "data",
+            "database",
+            "development",
+            "engineering",
+            "experiment",
+            "failure",
+            "function",
+            "hypothesis",
+            "implementation",
+            "iteration",
+            "method",
+            "optimization",
+            "performance",
+            "process",
+            "program",
+            "research",
+            "software",
+            "system",
+            "technical",
+            "technology",
+            "test",
+            "uncertainty",
+        ]
+
+        text_lower = text.lower()
+        has_technical_content = any(keyword in text_lower for keyword in technical_keywords)
+
+        # Lacks any technical keywords -> likely random text
+        # Apply penalty based on length (shorter = higher penalty)
+        if not has_technical_content:
+            if len(stripped) < 100:
+                penalty = 65  # Very short random text
+            elif len(stripped) < 300:
+                penalty = 55  # Medium-length random text
+            else:
+                penalty = 45  # Longer random text (still problematic)
+
+            issues.append(
+                Issue(
+                    category="trivial_content",
+                    severity="high",
+                    text="no technical or R&D content detected",
+                    suggestion="Include technical details about development activities "
+                    "and experimentation.",
+                )
+            )
+            return penalty
+
+        # No trivial content detected
+        return 0
 
     def _detect_routine_engineering(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect routine engineering patterns. Max penalty: 30 points.
