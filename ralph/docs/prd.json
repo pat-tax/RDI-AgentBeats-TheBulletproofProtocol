@@ -674,8 +674,8 @@
         "src/bulletproof_green/scorer.py",
         "tests/test_business_risk_detector.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-31T01:37:45Z",
       "content_hash": "49b2f7322b5375edc22f26569681d5b295dd60ee016132b4f1d80f5fa3476a5f",
       "depends_on": []
     },

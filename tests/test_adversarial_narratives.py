@@ -44,7 +44,9 @@ class TestAdversarialNarratives:
             item for item in adversarial_dataset if item["attack_type"] == "keyword_stuffing"
         ]
 
-        assert len(keyword_stuffing_narratives) > 0, "Dataset must contain keyword stuffing examples"
+        assert len(keyword_stuffing_narratives) > 0, (
+            "Dataset must contain keyword stuffing examples"
+        )
 
         for item in keyword_stuffing_narratives:
             result = evaluator.evaluate(item["narrative"])
@@ -97,10 +99,15 @@ class TestAdversarialNarratives:
 
     def test_whitespace_variation_resistance(self, evaluator):
         """Evaluator should handle extra whitespace consistently."""
-        base_narrative = "Our team researched technical uncertainty. We experimented with algorithms."
+        base_narrative = (
+            "Our team researched technical uncertainty. We experimented with algorithms."
+        )
 
         # Add extra whitespace
-        whitespace_narrative = "Our  team   researched    technical     uncertainty.  We  experimented  with  algorithms."
+        whitespace_narrative = (
+            "Our  team   researched    technical     uncertainty.  "
+            "We  experimented  with  algorithms."
+        )
 
         result_base = evaluator.evaluate(base_narrative)
         result_whitespace = evaluator.evaluate(whitespace_narrative)
@@ -132,9 +139,9 @@ class TestAdversarialNarratives:
         required_fields = {"id", "narrative", "attack_type", "expected_detection", "description"}
 
         for item in adversarial_dataset:
-            assert required_fields.issubset(
-                item.keys()
-            ), f"Item {item.get('id', 'unknown')} missing required fields"
+            assert required_fields.issubset(item.keys()), (
+                f"Item {item.get('id', 'unknown')} missing required fields"
+            )
 
             assert isinstance(item["id"], str)
             assert isinstance(item["narrative"], str)
@@ -148,12 +155,12 @@ class TestAdversarialNarratives:
     def test_overgeneralization_gaming(self, evaluator, adversarial_dataset):
         """Overgeneralization (vague technical terms) should be detected."""
         overgeneralization_narratives = [
-            item
-            for item in adversarial_dataset
-            if item["attack_type"] == "overgeneralization"
+            item for item in adversarial_dataset if item["attack_type"] == "overgeneralization"
         ]
 
-        assert len(overgeneralization_narratives) > 0, "Dataset must contain overgeneralization examples"
+        assert len(overgeneralization_narratives) > 0, (
+            "Dataset must contain overgeneralization examples"
+        )
 
         for item in overgeneralization_narratives:
             result = evaluator.evaluate(item["narrative"])
@@ -206,9 +213,7 @@ class TestAdversarialNarratives:
     def test_combined_gaming_strategies(self, evaluator, adversarial_dataset):
         """Combined gaming strategies should be detected."""
         combined_narratives = [
-            item
-            for item in adversarial_dataset
-            if item["attack_type"] == "combined_gaming"
+            item for item in adversarial_dataset if item["attack_type"] == "combined_gaming"
         ]
 
         if len(combined_narratives) > 0:
