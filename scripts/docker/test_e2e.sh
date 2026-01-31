@@ -44,7 +44,7 @@
 #
 # PREREQUISITES:
 #   - Docker and docker-compose installed
-#   - Ports 8001 (Purple) and 8002 (Green) available
+#   - Ports 9010 (Purple) and 9009 (Green) available
 #   - Ground truth data at: data/ground_truth.json
 #
 # OUTPUTS:
@@ -80,6 +80,9 @@ source "${SCRIPT_DIR}/common.sh"
 TEST_MODE="${E2E_MODE:-quick}"
 BUILD_FLAG=""
 [[ "${E2E_BUILD:-0}" == "1" ]] && BUILD_FLAG="--build"
+
+# Docker Compose configuration (aligns with docker-compose-local.yml)
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose-local.yml}"
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -145,12 +148,12 @@ start_containers() {
     if [ -n "$BUILD_FLAG" ]; then
         echo "(with --build)"
     fi
-    docker-compose up -d $BUILD_FLAG
+    docker-compose -f "$COMPOSE_FILE" up -d $BUILD_FLAG
 
     echo "Waiting for agents to be ready..."
     for i in {1..30}; do
-        if curl -s http://localhost:8001/.well-known/agent-card.json > /dev/null 2>&1 && \
-           curl -s http://localhost:8002/.well-known/agent-card.json > /dev/null 2>&1; then
+        if curl -s http://localhost:9010/.well-known/agent-card.json > /dev/null 2>&1 && \
+           curl -s http://localhost:9009/.well-known/agent-card.json > /dev/null 2>&1; then
             break
         fi
         sleep 1
@@ -158,7 +161,7 @@ start_containers() {
 
     echo ""
     echo "Step 2: Checking containers..."
-    if docker-compose ps | grep -q "Up"; then
+    if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
         pass "Containers running"
     else
         fail "Containers not running"
@@ -171,7 +174,7 @@ start_containers() {
 test_agent_cards() {
     echo ""
     echo "Step 3: Testing Purple AgentCard..."
-    PURPLE_CARD=$(curl -s http://localhost:8001/.well-known/agent-card.json)
+    PURPLE_CARD=$(curl -s http://localhost:9010/.well-known/agent-card.json)
     echo "$PURPLE_CARD" > "$LOG_DIR/purple_agent_card.json"
     if echo "$PURPLE_CARD" | grep -q "Bulletproof Purple Agent"; then
         pass "Purple AgentCard OK"
@@ -181,7 +184,7 @@ test_agent_cards() {
 
     echo ""
     echo "Step 4: Testing Green AgentCard..."
-    GREEN_CARD=$(curl -s http://localhost:8002/.well-known/agent-card.json)
+    GREEN_CARD=$(curl -s http://localhost:9009/.well-known/agent-card.json)
     echo "$GREEN_CARD" > "$LOG_DIR/green_agent_card.json"
     if echo "$GREEN_CARD" | grep -q "Bulletproof Green Agent"; then
         pass "Green AgentCard OK"
@@ -196,7 +199,7 @@ test_agent_cards() {
 test_purple_agent() {
     echo ""
     echo "Step 5: Testing Purple Agent (narrative generation)..."
-    PURPLE_RESPONSE=$(curl -s -X POST http://localhost:8001/ \
+    PURPLE_RESPONSE=$(curl -s -X POST http://localhost:9010/ \
         -H "Content-Type: application/json" \
         -d '{"jsonrpc":"2.0","id":"1","method":"message/send","params":{"message":{"messageId":"test-1","role":"user","parts":[{"text":"Generate a qualifying R&D narrative"}]}}}')
     echo "$PURPLE_RESPONSE" > "$LOG_DIR/purple_narrative_response.json"
@@ -214,7 +217,7 @@ test_purple_agent() {
 call_green_agent() {
     local narrative="$1"
     local id="$2"
-    curl -s -X POST http://localhost:8002/ \
+    curl -s -X POST http://localhost:9009/ \
         -H "Content-Type: application/json" \
         -d "{\"jsonrpc\":\"2.0\",\"id\":\"$id\",\"method\":\"message/send\",\"params\":{\"message\":{\"messageId\":\"test-$id\",\"role\":\"user\",\"parts\":[{\"text\":\"$narrative\"}]}}}"
 }
@@ -458,6 +461,6 @@ ls -la "$LOG_DIR"
 echo ""
 read -p "Stop containers? (y/N): " STOP
 if [ "$STOP" = "y" ] || [ "$STOP" = "Y" ]; then
-    docker-compose down
+    docker-compose -f "$COMPOSE_FILE" down
     echo "Containers stopped."
 fi
