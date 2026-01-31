@@ -695,8 +695,8 @@
         "src/bulletproof_green/rules/specificity_detector.py",
         "tests/test_specificity_detector.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-31T02:46:35Z",
       "content_hash": "76a95defb658f6cd8999cb00115c3a97e00c2c95c87f667b7ad567e9ae51b6cf",
       "depends_on": []
     },
