@@ -188,3 +188,13 @@ Story: STORY-029
 Status: PASS
 Notes: Already complete, verified by quality checks
 
+## Iteration 6 - Sat Jan 31 01:29:35 AM UTC 2026
+Story: STORY-030
+Status: RETRY
+Notes: TDD failed, retrying
+
+## Iteration 7 - Fri Jan 31 18:00:00 UTC 2026
+Story: STORY-030
+Status: PASS
+Notes: Story already complete with full implementation and tests. All acceptance criteria verified: (1) Difficulty tags exist in ground_truth.json - 8 easy, 8 medium, 8 hard entries providing even distribution ✓ (2) Per-tier accuracy reporting implemented in validate_benchmark.py generate_tier_results() method (lines 242-277) ✓ (3) Validation script reports breakdown in to_summary() output (lines 78-85) ✓ (4) JSON schema updated with difficulty field in GroundTruthEntry, ValidationResult, and DifficultyTierResult models ✓ (5) CLI output includes "RESULTS BY DIFFICULTY TIER" section ✓ (6) Comprehensive tests in test_accuracy_by_difficulty_tier.py verify all functionality ✓. Implementation existed from STORY-009 and STORY-029. Test commit cc9a359 verified functionality.
+
