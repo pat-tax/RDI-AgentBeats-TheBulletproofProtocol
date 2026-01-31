@@ -13,6 +13,8 @@ import time
 from typing import TYPE_CHECKING
 
 from bulletproof_green.models import EvaluationResult, Issue, Redline
+from bulletproof_green.rules.business_risk_detector import BusinessRiskDetector
+from bulletproof_green.rules.specificity_detector import SpecificityDetector
 
 if TYPE_CHECKING:
     from bulletproof_green.evals.llm_judge import LLMJudge
@@ -24,7 +26,15 @@ class RuleBasedEvaluator:
     REVIEW/FIXME: Custom rule-based evaluation (intentionally not using pre-built
     packages like scikit-learn, spaCy, or other ML/NLP libraries). All pattern
     detection is implemented from first principles for domain-specific IRS compliance.
+
+    STORY-033: Modular detector architecture - uses BusinessRiskDetector and
+    SpecificityDetector modules for improved maintainability and testability.
     """
+
+    def __init__(self):
+        """Initialize evaluator with modular detectors (STORY-033)."""
+        self.business_risk_detector = BusinessRiskDetector()
+        self.specificity_detector = SpecificityDetector()
 
     # REVIEW/FIXME: Custom-crafted patterns (not using pre-built pattern libraries)
     # Routine engineering patterns (IRS considers these non-qualifying)
@@ -403,29 +413,32 @@ class RuleBasedEvaluator:
         return min(30, penalty), count
 
     def _detect_business_risk(self, text: str, issues: list[Issue]) -> tuple[int, int]:
-        """Detect business risk language. Max penalty: 20 points.
+        """Detect business risk language using BusinessRiskDetector module.
 
-        REVIEW/FIXME: Custom pattern matching (not using pre-built NLP/text classification)
+        STORY-033: Delegates to modular BusinessRiskDetector for detection logic.
+        Max penalty: 20 points.
 
         Returns:
             tuple[int, int]: (penalty, count of patterns detected)
         """
-        penalty = 0
-        count = 0
-        for pattern, description in self.BUSINESS_PATTERNS:
-            if re.search(pattern, text, re.IGNORECASE):
-                penalty += 5
-                count += 1
-                issues.append(
-                    Issue(
-                        category="business_risk",
-                        severity="high" if penalty >= 10 else "medium",
-                        text=description,
-                        suggestion="Focus on technical uncertainty rather than "
-                        "business or market objectives.",
-                    )
+        # Use modular detector (STORY-033)
+        penalty, count = self.business_risk_detector.detect(text)
+
+        # Add issues for each detection
+        if count > 0:
+            # Add aggregated issue based on severity
+            severity = "high" if penalty >= 10 else "medium"
+            issues.append(
+                Issue(
+                    category="business_risk",
+                    severity=severity,
+                    text=f"{count} business risk pattern(s) detected",
+                    suggestion="Focus on technical uncertainty rather than "
+                    "business or market objectives.",
                 )
-        return min(20, penalty), count
+            )
+
+        return penalty, count
 
     def _detect_vagueness(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect vague language without specific metrics. Max penalty: 25 points.
@@ -489,35 +502,31 @@ class RuleBasedEvaluator:
             return 15, evidence_score
 
     def _detect_lack_of_specificity(self, text: str, issues: list[Issue]) -> tuple[int, float]:
-        """Detect lack of specific metrics. Max penalty: 10 points.
+        """Detect lack of specific metrics using SpecificityDetector module.
 
-        REVIEW/FIXME: Custom regex matching (not using pre-built metric extraction libraries)
+        STORY-033: Delegates to modular SpecificityDetector for detection logic.
+        Max penalty: 10 points.
 
         Returns:
             tuple[int, float]: (penalty, specificity_score 0.0-1.0)
         """
-        # Count specific metrics in the text
-        metrics = self.SPECIFICITY_PATTERN.findall(text)
+        # Use modular detector (STORY-033)
+        penalty, specificity_score = self.specificity_detector.detect(text)
 
-        # Calculate specificity score (normalized to 0.0-1.0)
-        # Good narratives have 3+ metrics
-        specificity_score = min(1.0, len(metrics) / 3.0)
-
-        if len(metrics) >= 3:
-            return 0, specificity_score
-        elif len(metrics) >= 1:
-            return 3, specificity_score
-        else:
+        # Add issue if penalty detected
+        if penalty > 0:
+            severity = "low" if penalty <= 5 else "medium"
             issues.append(
                 Issue(
                     category="specificity",
-                    severity="low",
+                    severity=severity,
                     text="lack of specific metrics",
                     suggestion="Include quantitative metrics (e.g., latency, "
                     "throughput, memory usage, error rates).",
                 )
             )
-            return 10, specificity_score
+
+        return penalty, specificity_score
 
     # ============================================================================
     # STORY-031: Adversarial Gaming Detection
