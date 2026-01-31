@@ -381,13 +381,14 @@ target_risk_score = 20
 **Deadline**: January 31, 2026
 
 **Deliverables**:
-- [ ] Abstract (300 words) - `ABSTRACT.md`
 - [ ] Public GitHub repository with code + README
 - [ ] Green agent (benchmark) - A2A compatible
 - [ ] Purple agent (baseline) - demonstrates benchmark
 - [ ] Docker images on GHCR (public)
 - [ ] Agents registered on agentbeats.dev
-- [ ] 3-minute demo video
+- [ ] Abstract (300 words) - `docs/AgentBeats/ABSTRACT.md`
+- [ ] Demo video script (3-minute recording guide) - `docs/AgentBeats/DEMO_VIDEO_SCRIPT.md`
+- [ ] 3-minute demo video (recorded)
 - [ ] Phase 1 submission form completed
 
 **Judging Criteria**:
@@ -438,7 +439,7 @@ target_risk_score = 20
 - **Feature 9** → STORY-013: Register agents on agentbeats.dev (depends: STORY-012)
 
 **Submission**:
-- STORY-014: Write abstract and demo video (depends: STORY-013)
+- STORY-014: Write abstract (`docs/AgentBeats/ABSTRACT.md`) and demo video script (`docs/AgentBeats/DEMO_VIDEO_SCRIPT.md`) (depends: STORY-013)
 
 ### Story Breakdown - Phase 2 (32 stories total)
 
