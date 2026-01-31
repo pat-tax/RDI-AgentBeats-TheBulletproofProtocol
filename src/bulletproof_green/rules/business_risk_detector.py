@@ -1,4 +1,4 @@
-"""Business risk detector for IRS Section 41 R&D narratives (STORY-033).
+"""Business risk detector for IRS Section 41 R&D narratives.
 
 Detects business-focused language that indicates business risk rather than
 technical risk/uncertainty. IRS Section 41 requires focus on technical
@@ -18,7 +18,7 @@ class BusinessRiskDetector:
     """Detects business risk language in narratives.
 
     Implements detect(text: str) -> tuple[int, int] interface for modular
-    detector architecture (STORY-033, STORY-040-045).
+    detector architecture.
     """
 
     # Business risk patterns (should focus on technical risk instead)

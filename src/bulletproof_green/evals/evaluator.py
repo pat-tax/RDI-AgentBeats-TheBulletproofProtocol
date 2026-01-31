@@ -27,12 +27,12 @@ class RuleBasedEvaluator:
     packages like scikit-learn, spaCy, or other ML/NLP libraries). All pattern
     detection is implemented from first principles for domain-specific IRS compliance.
 
-    STORY-033: Modular detector architecture - uses BusinessRiskDetector and
+    Modular detector architecture - uses BusinessRiskDetector and
     SpecificityDetector modules for improved maintainability and testability.
     """
 
     def __init__(self):
-        """Initialize evaluator with modular detectors (STORY-033)."""
+        """Initialize evaluator with modular detectors."""
         self.business_risk_detector = BusinessRiskDetector()
         self.specificity_detector = SpecificityDetector()
 
@@ -415,13 +415,13 @@ class RuleBasedEvaluator:
     def _detect_business_risk(self, text: str, issues: list[Issue]) -> tuple[int, int]:
         """Detect business risk language using BusinessRiskDetector module.
 
-        STORY-033: Delegates to modular BusinessRiskDetector for detection logic.
+        Delegates to modular BusinessRiskDetector for detection logic.
         Max penalty: 20 points.
 
         Returns:
             tuple[int, int]: (penalty, count of patterns detected)
         """
-        # Use modular detector (STORY-033)
+        # Use modular detector
         penalty, count = self.business_risk_detector.detect(text)
 
         # Add issues for each detection
@@ -504,13 +504,13 @@ class RuleBasedEvaluator:
     def _detect_lack_of_specificity(self, text: str, issues: list[Issue]) -> tuple[int, float]:
         """Detect lack of specific metrics using SpecificityDetector module.
 
-        STORY-033: Delegates to modular SpecificityDetector for detection logic.
+        Delegates to modular SpecificityDetector for detection logic.
         Max penalty: 10 points.
 
         Returns:
             tuple[int, float]: (penalty, specificity_score 0.0-1.0)
         """
-        # Use modular detector (STORY-033)
+        # Use modular detector
         penalty, specificity_score = self.specificity_detector.detect(text)
 
         # Add issue if penalty detected

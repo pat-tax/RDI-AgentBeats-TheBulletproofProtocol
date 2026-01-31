@@ -1,4 +1,4 @@
-"""Tests for benchmark validation with difficulty tier reporting (STORY-035).
+"""Tests for benchmark validation with difficulty tier reporting (STORY-030).
 
 This test module validates that validate_benchmark.py reports accuracy breakdown
 by difficulty level, shows pass/fail counts per difficulty, and includes
@@ -74,9 +74,7 @@ class TestDifficultyTierAccuracyReporting:
 
         for tier in report.tier_results:
             assert hasattr(tier, "pass_rate"), f"{tier.tier} must have pass_rate"
-            assert 0.0 <= tier.pass_rate <= 1.0, (
-                f"{tier.tier} pass_rate must be between 0 and 1"
-            )
+            assert 0.0 <= tier.pass_rate <= 1.0, f"{tier.tier} pass_rate must be between 0 and 1"
             # Verify pass_rate calculation
             expected_rate = tier.passed / tier.total if tier.total > 0 else 0.0
             assert abs(tier.pass_rate - expected_rate) < 0.001, (
@@ -131,9 +129,7 @@ class TestDifficultyTierAccuracyReporting:
 
         # Verify tier_results contains distribution information
         total_entries = sum(tier.total for tier in report.tier_results)
-        assert total_entries == len(data), (
-            "Sum of tier totals must equal total entries"
-        )
+        assert total_entries == len(data), "Sum of tier totals must equal total entries"
 
         # Each tier should have at least some entries
         for tier in report.tier_results:
@@ -154,9 +150,7 @@ class TestAccuracyByDifficultyLevel:
         # Manually verify calculation for each tier
         from collections import defaultdict
 
-        tier_stats: dict[str, dict[str, int]] = defaultdict(
-            lambda: {"total": 0, "passed": 0}
-        )
+        tier_stats: dict[str, dict[str, int]] = defaultdict(lambda: {"total": 0, "passed": 0})
         for result in results:
             tier = result.difficulty
             tier_stats[tier]["total"] += 1
@@ -169,9 +163,7 @@ class TestAccuracyByDifficultyLevel:
             expected_passed = tier_stats[tier_result.tier]["passed"]
             expected_rate = expected_passed / expected_total if expected_total > 0 else 0.0
 
-            assert tier_result.total == expected_total, (
-                f"{tier_result.tier}: incorrect total count"
-            )
+            assert tier_result.total == expected_total, f"{tier_result.tier}: incorrect total count"
             assert tier_result.passed == expected_passed, (
                 f"{tier_result.tier}: incorrect passed count"
             )
@@ -285,6 +277,5 @@ class TestIntegrationWithGroundTruth:
         total_results = len(report.validation_results)
 
         assert total_from_tiers == total_results, (
-            f"Tier totals ({total_from_tiers}) must equal "
-            f"total results ({total_results})"
+            f"Tier totals ({total_from_tiers}) must equal total results ({total_results})"
         )

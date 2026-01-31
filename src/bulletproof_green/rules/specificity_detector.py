@@ -17,7 +17,7 @@ class SpecificityDetector:
     """Detects specificity in narratives through metrics, dates, and measurements.
 
     Implements detect(text: str) -> tuple[int, float] interface for modular
-    detector architecture (STORY-032, STORY-040-045).
+    detector architecture (STORY-032).
     """
 
     # Metrics pattern: numbers with units (ms, %, GB, req/s, etc.)
