@@ -55,6 +55,45 @@ class SpecificityDetector:
         r"\bfinal",
     ]
 
+    def _calculate_penalty(
+        self,
+        total_indicators: int,
+        exp_evidence: int,
+        bare_numbers_count: int,
+        is_metric_stuffing: bool,
+    ) -> int:
+        """Calculate penalty based on specificity indicators and gaming detection.
+
+        Args:
+            total_indicators: Count of metrics + dates + error codes
+            exp_evidence: Count of experimentation keywords found
+            bare_numbers_count: Count of bare numbers found
+            is_metric_stuffing: Whether gaming/stuffing was detected
+
+        Returns:
+            int: Penalty score (0-15)
+        """
+        if is_metric_stuffing:
+            return 15  # Penalize gaming heavily
+        elif total_indicators >= 3:
+            return 0  # High specificity
+        elif total_indicators == 2:
+            return 0  # Reasonable specificity
+        elif total_indicators == 1:
+            # Error codes and other single indicators acceptable with context
+            if exp_evidence >= 2:
+                return 0  # Good context
+            elif exp_evidence >= 1:
+                return 3  # Some context
+            else:
+                return 5  # Standalone metric
+        else:
+            # Check if bare numbers provide some specificity
+            if bare_numbers_count >= 3:
+                return 5  # Some numbers present
+            else:
+                return 10  # No specificity at all
+
     def detect(self, text: str) -> tuple[int, float]:
         """Detect specificity in narrative text.
 
@@ -130,33 +169,9 @@ class SpecificityDetector:
         else:
             specificity_score = base_score
 
-        # Calculate penalty (inverse of score)
-        # 3+ indicators with context: 0 penalty
-        # 2 indicators: 0 penalty (sufficient specificity)
-        # 1 indicator: 3-5 penalty based on context
-        # 0 indicators: 10 penalty
-        # Metric stuffing: higher penalty despite metrics
-        if is_metric_stuffing:
-            penalty = 15  # Penalize gaming heavily
-        elif total_indicators >= 3:
-            penalty = 0  # High specificity
-        elif total_indicators == 2:
-            # 2 indicators = reasonable specificity
-            penalty = 0
-        elif total_indicators == 1:
-            # 1 indicator = moderate specificity
-            # Error codes and other single indicators acceptable with context
-            if exp_evidence >= 2:
-                penalty = 0  # Good context (e.g., "experiment failed with ERROR-503, retry...")
-            elif exp_evidence >= 1:
-                penalty = 3  # Some context
-            else:
-                penalty = 5  # Standalone metric
-        else:
-            # Check if bare numbers provide some specificity
-            if len(bare_numbers) >= 3:
-                penalty = 5  # Some numbers present
-            else:
-                penalty = 10  # No specificity at all
+        # Calculate penalty based on indicators and gaming detection
+        penalty = self._calculate_penalty(
+            total_indicators, exp_evidence, len(bare_numbers), is_metric_stuffing
+        )
 
         return (penalty, specificity_score)
