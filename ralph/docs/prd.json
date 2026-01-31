@@ -731,8 +731,8 @@
       "files": [
         "data/ground_truth.json"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-31T20:54:55Z",
       "content_hash": "09a5ba0c8867603b29edc82346a912d7f9cd3f3cef1cc236bf2094fb5a118c4c",
       "depends_on": []
     },
