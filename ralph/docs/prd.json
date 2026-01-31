@@ -564,7 +564,7 @@
     },
     {
       "id": "STORY-026",
-      "title": "Statistical rigor (Cohen's \u03ba, 95% CI)",
+      "title": "Statistical rigor (Cohen's κ, 95% CI)",
       "description": "Integrate LLM judge with rule-based scoring to create hybrid evaluation system",
       "acceptance": [
         "Evaluator uses both rule-based and LLM scoring",
@@ -587,26 +587,26 @@
       "title": "Create held-out test set",
       "description": "Test benchmark with trivial agents (empty response, random text) to establish baseline scores and ensure they score >80 (high risk = failing)",
       "acceptance": [
-        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
-        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
+        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
+        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
         "Held-out test set (separate from training/validation data)",
         "Documented limitations and edge cases",
         "scipy or statsmodels for statistical calculations",
         "Test framework integration"
       ],
       "files": [],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-31T01:06:19Z",
       "content_hash": "ce3925e946f7121befe813bff7e47aa47b6340379dd3754973d27c752b6c33d8",
       "depends_on": []
     },
     {
       "id": "STORY-028",
       "title": "Document benchmark limitations",
-      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's \u03ba)",
+      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's κ)",
       "acceptance": [
-        "Trivial agent baseline (empty response \u2192 risk_score > 80, random text \u2192 risk_score > 70)",
-        "Statistical measures (Cohen's \u03ba \u2265 0.75, 95% confidence intervals)",
+        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
+        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
         "Held-out test set (separate from training/validation data)",
         "Documented limitations and edge cases",
         "scipy or statsmodels for statistical calculations",
