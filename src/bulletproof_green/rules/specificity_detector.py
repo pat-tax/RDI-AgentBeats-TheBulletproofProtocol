@@ -71,10 +71,10 @@ class SpecificityDetector:
             is_metric_stuffing: Whether gaming/stuffing was detected
 
         Returns:
-            int: Penalty score (0-15)
+            int: Penalty score (0-15, evaluator may cap at 10 for risk calculation)
         """
         if is_metric_stuffing:
-            return 15  # Penalize gaming heavily
+            return 15  # Penalize gaming heavily (STORY-032 adversarial detection)
         elif total_indicators >= 3:
             return 0  # High specificity
         elif total_indicators == 2:
@@ -149,10 +149,13 @@ class SpecificityDetector:
         # 1. Metric repetition (same metric repeated 2.5+ times)
         # 2. High density (>30%) with no/weak exp evidence
         # 3. Very high density (>50%) regardless of evidence
+        # 4. Many metrics (>=5) with weak context: no error codes/dates AND weak exp (STORY-033)
+        has_technical_context = len(error_codes) > 0 or len(dates) > 0
         is_metric_stuffing = (
             has_metric_repetition
             or (metric_density > 30 and exp_evidence <= 1)
             or (metric_density > 50)
+            or (len(metrics) >= 5 and exp_evidence <= 2 and not has_technical_context)
         )
 
         # Calculate base specificity score (0.0-1.0)
