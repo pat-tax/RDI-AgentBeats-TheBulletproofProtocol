@@ -82,7 +82,7 @@
 
 **Rationale for Deferral**: Complex orchestration not required for Phase 1 benchmark. Better suited for Purple agent competition phase.
 
-**See**: [PRD.md](PRD.md) Feature 4 for complete specification
+**See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 4 for complete specification
 
 ---
 
@@ -94,7 +94,7 @@
 
 **Rationale for Deferral**: Phase 1 requires reproducible, deterministic scoring. Rule-based evaluation meets this requirement. LLM integration adds complexity without strengthening Phase 1 submission.
 
-**See**: [PRD.md](PRD.md) Feature 5 for complete specification
+**See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 5 for complete specification
 
 ---
 
@@ -106,7 +106,7 @@
 
 **Rationale for Deferral**: Current output schema meets Phase 1 requirements. Enhanced schema is a polish feature.
 
-**See**: [PRD.md](PRD.md) Feature 10 for complete specification
+**See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 10 for complete specification
 
 ---
 
@@ -118,7 +118,7 @@
 
 **Rationale for Deferral**: Not required for Phase 1 A2A protocol compliance. JSON-RPC 2.0 task lifecycle is sufficient.
 
-**See**: [PRD.md](PRD.md) Feature 15 for complete specification
+**See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 15 for complete specification
 
 ---
 
@@ -130,7 +130,7 @@
 
 **Rationale for Deferral**: Belongs in Purple agent competition phase, not green agent benchmark submission.
 
-**See**: [PRD.md](PRD.md) Feature 16 for complete specification
+**See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 16 for complete specification
 
 ---
 
@@ -142,7 +142,7 @@
 
 **Rationale for Deferral**: Current dataset meets Phase 1 requirements.
 
-**See**: [PRD.md](PRD.md) Feature 6 for complete specification
+**See**: [GreenAgent-PRD.md](GreenAgent-PRD.md) Feature 6 for complete specification
 
 ---
 
@@ -155,7 +155,7 @@
 **Rationale for Deferral**: Basic measures already documented in LIMITATIONS.md. Advanced testing is Phase 2 enhancement.
 
 **See**:
-- [PRD.md](PRD.md) Feature 14 for complete specification
+- [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 14 for complete specification
 - [LIMITATIONS.md](AgentBeats/LIMITATIONS.md) for current edge case documentation
 
 ---
@@ -169,7 +169,7 @@
 
 **Rationale for Deferral**: Current hybrid architecture (2 modular detectors + embedded logic) meets Phase 1 requirements. Full refactoring is architecture polish.
 
-**See**: [PRD.md](PRD.md) Feature 11 for complete specification
+**See**: [GreenAgent-PRD.md](GreenAgent-PRD.md) Feature 11 for complete specification
 
 ---
 
@@ -257,7 +257,8 @@ These Phase 2 features are **already complete** and **strengthen Phase 1 submiss
 - [Submission Guide](AgentBeats/SUBMISSION-GUIDE.md) - Requirements, checklist, deployment steps
 - [Resources](AgentBeats/RESOURCES.md) - Platform links, official repos, A2A protocol, IRS references
 - [Abstract](AgentBeats/ABSTRACT.md) - Benchmark description and demo video script
-- [PRD](PRD.md) - Product Requirements Document with all feature specifications
+- [Green Agent PRD](GreenAgent-PRD.md) - Phase 1 requirements (benchmark)
+- [Purple Agent PRD](PurpleAgent-PRD.md) - Phase 2 requirements (competition)
 - [LIMITATIONS](AgentBeats/LIMITATIONS.md) - Known limitations and edge cases
 
 ---

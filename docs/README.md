@@ -522,9 +522,11 @@ src/bulletproof_green/
 - [Resources](AgentBeats/RESOURCES.md) - External links
 
 ### Project Documentation
-- [Abstract](Abstract.md) - 500-word benchmark description
-- [PRD](PRD.md) - Product Requirements Document
-- [User Stories](UserStory.md) - User story specifications
+- [Abstract](AgentBeats/ABSTRACT.md) - 500-word benchmark description
+- [Green Agent PRD](GreenAgent-PRD.md) - Phase 1 requirements (benchmark)
+- [Purple Agent PRD](PurpleAgent-PRD.md) - Phase 2 requirements (competition)
+- [Green Agent User Story](GreenAgent-UserStory.md) - Phase 1 user stories
+- [Purple Agent User Story](PurpleAgent-UserStory.md) - Phase 2 user stories
 - [Gap Analysis](GAP-ANALYSIS.md) - Current state analysis
 
 ### Best Practices
