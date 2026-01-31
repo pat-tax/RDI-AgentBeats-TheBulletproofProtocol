@@ -13,6 +13,7 @@ dist/
 
 # Testing
 .pytest_cache/
+pytest-of-vscode/
 .coverage/
 .coverage
 
@@ -39,10 +40,15 @@ Thumbs.db
 reference/
 site/
 
-# sanity
+# linting
 .ruff_cache/
 .mypy_cache/
 .complexipy_cache/
+
+# Platform runtime output (keep directory via .gitkeep)
+output/*.json
+output/*.log
+
 
 # configs (created by Claude Code sandbox)
 .bash_profile
