@@ -6,8 +6,6 @@ Tests held-out test set, version tracking, and data provenance.
 import json
 from pathlib import Path
 
-import pytest
-
 
 class TestHeldOutTestSet:
     """Tests for held-out test set that's not in public ground truth."""

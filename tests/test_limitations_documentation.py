@@ -34,9 +34,9 @@ class TestLimitationsDocumentation:
         content = limitations_file.read_text().lower()
 
         # Should mention Cohen's kappa or inter-rater reliability
-        assert any(keyword in content for keyword in [
-            "cohen", "kappa", "κ", "inter-rater", "reliability"
-        ]), "Must document Cohen's κ limitations"
+        assert any(
+            keyword in content for keyword in ["cohen", "kappa", "κ", "inter-rater", "reliability"]
+        ), "Must document Cohen's κ limitations"
 
         # Should mention confidence intervals
         assert "confidence interval" in content, "Must document CI limitations"
@@ -46,27 +46,30 @@ class TestLimitationsDocumentation:
         content = limitations_file.read_text().lower()
 
         # Should discuss sample size, dataset size, or ground truth limitations
-        assert any(keyword in content for keyword in [
-            "sample size", "dataset size", "ground truth", "test set"
-        ]), "Must document sample size limitations"
+        assert any(
+            keyword in content
+            for keyword in ["sample size", "dataset size", "ground truth", "test set"]
+        ), "Must document sample size limitations"
 
     def test_documents_rule_based_limitations(self, limitations_file: Path):
         """Test that rule-based evaluation limitations are documented."""
         content = limitations_file.read_text().lower()
 
         # Should mention rule-based, pattern matching, or keyword detection limitations
-        assert any(keyword in content for keyword in [
-            "rule-based", "pattern", "keyword", "false positive", "false negative"
-        ]), "Must document rule-based evaluation limitations"
+        assert any(
+            keyword in content
+            for keyword in ["rule-based", "pattern", "keyword", "false positive", "false negative"]
+        ), "Must document rule-based evaluation limitations"
 
     def test_documents_edge_cases(self, limitations_file: Path):
         """Test that known edge cases are documented."""
         content = limitations_file.read_text().lower()
 
         # Should mention edge cases, corner cases, or known failures
-        assert any(keyword in content for keyword in [
-            "edge case", "corner case", "limitation", "known issue"
-        ]), "Must document known edge cases"
+        assert any(
+            keyword in content
+            for keyword in ["edge case", "corner case", "limitation", "known issue"]
+        ), "Must document known edge cases"
 
     def test_has_proper_markdown_structure(self, limitations_file: Path):
         """Test that LIMITATIONS.md follows proper markdown structure."""
@@ -84,15 +87,17 @@ class TestLimitationsDocumentation:
         content = limitations_file.read_text().lower()
 
         # Should discuss reproducibility, determinism, or variability
-        assert any(keyword in content for keyword in [
-            "reproducib", "deterministic", "variability", "consistency"
-        ]), "Must document reproducibility constraints"
+        assert any(
+            keyword in content
+            for keyword in ["reproducib", "deterministic", "variability", "consistency"]
+        ), "Must document reproducibility constraints"
 
     def test_documents_mitigation_strategies(self, limitations_file: Path):
         """Test that mitigation strategies are documented."""
         content = limitations_file.read_text().lower()
 
         # Should provide guidance on addressing limitations
-        assert any(keyword in content for keyword in [
-            "mitigate", "address", "improve", "recommendation", "future work"
-        ]), "Must document mitigation strategies"
+        assert any(
+            keyword in content
+            for keyword in ["mitigate", "address", "improve", "recommendation", "future work"]
+        ), "Must document mitigation strategies"

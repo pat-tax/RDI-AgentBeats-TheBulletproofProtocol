@@ -5,7 +5,6 @@ broken down by difficulty tier (EASY, MEDIUM, HARD) and that tiers are
 evenly distributed.
 """
 
-import json
 from collections import Counter
 from pathlib import Path
 
@@ -126,9 +125,7 @@ class TestDifficultyTierReporting:
             expected_passed = tier_stats[tier_result.tier]["passed"]
             expected_pass_rate = expected_passed / expected_total if expected_total > 0 else 0.0
 
-            assert tier_result.total == expected_total, (
-                f"{tier_result.tier}: total mismatch"
-            )
+            assert tier_result.total == expected_total, f"{tier_result.tier}: total mismatch"
             assert tier_result.passed == expected_passed, (
                 f"{tier_result.tier}: passed count mismatch"
             )
