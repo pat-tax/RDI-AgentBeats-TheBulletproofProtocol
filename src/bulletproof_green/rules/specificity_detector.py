@@ -150,7 +150,7 @@ class SpecificityDetector:
         comparison_patterns = [
             r"from\s+\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "from 200ms to 45ms"
             r"reduced?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "reduced from 200ms to 45ms"
-            r"decreased?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "decreased from 1.2GB to 800MB"
+            r"decreased?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "decreased 1.2GB to 800MB"
             r"improved?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "improved from 5% to 1%"
             r"dropped?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "dropped from 5% to 0.2%"
         ]
