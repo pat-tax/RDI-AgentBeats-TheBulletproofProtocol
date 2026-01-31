@@ -5,7 +5,7 @@
 # Green Agent (Benchmark): Evaluates R&D narratives for IRS compliance
 # Purple Agent (Reference): Generates sample R&D narratives for testing
 #
-# Registration Guide: docs/AgentBeats/AGENTBEATS_REGISTRATION.md
+# Registration Guide: docs/AgentBeats/SUBMISSION-GUIDE.md
 #
 # IMPORTANT: Replace placeholder agentbeats_id values with actual IDs
 # obtained from registering your agents at https://agentbeats.dev

@@ -140,7 +140,7 @@ Your images will be available at:
 
 For production deployment, register your agents on the AgentBeats platform and update `scenario.toml` with your agent IDs.
 
-**See the complete registration guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
+**See the complete registration guide**: [docs/AgentBeats/SUBMISSION-GUIDE.md](docs/AgentBeats/SUBMISSION-GUIDE.md)
 
 Quick overview:
 1. Sign up at [agentbeats.dev](https://agentbeats.dev)
@@ -191,9 +191,9 @@ Before submitting, ensure all deliverables are complete:
   - [ ] All tests passing: `make validate`
 
 - [ ] **Documentation**
-  - `docs/Abstract.md` (≤500 words describing benchmark methodology)
+  - `docs/AgentBeats/ABSTRACT.md` (≤500 words describing benchmark methodology)
   - `README.md` (this file) with usage instructions
-  - `docs/AgentBeats/AGENTBEATS_REGISTRATION.md` (registration guide)
+  - `docs/AgentBeats/SUBMISSION-GUIDE.md` (registration and submission guide)
   - `ralph/README.md` (Ralph Loop documentation)
 
 - [ ] **AgentBeats Platform Registration**
@@ -240,8 +240,9 @@ bash scripts/build.sh && bash scripts/push.sh
 
 **Project Documentation**:
 
-- **Registration Guide**: [docs/AgentBeats/AGENTBEATS_REGISTRATION.md](docs/AgentBeats/AGENTBEATS_REGISTRATION.md)
-- **Abstract**: [docs/Abstract.md](docs/Abstract.md)
+- **Competition Alignment**: [docs/AgentBeats/COMPETITION-ALIGNMENT.md](docs/AgentBeats/COMPETITION-ALIGNMENT.md)
+- **Submission Guide**: [docs/AgentBeats/SUBMISSION-GUIDE.md](docs/AgentBeats/SUBMISSION-GUIDE.md)
+- **Abstract**: [docs/AgentBeats/ABSTRACT.md](docs/AgentBeats/ABSTRACT.md)
 - **Ralph Loop**: [ralph/README.md](ralph/README.md)
 
 ## Contributing

@@ -16,6 +16,18 @@
 | Signup | [forms.gle/NHE8wYVgS6iJLwRj8](https://forms.gle/NHE8wYVgS6iJLwRj8) |
 | Phase 1 Submission | [forms.gle/1C5d8KXny2JBpZhz7](https://forms.gle/1C5d8KXny2JBpZhz7) |
 
+## Key Dates
+
+| Date | Event |
+|------|-------|
+| Oct 16, 2025 | Participant registration open |
+| Oct 24, 2025 | Team signup & Build Phase 1 |
+| **Jan 31, 2026** | **Green agent submission deadline** |
+| Feb 1, 2026 | Green agent judging begins |
+| Feb 16, 2026 | Phase 2: Purple agent competition starts |
+| March 30, 2026 | Purple agent submission deadline |
+| March 31, 2026 | Purple agent judging |
+
 ## Official Repos
 
 | Repo | Purpose |

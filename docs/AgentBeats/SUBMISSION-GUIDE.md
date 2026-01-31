@@ -6,7 +6,7 @@
 
 | # | Requirement | Status |
 |---|-------------|--------|
-| 1 | **Abstract** - Brief description of tasks your green agent evaluates | [docs/ABSTRACT.md](../ABSTRACT.md) |
+| 1 | **Abstract** - Brief description of tasks your green agent evaluates | [ABSTRACT.md](ABSTRACT.md) |
 | 2 | **Public GitHub repo** - Complete source code + README with setup/usage | This repo |
 | 3 | **Baseline purple agent(s)** - A2A-compatible agent showing benchmark evaluation | `bulletproof_purple` |
 | 4 | **Docker image** - Packaged green agent, runs end-to-end without manual intervention | `Dockerfile.green` |
@@ -173,7 +173,7 @@ name = "substantiator"
 ## Pre-Submission Checklist
 
 ### Requirements
-- [ ] Abstract written ([docs/ABSTRACT.md](../ABSTRACT.md))
+- [ ] Abstract written ([ABSTRACT.md](ABSTRACT.md))
 - [ ] Public GitHub repo with README
 - [ ] Purple agent (baseline) implemented
 - [ ] Docker images build on `linux/amd64`
