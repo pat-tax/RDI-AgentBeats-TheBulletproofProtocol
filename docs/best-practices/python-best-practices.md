@@ -74,9 +74,25 @@ def evaluate(data: dict[str, str]) -> float:
 
 ## Pydantic Models
 
-- Use Pydantic for data validation
-- Add `model_config` for strict validation
+### When to Use Pydantic Validation
+
+**Core Principle**: Validate at system boundaries, trust internal code.
+
+Use Pydantic `model_validate()` for **external data** from:
+
+- **API requests/responses** - HTTP, JSON-RPC, A2A protocol messages
+- **File I/O** - JSON/YAML/TOML configuration files, data files
+- **Cross-module boundaries** - When receiving data from another module where the source is untrusted or dynamically generated
+- **User input** - CLI arguments, form data, uploaded files
+
+**Internal code** (same module, trusted sources) can use direct construction for performance.
+
+### Model Definition
+
+- Use Pydantic for data validation and serialization
+- Add `model_config` for strict validation (`strict=True` catches type errors early)
 - Document fields with descriptions
+- Use `frozen=True` for immutable data
 
 ```python
 from pydantic import BaseModel, Field
@@ -88,6 +104,45 @@ class EvalRequest(BaseModel):
 
     agent_url: str = Field(..., description="URL of agent to evaluate")
     task: str = Field(..., description="Task description")
+```
+
+### Validation at Boundaries
+
+Use `model_validate()` for external/untrusted data to catch schema violations:
+
+```python
+# GOOD: Validate external API response
+response_data = await client.post(url, json=payload)
+eval_result = EvaluationResult.model_validate(response_data.json())
+
+# GOOD: Validate file data
+config_data = json.loads(Path("config.json").read_text())
+config = AppConfig.model_validate(config_data)
+
+# GOOD: Validate cross-module data from untrusted source
+def process_external_data(raw_data: dict[str, str]) -> ProcessedResult:
+    """Process data from external module."""
+    validated = InputData.model_validate(raw_data)  # Validate boundary
+    return _internal_process(validated)
+
+# ACCEPTABLE: Direct construction for internal trusted data
+def _internal_process(data: InputData) -> ProcessedResult:
+    """Internal function - data already validated."""
+    result = ProcessedResult(score=0.95, valid=True)  # Trust internal code
+    return result
+```
+
+### Error Handling
+
+Pydantic validation errors should be caught at boundaries:
+
+```python
+from pydantic import ValidationError
+
+try:
+    request = EvalRequest.model_validate(request_data)
+except ValidationError as e:
+    raise ValueError(f"Invalid request: {e.errors()}") from e
 ```
 
 ## Async Patterns
