@@ -18,18 +18,21 @@ class TestHeldOutTestSet:
         assert held_out_path.exists(), "Held-out test set file must exist"
 
     def test_held_out_test_set_valid_json(self):
-        """Held-out test set should be valid JSON."""
+        """Held-out test set should be valid JSON with metadata and test_cases."""
         held_out_path = Path(__file__).parent.parent / "data" / "held_out_test_set.json"
         with open(held_out_path) as f:
             data = json.load(f)
-        assert isinstance(data, list), "Held-out test set must be a list"
+        assert isinstance(data, dict), "Held-out test set must be a dict"
+        assert "metadata" in data, "Held-out test set must have metadata"
+        assert "test_cases" in data, "Held-out test set must have test_cases"
 
     def test_held_out_test_set_has_entries(self):
         """Held-out test set should contain at least 5 entries."""
         held_out_path = Path(__file__).parent.parent / "data" / "held_out_test_set.json"
         with open(held_out_path) as f:
             data = json.load(f)
-        assert len(data) >= 5, "Held-out test set must have at least 5 entries"
+        test_cases = data["test_cases"]
+        assert len(test_cases) >= 5, "Held-out test set must have at least 5 entries"
 
     def test_held_out_narratives_not_in_ground_truth(self):
         """Narratives in held-out set must not appear in public ground truth."""
@@ -39,10 +42,10 @@ class TestHeldOutTestSet:
         with open(ground_truth_path) as f:
             ground_truth = json.load(f)
         with open(held_out_path) as f:
-            held_out = json.load(f)
+            held_out_data = json.load(f)
 
         ground_truth_ids = {entry["id"] for entry in ground_truth}
-        held_out_ids = {entry["id"] for entry in held_out}
+        held_out_ids = {entry["id"] for entry in held_out_data["test_cases"]}
 
         overlap = ground_truth_ids & held_out_ids
         assert len(overlap) == 0, f"IDs must not overlap between sets: {overlap}"
@@ -54,7 +57,7 @@ class TestHeldOutTestSet:
             data = json.load(f)
 
         valid_difficulties = {"easy", "medium", "hard", "EASY", "MEDIUM", "HARD"}
-        for entry in data:
+        for entry in data["test_cases"]:
             assert "difficulty" in entry, f"Entry {entry.get('id')} missing difficulty"
             assert entry["difficulty"] in valid_difficulties, (
                 f"Entry {entry.get('id')} has invalid difficulty: {entry.get('difficulty')}"
@@ -82,7 +85,7 @@ class TestVersionTracking:
         with open(held_out_path) as f:
             data = json.load(f)
 
-        for entry in data:
+        for entry in data["test_cases"]:
             assert "version" in entry, f"Entry {entry.get('id')} missing version field"
             assert isinstance(entry["version"], str), (
                 f"Entry {entry.get('id')} version must be string"

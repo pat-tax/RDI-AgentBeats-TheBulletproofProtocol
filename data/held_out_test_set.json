@@ -1,11 +1,12 @@
 {
   "metadata": {
-    "version": "1.0",
+    "version": "1.0.0",
     "created_at": "2026-01-31T01:00:00Z",
-    "description": "Held-out test set for STORY-027 - separate from public ground truth to prevent data contamination",
+    "description": "Held-out test set for STORY-027/029 - separate from public ground truth to prevent data contamination",
     "contamination_check": "All narratives verified to NOT appear in ground_truth.json",
     "total_cases": 12,
-    "purpose": "Validate benchmark rigor with unseen test cases"
+    "purpose": "Validate benchmark rigor with unseen test cases",
+    "provenance": "synthetic_held_out_test_set"
   },
   "test_cases": [
     {
@@ -14,6 +15,9 @@
       "expected_classification": "QUALIFYING",
       "expected_risk_range": [5, 15],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_qualifying_computational_chemistry",
       "source": "held_out_computational_chemistry_001"
     },
     {
@@ -22,6 +26,9 @@
       "expected_classification": "QUALIFYING",
       "expected_risk_range": [8, 18],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_qualifying_model_compression",
       "source": "held_out_model_compression_001"
     },
     {
@@ -30,6 +37,9 @@
       "expected_classification": "QUALIFYING",
       "expected_risk_range": [10, 20],
       "difficulty": "MEDIUM",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_qualifying_formal_verification",
       "source": "held_out_formal_verification_001"
     },
     {
@@ -38,6 +48,9 @@
       "expected_classification": "QUALIFYING",
       "expected_risk_range": [12, 22],
       "difficulty": "MEDIUM",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_qualifying_federated_learning",
       "source": "held_out_federated_learning_001"
     },
     {
@@ -46,6 +59,9 @@
       "expected_classification": "QUALIFYING",
       "expected_risk_range": [5, 12],
       "difficulty": "HARD",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_qualifying_neuromorphic",
       "source": "held_out_neuromorphic_001"
     },
     {
@@ -54,6 +70,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [45, 65],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_non_qualifying_routine",
       "source": "held_out_routine_auth_001"
     },
     {
@@ -62,6 +81,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [55, 75],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_non_qualifying_routine",
       "source": "held_out_routine_dashboard_001"
     },
     {
@@ -70,6 +92,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [60, 80],
       "difficulty": "MEDIUM",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_non_qualifying_business_risk",
       "source": "held_out_business_migration_001"
     },
     {
@@ -78,6 +103,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [50, 70],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_non_qualifying_routine",
       "source": "held_out_devops_001"
     },
     {
@@ -86,6 +114,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [85, 100],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_trivial_baseline",
       "source": "trivial_empty_baseline"
     },
     {
@@ -94,6 +125,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [65, 85],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_trivial_baseline",
       "source": "trivial_random_baseline"
     },
     {
@@ -102,6 +136,9 @@
       "expected_classification": "NON_QUALIFYING",
       "expected_risk_range": [85, 100],
       "difficulty": "EASY",
+      "version": "1.0.0",
+      "created_at": "2026-01-31T01:00:00Z",
+      "provenance": "synthetic_trivial_baseline",
       "source": "trivial_gibberish_baseline"
     }
   ]

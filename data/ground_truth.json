@@ -8,8 +8,17 @@
     "annotations": {
       "irs_rationale": "Meets IRS Section 41(d)(1) technical uncertainty test: unclear if sub-100ms strong consistency was achievable. Demonstrates process of experimentation per Section 41(d)(1)(C) with documented hypothesis testing, failures, and systematic evaluation of alternatives.",
       "failure_patterns": [],
-      "positive_indicators": ["hypothesis", "experiments", "failed", "systematic testing", "73%"]
-    }
+      "positive_indicators": [
+        "hypothesis",
+        "experiments",
+        "failed",
+        "systematic testing",
+        "73%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q002",
@@ -20,8 +29,18 @@
     "annotations": {
       "irs_rationale": "Demonstrates qualified research per Section 41(d)(1): relied on principles of computer science to resolve uncertainty about adversarial detection. Process of experimentation documented with multiple failed approaches, alternative evaluations, and iterative discovery process per Section 41(d)(1)(C).",
       "failure_patterns": [],
-      "positive_indicators": ["unknown", "hypothesis", "experiments failed", "unsuccessful", "alternative methods", "94%"]
-    }
+      "positive_indicators": [
+        "unknown",
+        "hypothesis",
+        "experiments failed",
+        "unsuccessful",
+        "alternative methods",
+        "94%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q003",
@@ -32,8 +51,18 @@
     "annotations": {
       "irs_rationale": "Satisfies Section 41(d)(1) technological uncertainty: unclear if deterministic microsecond latency was achievable in NUMA systems. Evidence of experimentation process per Section 41(d)(1)(C) with documented hypothesis, failed initial attempts, systematic comparison of alternatives, and measurable outcomes.",
       "failure_patterns": [],
-      "positive_indicators": ["uncertain", "hypothesized", "experiments", "failed", "alternative approaches", "2.3 microseconds"]
-    }
+      "positive_indicators": [
+        "uncertain",
+        "hypothesized",
+        "experiments",
+        "failed",
+        "alternative approaches",
+        "2.3 microseconds"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q004",
@@ -44,8 +73,18 @@
     "annotations": {
       "irs_rationale": "Meets Section 41(d)(1)(A) discovery of information requirement: unclear if quantum-inspired methods could outperform classical optimization. Process of experimentation per Section 41(d)(1)(C) demonstrated through failed linear cooling approach, systematic testing of alternatives, and documented discovery of hybrid solution.",
       "failure_patterns": [],
-      "positive_indicators": ["uncertainty", "hypothesis", "failed", "experimented", "systematic evaluation", "34%"]
-    }
+      "positive_indicators": [
+        "uncertainty",
+        "hypothesis",
+        "failed",
+        "experimented",
+        "systematic evaluation",
+        "34%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q005",
@@ -56,8 +95,18 @@
     "annotations": {
       "irs_rationale": "Qualifies under Section 41(d)(1): technical uncertainty about practical zero-knowledge proof performance. Section 41(d)(1)(C) experimentation process evident through hypothesis testing, failed initial approach (40x performance miss), systematic evaluation of alternative cryptographic protocols, and iterative discovery of batching optimization.",
       "failure_patterns": [],
-      "positive_indicators": ["uncertainty", "hypothesized", "exceeded acceptable", "alternative", "experimentation", "87%"]
-    }
+      "positive_indicators": [
+        "uncertainty",
+        "hypothesized",
+        "exceeded acceptable",
+        "alternative",
+        "experimentation",
+        "87%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "NQ001",
@@ -67,9 +116,19 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(3) routine engineering exclusion: debugging production issues and upgrading libraries are explicitly excluded. Work involved applying existing techniques (connection pooling, error handling) without technical uncertainty. No qualified research per Section 41(d)(1) - capability of connection pools was already known.",
-      "failure_patterns": ["routine_engineering"],
-      "flagged_terms": ["fixed", "debugged", "upgraded", "refactored"]
-    }
+      "failure_patterns": [
+        "routine_engineering"
+      ],
+      "flagged_terms": [
+        "fixed",
+        "debugged",
+        "upgraded",
+        "refactored"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_routine"
   },
   {
     "id": "NQ002",
@@ -79,9 +138,20 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3) as routine engineering: database optimization using well-known techniques (indexing, caching, configuration tuning). Vague language ('improved performance', 'improved user experience') without documented technical uncertainty. Method of achieving performance improvement was known - standard database optimization practices.",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["improved", "optimizing", "upgraded", "improved overall user experience"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "improved",
+        "optimizing",
+        "upgraded",
+        "improved overall user experience"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ003",
@@ -91,9 +161,22 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Fails qualification under Section 41(d)(3): routine UI enhancement work. Excessive vague language ('more intuitive', 'user-friendly', 'better visual feedback', 'improved accessibility') without numeric substantiation. No technical uncertainty - capability to improve UI with component upgrades was known. Not technological in nature per Section 41(d)(1).",
-      "failure_patterns": ["vague_language", "routine_engineering"],
-      "flagged_terms": ["enhanced", "more intuitive", "user-friendly", "better visual feedback", "improved accessibility", "better engagement"]
-    }
+      "failure_patterns": [
+        "vague_language",
+        "routine_engineering"
+      ],
+      "flagged_terms": [
+        "enhanced",
+        "more intuitive",
+        "user-friendly",
+        "better visual feedback",
+        "improved accessibility",
+        "better engagement"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ004",
@@ -103,9 +186,22 @@
     "difficulty": "medium",
     "annotations": {
       "irs_rationale": "Excluded as routine engineering per Section 41(d)(3): migration to microservices using established patterns and tools. Contains business risk language ('gain market share', 'stay competitive', 'business growth'). Vague claims ('improve scalability', 'improved deployment flexibility') lack numeric evidence. No documented technical uncertainty.",
-      "failure_patterns": ["routine_engineering", "business_risk", "vague_language"],
-      "flagged_terms": ["migrated", "market share", "stay competitive", "business growth", "improve scalability"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "business_risk",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "migrated",
+        "market share",
+        "stay competitive",
+        "business growth",
+        "improve scalability"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ005",
@@ -115,9 +211,21 @@
     "difficulty": "medium",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(1) - no technical uncertainty. Routine engineering per Section 41(d)(3): applying well-known security practices (OAuth, rate limiting, password hashing). Vague language ('improve security', 'improve code quality', 'better protection') without quantification. Work involved maintenance, refactoring, and upgrades - explicitly excluded activities.",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["refactored", "upgraded", "improve security", "cleaning up", "better protection"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "refactored",
+        "upgraded",
+        "improve security",
+        "cleaning up",
+        "better protection"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ006",
@@ -127,9 +235,22 @@
     "difficulty": "medium",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine data engineering optimization. Contains business risk language ('increase revenue', 'profit margins'). Vague language ('optimized', 'process data faster', 'improve reliability') with limited technical detail. While numeric results provided (6h to 2h), method used standard parallelization techniques without documented uncertainty.",
-      "failure_patterns": ["routine_engineering", "business_risk", "vague_language"],
-      "flagged_terms": ["revenue", "optimized", "upgraded", "improve reliability", "profit margins"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "business_risk",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "revenue",
+        "optimized",
+        "upgraded",
+        "improve reliability",
+        "profit margins"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ007",
@@ -139,9 +260,21 @@
     "difficulty": "hard",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(3) exclusion: routine mobile app enhancement. Vague language dominates ('better user experience', 'faster performance', 'enhanced', 'improved'). While 40% load time improvement cited, work involved standard optimization (library upgrades, component refactoring, bug fixes) without technical uncertainty. No qualified research per Section 41(d)(1).",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["enhanced", "better user experience", "faster performance", "fixed", "improved"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "enhanced",
+        "better user experience",
+        "faster performance",
+        "fixed",
+        "improved"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "Q006",
@@ -152,8 +285,19 @@
     "annotations": {
       "irs_rationale": "Satisfies Section 41(d)(1) technological in nature requirement: resolving uncertainty about edge device transcoding capabilities required computer science principles. Process of experimentation per Section 41(d)(1)(C) shown through hypothesis testing, failed H.265 approach, codec alternatives evaluation, and discovery of AI preprocessing solution.",
       "failure_patterns": [],
-      "positive_indicators": ["uncertain", "hypothesis", "experiments", "failed", "alternative", "systematic profiling", "61%"]
-    }
+      "positive_indicators": [
+        "uncertain",
+        "hypothesis",
+        "experiments",
+        "failed",
+        "alternative",
+        "systematic profiling",
+        "61%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q007",
@@ -164,8 +308,19 @@
     "annotations": {
       "irs_rationale": "Meets Section 41(d)(1) qualified research criteria: uncertainty about achieving serializability without 2PC overhead. Section 41(d)(1)(C) experimentation demonstrated through hypothesis formation, documented anomalies in initial approach, systematic testing of alternatives, and discovery of hybrid solution after multiple failures.",
       "failure_patterns": [],
-      "positive_indicators": ["uncertainty", "hypothesized", "experiments", "anomalies", "unsuccessful attempts", "alternative approaches", "99.95%"]
-    }
+      "positive_indicators": [
+        "uncertainty",
+        "hypothesized",
+        "experiments",
+        "anomalies",
+        "unsuccessful attempts",
+        "alternative approaches",
+        "99.95%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q008",
@@ -176,8 +331,20 @@
     "annotations": {
       "irs_rationale": "Meets Section 41(d)(1) technical uncertainty criteria: unclear if sub-millisecond GC pauses were achievable in high-throughput systems. Process of experimentation per Section 41(d)(1)(C) demonstrated through hypothesis testing, failed generational GC approach, systematic evaluation of alternatives, and measurable discovery.",
       "failure_patterns": [],
-      "positive_indicators": ["investigated", "uncertainty", "hypothesized", "experiments", "failed", "alternative", "systematic", "0.3ms"]
-    }
+      "positive_indicators": [
+        "investigated",
+        "uncertainty",
+        "hypothesized",
+        "experiments",
+        "failed",
+        "alternative",
+        "systematic",
+        "0.3ms"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q009",
@@ -188,8 +355,21 @@
     "annotations": {
       "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about maintaining differential privacy with acceptable accuracy. Section 41(d)(1)(C) process of experimentation shown through hypothesis, failed initial approach, systematic evaluation of alternatives, and quantifiable discovery.",
       "failure_patterns": [],
-      "positive_indicators": ["research", "uncertain", "hypothesized", "experiments", "unacceptable", "alternative", "extensive experimentation", "epsilon=0.5", "94%"]
-    }
+      "positive_indicators": [
+        "research",
+        "uncertain",
+        "hypothesized",
+        "experiments",
+        "unacceptable",
+        "alternative",
+        "extensive experimentation",
+        "epsilon=0.5",
+        "94%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q010",
@@ -200,8 +380,19 @@
     "annotations": {
       "irs_rationale": "Meets Section 41(d)(1)(A): uncertainty about capturing causality without prohibitive overhead. Section 41(d)(1)(C) experimentation evident through hypothesis formation, failed full logging approach, systematic comparison of alternatives, and discovery of selective logging solution.",
       "failure_patterns": [],
-      "positive_indicators": ["explored", "fundamental uncertainty", "hypothesis", "failed", "experimented", "systematic analysis", "3% overhead"]
-    }
+      "positive_indicators": [
+        "explored",
+        "fundamental uncertainty",
+        "hypothesis",
+        "failed",
+        "experimented",
+        "systematic analysis",
+        "3% overhead"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q011",
@@ -212,8 +403,21 @@
     "annotations": {
       "irs_rationale": "Qualifies under Section 41(d)(1): technical uncertainty about distinguishing meaningful drift from variance. Process of experimentation per Section 41(d)(1)(C) shown through hypothesis, failed initial approach with quantified results, alternative testing, and systematic discovery.",
       "failure_patterns": [],
-      "positive_indicators": ["researched", "technical uncertainty", "hypothesized", "experiments", "produced excessive false positives", "alternative approaches", "systematic evaluation", "4%", "96%"]
-    }
+      "positive_indicators": [
+        "researched",
+        "technical uncertainty",
+        "hypothesized",
+        "experiments",
+        "produced excessive false positives",
+        "alternative approaches",
+        "systematic evaluation",
+        "4%",
+        "96%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "NQ008",
@@ -223,9 +427,20 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine system administration using established monitoring tools and practices. Vague language ('improve visibility', 'better insights', 'respond faster'). No technical uncertainty - standard observability setup with known capabilities.",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["improve visibility", "better insights", "respond faster", "improved monitoring"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "improve visibility",
+        "better insights",
+        "respond faster",
+        "improved monitoring"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ009",
@@ -235,9 +450,20 @@
     "difficulty": "medium",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Routine engineering per Section 41(d)(3): migration using established ETL patterns and industry-standard practices. Vague claims ('improve data accuracy', 'easier to maintain') without documented uncertainty.",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["modernized", "improve data accuracy", "industry-standard practices", "easier to maintain"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "modernized",
+        "improve data accuracy",
+        "industry-standard practices",
+        "easier to maintain"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ010",
@@ -247,9 +473,20 @@
     "difficulty": "medium",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine software engineering using existing feature flag solutions. No technical uncertainty - capability of feature flag systems is well-established. Vague language ('safer deployments', 'improved our deployment confidence').",
-      "failure_patterns": ["routine_engineering", "vague_language"],
-      "flagged_terms": ["implemented", "evaluated", "improved our deployment confidence", "safer deployments"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "implemented",
+        "evaluated",
+        "improved our deployment confidence",
+        "safer deployments"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_vague"
   },
   {
     "id": "NQ011",
@@ -259,9 +496,22 @@
     "difficulty": "hard",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty documented. Routine engineering per Section 41(d)(3): standard gateway optimization using established patterns (rate limiting, caching, coalescing). Vague claims ('better performance', 'better experience') without documented uncertainty about outcomes.",
-      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
-      "flagged_terms": ["enhanced", "improve response times", "better performance", "better experience", "growing customer base"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language",
+        "business_risk"
+      ],
+      "flagged_terms": [
+        "enhanced",
+        "improve response times",
+        "better performance",
+        "better experience",
+        "growing customer base"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ012",
@@ -271,9 +521,21 @@
     "difficulty": "hard",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine data engineering using established medallion architecture pattern. Contains business risk language ('drive better business decisions', 'time-to-insight'). Vague claims ('improved significantly', 'better business decisions') without technical uncertainty.",
-      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
-      "flagged_terms": ["centralize", "improved significantly", "better business decisions", "time-to-insight"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language",
+        "business_risk"
+      ],
+      "flagged_terms": [
+        "centralize",
+        "improved significantly",
+        "better business decisions",
+        "time-to-insight"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ013",
@@ -283,9 +545,20 @@
     "difficulty": "hard",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Standard software engineering patterns per Section 41(d)(3): message queues, retry logic, dead letter queues are well-established. Contains business risk language ('increasing user engagement'). While numeric results cited, methods used are routine.",
-      "failure_patterns": ["routine_engineering", "business_risk"],
-      "flagged_terms": ["refactored", "improve delivery reliability", "enhanced customer communication", "increasing user engagement"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "business_risk"
+      ],
+      "flagged_terms": [
+        "refactored",
+        "improve delivery reliability",
+        "enhanced customer communication",
+        "increasing user engagement"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ014",
@@ -295,9 +568,22 @@
     "difficulty": "hard",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine architecture work (service consolidation) using established domain-driven design patterns. Contains business risk language ('strategic move', 'core business features', 'developer productivity'). No technical uncertainty - outcomes of consolidation were predictable.",
-      "failure_patterns": ["routine_engineering", "business_risk", "vague_language"],
-      "flagged_terms": ["consolidated", "improve system performance", "strategic move", "core business features", "improved developer productivity"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "business_risk",
+        "vague_language"
+      ],
+      "flagged_terms": [
+        "consolidated",
+        "improve system performance",
+        "strategic move",
+        "core business features",
+        "improved developer productivity"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "Q012",
@@ -308,8 +594,20 @@
     "annotations": {
       "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about generalization across body types without calibration. Section 41(d)(1)(C) experimentation shown through hypothesis, failed initial approach (85mm error), systematic testing of alternatives, and discovery (23mm error).",
       "failure_patterns": [],
-      "positive_indicators": ["researched", "uncertainty", "hypothesis", "experiments", "unacceptable", "alternative", "systematic ablation", "23mm"]
-    }
+      "positive_indicators": [
+        "researched",
+        "uncertainty",
+        "hypothesis",
+        "experiments",
+        "unacceptable",
+        "alternative",
+        "systematic ablation",
+        "23mm"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "Q013",
@@ -320,8 +618,20 @@
     "annotations": {
       "irs_rationale": "Meets Section 41(d)(1): uncertainty about handling concurrent edits without divergence or latency issues. Process of experimentation per Section 41(d)(1)(C) evident through hypothesis, failed standard CRDT approach, systematic evaluation of alternatives, and discovery.",
       "failure_patterns": [],
-      "positive_indicators": ["investigation", "uncertainty", "hypothesized", "experiments", "unacceptable latency", "alternative approaches", "systematic optimization", "8ms"]
-    }
+      "positive_indicators": [
+        "investigation",
+        "uncertainty",
+        "hypothesized",
+        "experiments",
+        "unacceptable latency",
+        "alternative approaches",
+        "systematic optimization",
+        "8ms"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   },
   {
     "id": "NQ015",
@@ -331,9 +641,21 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Excluded under Section 41(d)(3): routine DevOps optimization using established CI/CD practices. Contains business risk language ('stay ahead of competitors', 'ship features more quickly'). Vague claims ('improve developer experience', 'boosted team morale'). No technical uncertainty.",
-      "failure_patterns": ["routine_engineering", "vague_language", "business_risk"],
-      "flagged_terms": ["upgraded", "improve developer experience", "boosted team morale", "stay ahead of competitors"]
-    }
+      "failure_patterns": [
+        "routine_engineering",
+        "vague_language",
+        "business_risk"
+      ],
+      "flagged_terms": [
+        "upgraded",
+        "improve developer experience",
+        "boosted team morale",
+        "stay ahead of competitors"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_business_risk"
   },
   {
     "id": "NQ016",
@@ -343,9 +665,18 @@
     "difficulty": "easy",
     "annotations": {
       "irs_rationale": "Fails Section 41(d)(1): no technical uncertainty. Standard cloud infrastructure management per Section 41(d)(3): auto-scaling is well-documented cloud platform feature. While quantitative results cited, methods used are routine configuration of existing capabilities.",
-      "failure_patterns": ["routine_engineering"],
-      "flagged_terms": ["implemented", "configured", "handle variable workloads more efficiently"]
-    }
+      "failure_patterns": [
+        "routine_engineering"
+      ],
+      "flagged_terms": [
+        "implemented",
+        "configured",
+        "handle variable workloads more efficiently"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_non_qualifying_routine"
   },
   {
     "id": "Q014",
@@ -356,7 +687,20 @@
     "annotations": {
       "irs_rationale": "Satisfies Section 41(d)(1): technical uncertainty about blocking adversarial prompts while preserving legitimate intent. Section 41(d)(1)(C) experimentation demonstrated through hypothesis, failed keyword blocking (quantified), systematic testing of alternatives, and discovery of effective solution.",
       "failure_patterns": [],
-      "positive_indicators": ["investigated", "uncertainty", "hypothesis", "experiments", "failed catastrophically", "alternative approaches", "systematic", "99.2%", "0.8%"]
-    }
+      "positive_indicators": [
+        "investigated",
+        "uncertainty",
+        "hypothesis",
+        "experiments",
+        "failed catastrophically",
+        "alternative approaches",
+        "systematic",
+        "99.2%",
+        "0.8%"
+      ]
+    },
+    "version": "1.0.0",
+    "created_at": "2026-01-31T00:00:00Z",
+    "provenance": "synthetic_qualifying"
   }
 ]
