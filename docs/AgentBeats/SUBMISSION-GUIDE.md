@@ -170,6 +170,115 @@ name = "substantiator"
 
 ---
 
+## E2E Submission Testing
+
+### Step 5: Run E2E Submission Test
+
+Before submitting, validate your agents produce AgentBeats-compatible output:
+
+```bash
+# Quick smoke test (2 narratives, ~60s)
+./scripts/docker/test_e2e.sh quick
+
+# Comprehensive test (30 narratives from ground truth, ~10min)
+./scripts/docker/test_e2e.sh comprehensive
+
+# Verify output format
+cat logs/e2e_*/results.json | jq '.'
+```
+
+**Expected Output** (`output/results.json`):
+```json
+{
+  "benchmark_id": "bulletproof-green-v1",
+  "participant_id": "purple-baseline",
+  "score": 3.0,
+  "max_score": 4.0,
+  "pass_rate": 75.0,
+  "overall_score": 0.75,
+  "timestamp": "2026-01-31T18:00:00Z",
+  "metadata": {
+    "classification": "qualifying",
+    "risk_score": 18,
+    "risk_category": "low",
+    "confidence": 0.95,
+    "component_scores": {
+      "correctness": 0.90,
+      "safety": 0.95,
+      "specificity": 0.80,
+      "experimentation": 0.85
+    }
+  }
+}
+```
+
+### Step 6: Validate SQL Compatibility
+
+AgentBeats leaderboard uses DuckDB to query results. Verify your output is compatible:
+
+```bash
+# Install DuckDB (if not already installed)
+pip install duckdb
+
+# Test SQL extraction
+duckdb << 'SQL'
+SELECT
+  json_extract_string(r.value, '$.benchmark_id') AS benchmark_id,
+  json_extract_string(r.value, '$.participant_id') AS participant_id,
+  ROUND(CAST(json_extract(r.value, '$.pass_rate') AS DOUBLE), 1) AS pass_rate,
+  ROUND(CAST(json_extract(r.value, '$.overall_score') AS DOUBLE), 2) AS overall_score,
+  CAST(json_extract(r.value, '$.score') AS DOUBLE) AS score,
+  CAST(json_extract(r.value, '$.max_score') AS DOUBLE) AS max_score,
+  json_extract_string(r.value, '$.metadata.classification') AS classification,
+  CAST(json_extract(r.value, '$.metadata.risk_score') AS INTEGER) AS risk_score,
+  json_extract_string(r.value, '$.timestamp') AS timestamp
+FROM read_json_auto('logs/e2e_*/results.json') AS r
+ORDER BY pass_rate DESC, overall_score DESC;
+SQL
+```
+
+**Expected Output:**
+```
+┌──────────────────────┬──────────────────┬───────────┬───────────────┬───────┬───────────┬────────────────┬────────────┬──────────────────────┐
+│    benchmark_id      │ participant_id   │ pass_rate │ overall_score │ score │ max_score │ classification │ risk_score │      timestamp       │
+├──────────────────────┼──────────────────┼───────────┼───────────────┼───────┼───────────┼────────────────┼────────────┼──────────────────────┤
+│ bulletproof-green-v1 │ purple-baseline  │      75.0 │          0.75 │   3.0 │       4.0 │ qualifying     │         18 │ 2026-01-31T18:00:00Z │
+└──────────────────────┴──────────────────┴───────────┴───────────────┴───────┴───────────┴────────────────┴────────────┴──────────────────────┘
+```
+
+### Step 7: Test GitHub Workflow (Optional)
+
+Test the full AgentBeats submission workflow:
+
+```bash
+# Prerequisites:
+# - Agents registered on agentbeats.dev
+# - scenario.toml updated with production agentbeats_id values
+# - Docker images pushed to GHCR (public)
+
+# Trigger workflow manually
+gh workflow run agentbeats-run-scenario.yml
+
+# Monitor workflow
+gh run watch
+
+# Check outputs
+ls -la submissions/  # scenario.toml + provenance.json
+ls -la results/      # results.json
+```
+
+**Workflow produces:**
+- `submissions/USERNAME-TIMESTAMP.toml` - Scenario configuration
+- `submissions/USERNAME-TIMESTAMP.provenance.json` - Container metadata
+- `results/USERNAME-TIMESTAMP.json` - Evaluation results
+
+**Submission via PR:**
+1. Workflow creates branch: `submission-USERNAME-TIMESTAMP`
+2. Opens PR to agentbeats/leaderboard
+3. ⚠️ **IMPORTANT**: Uncheck "Allow edits and access to secrets by maintainers"
+
+---
+
 ## Pre-Submission Checklist
 
 ### Requirements
@@ -183,7 +292,9 @@ name = "substantiator"
 ### Technical Quality
 - [ ] `docker-compose up` runs without errors
 - [ ] AgentCard endpoints respond correctly
-- [ ] E2E tests pass (`bash scripts/test_e2e.sh`)
+- [ ] E2E tests pass (`./scripts/docker/test_e2e.sh comprehensive`)
+- [ ] `output/results.json` validates against SQL schema
+- [ ] SQL query extracts metrics correctly (see Step 6)
 - [ ] Same input produces same output (reproducible)
 - [ ] Error handling and logging implemented
 
