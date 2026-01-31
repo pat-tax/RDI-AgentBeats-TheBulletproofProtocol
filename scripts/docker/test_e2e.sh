@@ -9,7 +9,7 @@
 #   workflow, agent communication, and validates against ground truth dataset.
 #
 #   This is for SYSTEM-WIDE validation (deployment, containers, networking).
-#   For ARENA MODE specific pytest tests, use: ./scripts/test_arena_e2e.sh
+#   For ARENA MODE specific pytest tests, use: test_arena_e2e.sh
 #
 # WHAT THIS TESTS:
 #   ✓ Docker deployment of both agents
@@ -25,7 +25,7 @@
 #   ✗ Python-only integration (use test_arena_e2e.sh)
 #
 # USAGE:
-#   ./scripts/test_e2e.sh [MODE] [OPTIONS]
+#   test_e2e.sh [MODE] [OPTIONS]
 #
 # MODES:
 #   quick (default)      Quick smoke test with 2 narratives (30-60s)
@@ -40,7 +40,7 @@
 #   E2E_BUILD=1                    Enable --build flag
 #
 # FOR ARENA MODE TESTS:
-#   Use: ./scripts/test_arena_e2e.sh (separate pytest-based tests)
+#   Use: test_arena_e2e.sh (separate pytest-based tests)
 #
 # PREREQUISITES:
 #   - Docker and docker-compose installed
@@ -57,16 +57,16 @@
 #
 # EXAMPLES:
 #   # Quick smoke test (recommended for CI)
-#   ./scripts/test_e2e.sh quick
+#   test_e2e.sh quick
 #
 #   # Full validation (pre-release)
-#   ./scripts/test_e2e.sh comprehensive
+#   test_e2e.sh comprehensive
 #
 #   # Rebuild containers first
-#   ./scripts/test_e2e.sh quick --build
+#   test_e2e.sh quick --build
 #
 #   # For arena mode pytest tests (separate script):
-#   ./scripts/test_arena_e2e.sh
+#   test_arena_e2e.sh
 #
 ################################################################################
 
@@ -111,7 +111,7 @@ for arg in "$@"; do
             echo "  E2E_BUILD=1"
             echo ""
             echo "For arena mode pytest tests:"
-            echo "  ./scripts/test_arena_e2e.sh"
+            echo "  test_arena_e2e.sh"
             exit 0
             ;;
     esac

@@ -8,7 +8,7 @@
 #   Tests multi-turn refinement, A2A protocol details, and arena configuration.
 #
 #   This is for ARENA MODE validation (iterative refinement, critique flow).
-#   For SYSTEM-WIDE Docker tests, use: ./scripts/test_e2e.sh
+#   For SYSTEM-WIDE Docker tests, use: test_e2e.sh
 #
 # WHAT THIS TESTS:
 #   ✓ Arena mode multi-turn iterative refinement
@@ -25,7 +25,7 @@
 #   ✗ Ground truth dataset (use test_e2e.sh comprehensive)
 #
 # USAGE:
-#   ./scripts/test_arena_e2e.sh
+#   test_arena_e2e.sh
 #
 # TECHNOLOGY:
 #   - pytest for test execution
@@ -80,18 +80,18 @@
 #
 # EXAMPLES:
 #   # Standard usage (auto-detects docker-compose)
-#   ./scripts/test_arena_e2e.sh
+#   test_arena_e2e.sh
 #
 #   # Force Docker usage
 #   docker-compose -f docker-compose-local.yml up -d purple
-#   ./scripts/test_arena_e2e.sh
+#   test_arena_e2e.sh
 #
 #   # Force manual usage (no Docker)
 #   cd src && python -m bulletproof_purple.server &
-#   cd .. && ./scripts/test_arena_e2e.sh
+#   cd .. && test_arena_e2e.sh
 #
 #   # With custom Purple port
-#   PURPLE_PORT=9001 ./scripts/test_arena_e2e.sh
+#   PURPLE_PORT=9001 test_arena_e2e.sh
 #
 #   # Run via pytest directly (requires Purple running)
 #   pytest tests/test_arena_integration.py -v
@@ -108,7 +108,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 # Configuration (gets defaults from settings.py - NOT hardcoded!)
-# Override via environment: PURPLE_PORT=9001 ./scripts/test_arena_e2e.sh
+# Override via environment: PURPLE_PORT=9001 test_arena_e2e.sh
 
 # Load settings from Python in ONE call
 read -r DEFAULT_PURPLE_HOST DEFAULT_PURPLE_PORT DEFAULT_PURPLE_URL < <(load_purple_agent_settings)
