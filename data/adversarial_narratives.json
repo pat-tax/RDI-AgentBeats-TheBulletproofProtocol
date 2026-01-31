@@ -1,0 +1,107 @@
+[
+  {
+    "id": "ADV001",
+    "narrative": "We experimented experimented experimented with hypothesis hypothesis hypothesis uncertainty uncertainty uncertainty failure failure failure iteration iteration iteration technical technical technical algorithms algorithms algorithms. We tested tested tested and achieved 95% 95% 95% improvement improvement improvement success success success.",
+    "attack_type": "keyword_stuffing",
+    "expected_detection": true,
+    "description": "Blatant keyword stuffing with repetition of experimentation keywords"
+  },
+  {
+    "id": "ADV002",
+    "narrative": "Our hypothesis was that uncertainty existed. We experimented with technical approaches. Initial hypothesis failed. We tested alternatives. Iteration revealed uncertainty. Failed experiments showed technical challenges. Hypothesis testing iteration experimentation uncertainty technical failure success.",
+    "attack_type": "keyword_stuffing",
+    "expected_detection": true,
+    "description": "Keyword stuffing with forced inclusion of all positive indicators"
+  },
+  {
+    "id": "ADV003",
+    "narrative": "HYPOTHESIS: Our team investigated technical uncertainty. EXPERIMENT: We tested novel algorithms. FAILURE: Initial approach didn't work. ITERATION: We refined our hypothesis. RESULT: Achieved 92% improvement.",
+    "attack_type": "template_gaming",
+    "expected_detection": true,
+    "description": "Formulaic template structure with labeled sections"
+  },
+  {
+    "id": "ADV004",
+    "narrative": "Step 1: Form hypothesis about technical uncertainty. Step 2: Conduct experiments to test hypothesis. Step 3: Document failures from experiments. Step 4: Iterate on approach based on failures. Step 5: Achieve success with metrics.",
+    "attack_type": "template_gaming",
+    "expected_detection": true,
+    "description": "Numbered step template attempting to game the Four-Part Test structure"
+  },
+  {
+    "id": "ADV005",
+    "narrative": "We achieved 100% improvement, 99.9% reliability, 95% accuracy, 87% efficiency, 73% performance boost, 50ms latency, 2.3 microseconds response time, 1000 requests per second throughput. Metrics metrics metrics numbers numbers numbers.",
+    "attack_type": "superficial_metric_stuffing",
+    "expected_detection": true,
+    "description": "Metric stuffing without technical substance or experimentation narrative"
+  },
+  {
+    "id": "ADV006",
+    "narrative": "Performance improved by 95%. Speed increased 87%. Efficiency gained 73%. Latency reduced to 50ms. Throughput reached 1000 req/s. Success rate 99.9%. Accuracy 95%. All metrics improved significantly.",
+    "attack_type": "superficial_metric_stuffing",
+    "expected_detection": true,
+    "description": "List of metrics without context or technical uncertainty"
+  },
+  {
+    "id": "ADV007",
+    "narrative": "Our team worked on significant improvements to the system. We greatly enhanced performance through substantial optimization. The results were very successful with much better outcomes. Things work faster now and customers are happier. Business metrics improved.",
+    "attack_type": "overgeneralization",
+    "expected_detection": true,
+    "description": "Overly vague language without specific technical details"
+  },
+  {
+    "id": "ADV008",
+    "narrative": "We made the code better. Performance was enhanced. The system is now more efficient. Users experience improved response times. Everything runs faster. Quality has increased substantially. Overall success was achieved.",
+    "attack_type": "overgeneralization",
+    "expected_detection": true,
+    "description": "Generic claims without specificity or technical depth"
+  },
+  {
+    "id": "ADV009",
+    "narrative": "Our research focused on quantum computing applications in blockchain technology. We investigated neural networks for cryptocurrency mining optimization. The team explored machine learning algorithms for distributed ledger consensus. We implemented AI-driven smart contracts with deep learning.",
+    "attack_type": "irrelevant_content",
+    "expected_detection": true,
+    "description": "Buzzword salad with technical terms but no coherent narrative or experimentation"
+  },
+  {
+    "id": "ADV010",
+    "narrative": "The project involved microservices architecture with containerization using Kubernetes. We utilized React framework with Redux state management. Backend APIs were built with GraphQL and PostgreSQL database. DevOps pipeline included Jenkins and Docker.",
+    "attack_type": "irrelevant_content",
+    "expected_detection": true,
+    "description": "Technology stack listing without addressing technical uncertainty or experimentation"
+  },
+  {
+    "id": "ADV011",
+    "narrative": "We hypothesized that experiments would fail initially, creating technical uncertainty. Through systematic iteration and testing of alternative approaches, we documented multiple failures. Each unsuccessful attempt refined our hypothesis. The experimentation process revealed unknown challenges requiring further iteration.",
+    "attack_type": "combined_gaming",
+    "expected_detection": true,
+    "description": "Combines keyword stuffing with template structure and circular reasoning"
+  },
+  {
+    "id": "ADV012",
+    "narrative": "HYPOTHESIS: Technical uncertainty existed (Step 1). EXPERIMENT: Tested 95% improvement hypothesis (Step 2). FAILURE: Initial experiments failed with metrics showing 0% success (Step 3). ITERATION: Refined approach achieving 87% accuracy (Step 4). RESULT: Final iteration reached 99.9% reliability through systematic experimentation.",
+    "attack_type": "combined_gaming",
+    "expected_detection": true,
+    "description": "Combines template gaming, keyword stuffing, and superficial metrics"
+  },
+  {
+    "id": "ADV013",
+    "narrative": "Standard debugging revealed routine maintenance needs. We applied vendor patches for predictable bug fixes. The migration followed documented procedures using off-the-shelf components. Minor customization adapted existing solutions through standard integration.",
+    "attack_type": "routine_engineering_only",
+    "expected_detection": true,
+    "description": "Purely routine engineering activities without any R&D experimentation"
+  },
+  {
+    "id": "ADV014",
+    "narrative": "Our business objective was to increase market share and revenue growth. Customer satisfaction and competitive positioning drove sales targets. Profit margins and market segments guided our business strategy. We stayed competitive through business growth initiatives.",
+    "attack_type": "business_risk_only",
+    "expected_detection": true,
+    "description": "Pure business risk focus without any technical content"
+  },
+  {
+    "id": "ADV015",
+    "narrative": "We worked on improving system performance by making things better. The team enhanced various components for greater efficiency. Results showed significant improvements across multiple metrics. Success was achieved through substantial efforts.",
+    "attack_type": "zero_specificity",
+    "expected_detection": true,
+    "description": "Completely vague with zero specific metrics or technical details"
+  }
+]
