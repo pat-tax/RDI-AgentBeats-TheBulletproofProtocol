@@ -7,7 +7,7 @@
 ![Version](https://img.shields.io/badge/version-0.0.0-58f4c2.svg)
 [![License](https://img.shields.io/badge/license-BSD3Clause-58f4c2.svg)](LICENSE.md)
 [![CodeQL](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/codeql.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/codeql.yaml)
-[![CodeFactor](https://www.codefactor.io/repository/github/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/badge)](https://www.codefactor.io/repository/github/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol)
+[![CodeFactor](https://www.codefactor.io/repository/github/pat-tax/rdi-agentbeats-thebulletproofprotocol/badge)](https://www.codefactor.io/repository/github/pat-tax/rdi-agentbeats-thebulletproofprotocol)
 [![ruff](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/ruff.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/ruff.yaml)
 [![pyright](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pyright.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pyright.yaml)
 [![pytest](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pytest.yaml/badge.svg)](https://github.com/sf-pat-tax/RDI-AgentBeats-TheBulletproofProtocol/actions/workflows/pytest.yaml)
