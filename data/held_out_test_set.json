@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created_at": "2026-01-31T01:00:00Z",
+    "description": "Held-out test set for STORY-027 - separate from public ground truth to prevent data contamination",
+    "contamination_check": "All narratives verified to NOT appear in ground_truth.json",
+    "total_cases": 12,
+    "purpose": "Validate benchmark rigor with unseen test cases"
+  },
+  "test_cases": [
+    {
+      "id": "HELD-Q001",
+      "narrative": "We researched whether graph neural networks could predict molecular binding affinity without MD simulations. The uncertainty was fundamental: could GNN representations capture quantum mechanical interactions? Our hypothesis involved learned embeddings that encode electron density distributions. Initial experiments using standard message passing failed to predict binding energies within 1 kcal/mol accuracy. We tested attention mechanisms and equivariant layers as alternatives. After systematic evaluation across 15 protein-ligand datasets, we achieved 0.7 kcal/mol RMSE by combining spherical harmonics with learned force fields.",
+      "expected_classification": "QUALIFYING",
+      "expected_risk_range": [5, 15],
+      "difficulty": "EASY",
+      "source": "held_out_computational_chemistry_001"
+    },
+    {
+      "id": "HELD-Q002",
+      "narrative": "Our team investigated compression techniques for neural network weights without accuracy loss. It was uncertain whether 4-bit quantization could preserve model performance on vision transformers. We hypothesized that asymmetric quantization with learned scaling factors could work. Early tests with symmetric quantization degraded ImageNet accuracy by 5%. We experimented with mixed-precision strategies and per-channel calibration. Through iterative refinement, we discovered that outlier-aware quantization maintained accuracy within 0.3% while reducing model size by 75%.",
+      "expected_classification": "QUALIFYING",
+      "expected_risk_range": [8, 18],
+      "difficulty": "EASY",
+      "source": "held_out_model_compression_001"
+    },
+    {
+      "id": "HELD-Q003",
+      "narrative": "We explored novel verification methods for autonomous vehicle perception systems. The core uncertainty was whether formal verification could scale to deep neural networks used in production. Our hypothesis centered on abstract interpretation combined with reachability analysis. Initial attempts using interval arithmetic produced overly conservative bounds, rejecting 80% of safe scenarios. We tested zonotope-based abstractions and SMT solver integration. After extensive experimentation comparing 7 verification approaches, we achieved 92% precision while maintaining soundness guarantees.",
+      "expected_classification": "QUALIFYING",
+      "expected_risk_range": [10, 20],
+      "difficulty": "MEDIUM",
+      "source": "held_out_formal_verification_001"
+    },
+    {
+      "id": "HELD-Q004",
+      "narrative": "Our research focused on privacy-preserving federated learning for medical imaging. The technical challenge: could we train diagnostic models without centralizing patient data while matching centralized performance? We hypothesized that secure aggregation with differential privacy could work, but initial experiments showed 15% accuracy degradation. We tested homomorphic encryption and secure multi-party computation as alternatives. Through systematic evaluation, we discovered that split learning with trusted execution environments achieved 99.2% of centralized accuracy while guaranteeing privacy.",
+      "expected_classification": "QUALIFYING",
+      "expected_risk_range": [12, 22],
+      "difficulty": "MEDIUM",
+      "source": "held_out_federated_learning_001"
+    },
+    {
+      "id": "HELD-HARD-Q001",
+      "narrative": "We investigated whether neuromorphic computing could achieve energy efficiency gains for spiking neural networks. Uncertainty centered on whether event-driven computation could maintain accuracy while reducing power by 100x. Our hypothesis involved asynchronous spike propagation with adaptive thresholds. Initial designs using synchronous clocking consumed 45mW, missing our 0.5mW target. We experimented with adiabatic logic and subthreshold operation. After testing 12 circuit topologies and failing multiple times with leakage current issues, we achieved 0.48mW power consumption with 94% classification accuracy.",
+      "expected_classification": "QUALIFYING",
+      "expected_risk_range": [5, 12],
+      "difficulty": "HARD",
+      "source": "held_out_neuromorphic_001"
+    },
+    {
+      "id": "HELD-NQ001",
+      "narrative": "Our team updated the authentication system by migrating from JWT to OAuth 2.0 tokens. We refactored the login flow to use the latest authentication library and added refresh token support. The migration involved updating API endpoints to validate OAuth tokens instead of JWTs. We also improved session management and added better error handling for expired tokens. After deployment, the system handled authentication more reliably and reduced token-related support tickets by 40%.",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [45, 65],
+      "difficulty": "EASY",
+      "source": "held_out_routine_auth_001"
+    },
+    {
+      "id": "HELD-NQ002",
+      "narrative": "We enhanced the reporting dashboard by adding new visualization widgets and improving chart rendering performance. The team upgraded the charting library to the latest version and optimized data fetching. We also refactored the code to reduce bundle size and implemented lazy loading for dashboard components. The improvements resulted in better user experience with faster page loads. Customer satisfaction scores increased and the dashboard received positive feedback.",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [55, 75],
+      "difficulty": "EASY",
+      "source": "held_out_routine_dashboard_001"
+    },
+    {
+      "id": "HELD-NQ003",
+      "narrative": "Our development team ported the mobile app from React Native to Flutter to stay competitive in the market. The migration improved app performance and allowed us to reach more customers across platforms. We refactored the codebase following standard Flutter patterns and integrated with existing backend APIs. The new app delivered better user engagement and helped drive revenue growth. Market positioning improved significantly after the launch.",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [60, 80],
+      "difficulty": "MEDIUM",
+      "source": "held_out_business_migration_001"
+    },
+    {
+      "id": "HELD-NQ004",
+      "narrative": "We implemented continuous integration and deployment pipelines using Jenkins and Docker. The project involved setting up automated testing, code quality checks, and deployment to staging and production environments. We configured build triggers, added monitoring, and improved the deployment process. The CI/CD pipeline reduced deployment time and improved developer productivity. Overall software delivery became more efficient and reliable.",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [50, 70],
+      "difficulty": "EASY",
+      "source": "held_out_devops_001"
+    },
+    {
+      "id": "HELD-TRIVIAL-001",
+      "narrative": "",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [85, 100],
+      "difficulty": "EASY",
+      "source": "trivial_empty_baseline"
+    },
+    {
+      "id": "HELD-TRIVIAL-002",
+      "narrative": "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [65, 85],
+      "difficulty": "EASY",
+      "source": "trivial_random_baseline"
+    },
+    {
+      "id": "HELD-TRIVIAL-003",
+      "narrative": "qwerty asdfgh zxcvbn 12345 !@#$%",
+      "expected_classification": "NON_QUALIFYING",
+      "expected_risk_range": [85, 100],
+      "difficulty": "EASY",
+      "source": "trivial_gibberish_baseline"
+    }
+  ]
+}
