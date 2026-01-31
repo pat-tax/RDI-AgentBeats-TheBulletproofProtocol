@@ -101,5 +101,5 @@ class TestBenchmarkReproducibility:
         risk_scores = [r.risk_score for r in results]
         assert len(set(risk_scores)) == 1, "Risk scores should be deterministic"
 
-        compliance = [r.compliance_classification for r in results]
-        assert len(set(compliance)) == 1, "Classifications should be deterministic"
+        classifications = [r.classification for r in results]
+        assert len(set(classifications)) == 1, "Classifications should be deterministic"
