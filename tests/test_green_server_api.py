@@ -91,19 +91,23 @@ class TestAgentCard:
 
     @pytest.mark.asyncio
     async def test_agent_card_contains_required_fields(self):
-        """Test AgentCard contains required A2A fields."""
+        """Test AgentCard contains required A2A fields and validates against SDK schema."""
+        from a2a.types import AgentCard
+
         app = create_app()
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/.well-known/agent-card.json")
             data = response.json()
 
-            # Required A2A AgentCard fields
-            assert "name" in data
-            assert "description" in data
-            assert "url" in data
-            assert "version" in data
-            assert "capabilities" in data
-            assert "skills" in data
+            # Validate against A2A SDK Pydantic model (ensures SDK compatibility)
+            card = AgentCard.model_validate(data)
+
+            # Verify structure
+            assert card.name == "Bulletproof Green Agent"
+            assert card.version == "1.0.0"
+            assert card.url is not None
+            assert card.capabilities is not None
+            assert len(card.skills) > 0
 
     @pytest.mark.asyncio
     async def test_agent_card_has_correct_name(self):

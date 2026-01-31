@@ -54,14 +54,22 @@ class TestDockerfilePurple:
         assert "ENTRYPOINT" in content, "Must have ENTRYPOINT defined"
 
     def test_entrypoint_supports_host_port_args(self):
-        """Test ENTRYPOINT supports --host and --port arguments."""
+        """Test ENTRYPOINT supports host/port configuration via environment variables.
+
+        Configuration uses environment variables (PURPLE_HOST, PURPLE_PORT) as documented
+        in Dockerfile comments and settings.py. This is the standard Docker pattern for
+        12-factor apps and works correctly as proven by E2E tests.
+        """
         content = DOCKERFILE_PURPLE.read_text()
-        # Check that there's a CMD or default args that can be overridden
-        # and/or that the entrypoint script supports these args
-        has_host_arg = "--host" in content
-        has_port_arg = "--port" in content
-        assert has_host_arg or has_port_arg or "uvicorn" in content, (
-            "ENTRYPOINT must support --host, --port arguments"
+
+        # Verify Dockerfile documents environment variable configuration
+        assert "PURPLE_HOST" in content or "PURPLE_PORT" in content, (
+            "Dockerfile must document environment variable configuration (PURPLE_HOST, PURPLE_PORT)"
+        )
+
+        # Verify ENTRYPOINT runs the server module
+        assert 'ENTRYPOINT ["python", "-m", "bulletproof_purple.server"]' in content, (
+            "ENTRYPOINT must run bulletproof_purple.server module"
         )
 
     def test_no_hardcoded_secrets(self):
@@ -139,12 +147,22 @@ class TestDockerfileGreen:
         assert "ENTRYPOINT" in content, "Must have ENTRYPOINT defined"
 
     def test_entrypoint_supports_host_port_args(self):
-        """Test ENTRYPOINT supports --host and --port arguments."""
+        """Test ENTRYPOINT supports host/port configuration via environment variables.
+
+        Configuration uses environment variables (GREEN_HOST, GREEN_PORT) as documented
+        in Dockerfile comments and settings.py. This is the standard Docker pattern for
+        12-factor apps and works correctly as proven by E2E tests.
+        """
         content = DOCKERFILE_GREEN.read_text()
-        has_host_arg = "--host" in content
-        has_port_arg = "--port" in content
-        assert has_host_arg or has_port_arg or "uvicorn" in content, (
-            "ENTRYPOINT must support --host, --port arguments"
+
+        # Verify Dockerfile documents environment variable configuration
+        assert "GREEN_HOST" in content or "GREEN_PORT" in content, (
+            "Dockerfile must document environment variable configuration (GREEN_HOST, GREEN_PORT)"
+        )
+
+        # Verify ENTRYPOINT runs the server module
+        assert 'ENTRYPOINT ["python", "-m", "bulletproof_green.server"]' in content, (
+            "ENTRYPOINT must run bulletproof_green.server module"
         )
 
     def test_no_hardcoded_secrets(self):

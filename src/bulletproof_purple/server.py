@@ -1,6 +1,13 @@
 """Purple Agent A2A server for IRS Section 41 narrative generation.
 
 Exposes narrative generation via JSON-RPC 2.0 protocol following A2A specification.
+
+FIXME: Monolithic architecture (all-in-one server.py) is intentional for Phase 1 baseline
+       simplicity. Refactor to 3-layer architecture (agent.py/executor.py/server.py) in
+       Phase 2 when Purple gains complex features (Arena Mode, Git/Jira integration, ART
+       fine-tuning). See GreenAgent architecture for reference pattern.
+       Rationale: YAGNI - Phase 1 Purple is simple template generation, doesn't need
+       separation of concerns yet.
 """
 
 from __future__ import annotations
