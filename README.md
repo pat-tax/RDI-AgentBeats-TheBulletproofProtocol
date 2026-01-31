@@ -1,5 +1,7 @@
 # RDI-AgentBeats-TheBulletproofProtocol
 
+> **For R&D tax credits: Measure how audit-proof, not just whether it qualifies.**
+
 **The Bulletproof Protocol** is an agentified benchmark for evaluating IRS Section 41 R&D tax credit narratives. This project submits to the AgentBeats Legal Track, providing a green agent (benchmark) that objectively evaluates R&D narratives against IRS compliance standards.
 
 ![Version](https://img.shields.io/badge/version-0.0.0-58f4c2.svg)
