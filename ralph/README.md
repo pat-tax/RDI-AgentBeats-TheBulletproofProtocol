@@ -139,7 +139,7 @@ Source: [Claude Code Skills](https://code.claude.com/docs/en/skills#advanced-pat
 
 ## Quick Start
 
-See [TEMPLATE_USAGE.md](TEMPLATE_USAGE.md) for setup and commands reference.
+See [TEMPLATE_USAGE.md](docs/TEMPLATE_USAGE.md) for setup and commands reference.
 
 ## Security
 
@@ -184,11 +184,11 @@ cd docs && ln -sf PurpleAgent-PRD.md PRD.md
 ralph/
 ├── CHANGELOG.md            # Ralph Loop version history
 ├── README.md               # Methodology (this file)
-├── TEMPLATE_USAGE.md       # Setup and usage guide
 ├── docs/
 │   ├── LEARNINGS.md        # Patterns and lessons learned
 │   ├── prd.json            # Story tracking (gitignored)
 │   ├── progress.txt        # Execution log (gitignored)
+│   ├── TEMPLATE_USAGE.md       # Setup and usage guide
 │   └── templates/          # Project templates
 │       ├── prd.json.template
 │       ├── prd.md.template

@@ -1,9 +1,5 @@
 # Ralph Loop Learnings
 
-**Root Cause**: Components pass unit tests individually but aren't wired together.
-
-**Context**: Discovered after STORY-001 to STORY-012. All 145 unit tests passed, but detectors (STORY-006 to STORY-009) were never integrated into evaluator (STORY-005).
-
 ## Patterns to Apply
 
 1. **Integration stories**: Add explicit wiring story after every 3-5 component stories
@@ -77,7 +73,7 @@ For any platform-targeted project, add to PRD:
 
 ### Anti-Pattern
 
-```
+```text
 BAD:  "Works on my machine" → Ship
 GOOD: "Works with platform tooling" → Ship
 ```
