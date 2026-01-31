@@ -5,8 +5,6 @@ applies-to: Agents and humans
 purpose: Developer setup, workflow, and contribution guidelines
 ---
 
-# Contributing
-
 Contributions welcome! Follow these guidelines for both human and agent contributors:
 
 ## Core Principles

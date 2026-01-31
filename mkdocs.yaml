@@ -34,13 +34,13 @@ theme:
         name: "Toggle Light Mode"
 nav:
   - Home: index.md
-  - PRD: PRD.md
-  - User Story: UserStory.md
-  - Sprint Plan: SprintPlan.md
+  - Green PRD: GreenAgent-PRD.md
+  - Purple PRD: PurpleAgent-PRD.md
+  - Green User Story: GreenAgent-UserStory.md
+  - Purple User Story: PurpleAgent-UserStory.md
   - Code: docstrings.md
   - Change Log: CHANGELOG.md
   - License: LICENSE.md
-  - llms.txt: llms.txt
 plugins:
   - search:
       lang: en
