@@ -26,16 +26,16 @@ while stories remain:
 **Usage:**
 
 ```bash
-make ralph_run ITERATIONS=25    # Run autonomous development
-make ralph_status               # Check progress
+make ralph_run MAX_ITERATIONS=25    # Run autonomous development
+make ralph_status                   # Check progress
 ```
 
-Or interactively via [ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop):
+**Configuration:**
 
-```text
-/ralph-loop "Implement stories from prd.json" --max-iterations 25
-/cancel-ralph   # Stop active loop
-```
+Environment variables control Ralph behavior:
+- `RALPH_MODEL` - Model selection: sonnet (default), opus, haiku
+- `MAX_ITERATIONS` - Loop limit (default: 25)
+- `REQUIRE_REFACTOR` - Enforce REFACTOR phase (default: false)
 
 **Sources:**
 
@@ -48,11 +48,13 @@ Or interactively via [ralph-loop plugin](https://github.com/anthropics/claude-pl
 
 ### TDD Enforcement (Red-Green-Refactor)
 
-Stories require verifiable acceptance criteria:
+Stories require verifiable acceptance criteria with TDD workflow:
 
-1. **Red** - Write failing test
-2. **Green** - Implement until tests pass
-3. **Refactor** - Clean up, commit, mark done
+1. **Red** - Write failing test (commit with `[RED]` marker)
+2. **Green** - Implement until tests pass (commit with `[GREEN]` marker)
+3. **Refactor** - Clean up, optimize (optional: commit with `[REFACTOR]` marker)
+
+The Ralph script enforces chronological commit verification and checks for proper phase markers.
 
 ### Compound Engineering
 
@@ -159,22 +161,31 @@ PRD.md → prd.json → Ralph Loop → src/ + tests/ → progress.txt
 
 ```text
 ralph/
+├── CHANGELOG.md            # Ralph Loop version history
+├── README.md               # Methodology (this file)
+├── TEMPLATE_USAGE.md       # Setup and usage guide
 ├── docs/
-│   ├── README.md           # Methodology (this file)
-│   ├── TEMPLATE_USAGE.md   # Setup guide
-│   ├── LEARNINGS.md        # Lessons learned
+│   ├── LEARNINGS.md        # Patterns and lessons learned
 │   ├── prd.json            # Story tracking (gitignored)
-│   └── progress.txt        # Execution log (gitignored)
+│   ├── progress.txt        # Execution log (gitignored)
+│   └── templates/          # Project templates
+│       ├── prd.json.template
+│       ├── prd.md.template
+│       ├── progress.txt.template
+│       ├── prompt.md
+│       └── userstory.md.template
 └── scripts/
-    ├── ralph.sh            # Orchestration script
-    └── generate_prd_json.py
+    ├── ralph.sh            # Main orchestration script
+    ├── generate_prd_json.py # PRD.md → prd.json parser
+    ├── init.sh             # Environment validation
+    ├── reorganize_prd.sh   # Archive and iterate
+    ├── setup_project.sh    # Interactive project setup
+    └── lib/
+        └── common.sh       # Shared utilities
 ```
 
 ---
 
-## TODO
+## Version History
 
-- [x] Adopt devcontainer firewall from Claude Code reference implementation (see `.claude/settings.json` sandbox config)
-- [x] Document sandbox usage patterns for Ralph execution (configured in `.claude/settings.json`)
-- [ ] Use `!` dynamic content in skills for live context injection (git status, test results)
-- [ ] Implement STORY-039: GreenAgent orchestrator class (agent.py:66 TODO)
+See [CHANGELOG.md](CHANGELOG.md) for Ralph Loop version history and changes.
