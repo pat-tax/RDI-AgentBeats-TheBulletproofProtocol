@@ -16,7 +16,9 @@ class TestHeldOutDataset:
     def test_held_out_dataset_exists(self):
         """Test that held-out test set file exists."""
         held_out_path = Path("data/held_out_test_set.json")
-        assert held_out_path.exists(), "Held-out test set should exist at data/held_out_test_set.json"
+        assert held_out_path.exists(), (
+            "Held-out test set should exist at data/held_out_test_set.json"
+        )
 
     def test_held_out_dataset_structure(self):
         """Test that held-out dataset has valid structure."""
@@ -60,7 +62,9 @@ class TestHeldOutDataset:
         for i, case in enumerate(test_cases):
             assert "id" in case, f"Test case {i} missing 'id'"
             assert "narrative" in case, f"Test case {i} missing 'narrative'"
-            assert "expected_classification" in case, f"Test case {i} missing 'expected_classification'"
+            assert "expected_classification" in case, (
+                f"Test case {i} missing 'expected_classification'"
+            )
             assert "expected_risk_range" in case, f"Test case {i} missing 'expected_risk_range'"
             assert "difficulty" in case, f"Test case {i} missing 'difficulty'"
             assert "source" in case, f"Test case {i} missing 'source' (provenance)"
