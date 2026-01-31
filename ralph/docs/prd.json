@@ -577,8 +577,8 @@
         "src/bulletproof_green/scorer.py",
         "tests/test_hybrid_evaluation.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-01-30T23:47:08Z",
       "content_hash": "a4dab19779b5b1606d9c67a2adbc7894eb5c71c26f477f1eb3fd8f3e65ed97f5",
       "depends_on": []
     },
