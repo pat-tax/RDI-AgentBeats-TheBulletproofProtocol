@@ -29,10 +29,7 @@ class TestBusinessRiskDetectorIntegration:
         # Should detect business risk patterns via the detector
         assert result.component_scores["business_risk_penalty"] > 0
         assert result.business_keywords_detected > 0
-        assert any(
-            issue.category == "business_risk"
-            for issue in result.redline.issues
-        )
+        assert any(issue.category == "business_risk" for issue in result.redline.issues)
 
     def test_business_risk_detector_returns_correct_interface(self):
         """Test that business_risk_detector returns (penalty, count) tuple."""

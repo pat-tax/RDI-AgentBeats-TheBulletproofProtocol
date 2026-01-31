@@ -145,16 +145,29 @@ class SpecificityDetector:
         else:
             has_metric_repetition = False
 
+        # Check for comparison patterns (legitimate before/after metrics)
+        # Patterns like "from X to Y", "reduced from X", "decreased from X to Y"
+        comparison_patterns = [
+            r"from\s+\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "from 200ms to 45ms"
+            r"reduced?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "reduced from 200ms to 45ms"
+            r"decreased?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "decreased from 1.2GB to 800MB"
+            r"improved?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "improved from 5% to 1%"
+            r"dropped?\s+(?:from\s+)?\d+[\w.%]+\s+to\s+\d+[\w.%]+",  # "dropped from 5% to 0.2%"
+        ]
+        has_comparison_metrics = any(
+            re.search(pattern, text.lower()) for pattern in comparison_patterns
+        )
+
         # Gaming detection rules:
         # 1. Metric repetition (same metric repeated 2.5+ times)
-        # 2. High density (>30%) with no/weak exp evidence
-        # 3. Very high density (>50%) regardless of evidence
-        # 4. Many metrics (>=5) with weak context: no error codes/dates AND weak exp (STORY-033)
-        has_technical_context = len(error_codes) > 0 or len(dates) > 0
+        # 2. High density (>30%) with no/weak exp evidence AND no comparisons
+        # 3. Very high density (>50%) regardless of evidence (unless comparisons)
+        # 4. Many metrics (>=5) with weak context: no error codes/dates/comparisons AND weak exp
+        has_technical_context = len(error_codes) > 0 or len(dates) > 0 or has_comparison_metrics
         is_metric_stuffing = (
             has_metric_repetition
-            or (metric_density > 30 and exp_evidence <= 1)
-            or (metric_density > 50)
+            or (metric_density > 30 and exp_evidence <= 1 and not has_comparison_metrics)
+            or (metric_density > 50 and not has_comparison_metrics)
             or (len(metrics) >= 5 and exp_evidence <= 2 and not has_technical_context)
         )
 
