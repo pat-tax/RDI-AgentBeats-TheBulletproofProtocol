@@ -293,6 +293,78 @@ difficulty = "medium"
 
 ---
 
+### Feature 14: E2E Submission Testing
+
+**Description**: End-to-end testing that produces AgentBeats-compatible submission files.
+
+**Phase 1 Status**: ✅ **COMPLETE** (STORY-009, workflow integration)
+
+**Acceptance Criteria**:
+- [x] E2E test produces `output/results.json` in SQL-compatible format
+- [x] Tests Purple agent → Green agent workflow via A2A
+- [x] Validates all required AgentBeats fields
+- [x] Integration with `.github/workflows/agentbeats-run-scenario.yml`
+- [x] Generates `output/provenance.json` for submission
+
+**SQL Query (DuckDB) - Extract Leaderboard Metrics**:
+```sql
+SELECT
+  json_extract_string(r.value, '$.benchmark_id') AS benchmark_id,
+  json_extract_string(r.value, '$.participant_id') AS participant_id,
+  ROUND(CAST(json_extract(r.value, '$.pass_rate') AS DOUBLE), 1) AS pass_rate,
+  ROUND(CAST(json_extract(r.value, '$.overall_score') AS DOUBLE), 2) AS overall_score,
+  CAST(json_extract(r.value, '$.score') AS DOUBLE) AS score,
+  CAST(json_extract(r.value, '$.max_score') AS DOUBLE) AS max_score,
+  json_extract_string(r.value, '$.metadata.classification') AS classification,
+  CAST(json_extract(r.value, '$.metadata.risk_score') AS INTEGER) AS risk_score,
+  json_extract_string(r.value, '$.metadata.risk_category') AS risk_category,
+  ROUND(CAST(json_extract(r.value, '$.metadata.confidence') AS DOUBLE), 2) AS confidence,
+  json_extract_string(r.value, '$.timestamp') AS timestamp
+FROM read_json_auto('output/results.json') AS r
+ORDER BY pass_rate DESC, overall_score DESC;
+```
+
+**Output Schema** (`output/results.json`):
+```json
+{
+  "benchmark_id": "bulletproof-green-v1",
+  "participant_id": "purple-baseline",
+  "score": 3.0,
+  "max_score": 4.0,
+  "pass_rate": 75.0,
+  "overall_score": 0.75,
+  "timestamp": "2026-01-31T18:00:00Z",
+  "metadata": {
+    "classification": "qualifying",
+    "risk_score": 18,
+    "risk_category": "low",
+    "confidence": 0.95,
+    "component_scores": {
+      "correctness": 0.90,
+      "safety": 0.95,
+      "specificity": 0.80,
+      "experimentation": 0.85
+    }
+  }
+}
+```
+
+**Technical Requirements**:
+- ✅ Docker Compose orchestration
+- ✅ AgentBeats client container integration
+- ✅ JSON schema validation
+- ✅ Provenance recording
+
+**Implementation**:
+- `scripts/docker/test_e2e.sh` (quick/comprehensive modes)
+- `.github/workflows/agentbeats-run-scenario.yml` (CI/CD workflow)
+- `scripts/leaderboard/generate_compose.py` (scenario.toml → docker-compose.yml)
+- `scripts/leaderboard/record_provenance.py` (container metadata)
+
+**See**: [SUBMISSION-GUIDE.md](AgentBeats/SUBMISSION-GUIDE.md#step-5-run-e2e-submission-test) for testing instructions
+
+---
+
 ## Purple Agent (Baseline)
 
 > **Note**: Purple Agent serves as baseline/reference implementation for Phase 1 submission.

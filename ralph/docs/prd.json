@@ -1,9 +1,9 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-  "scope": "Phase 1 complete (STORY-001 to STORY-014): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-015 to STORY-046): Arena mode, Hybrid evaluation, Modular detectors, Benchmark rigor, A2A compliance.",
-  "source": "docs/PRD.md",
-  "generated": "2026-01-30 23:45:00",
+  "scope": "Phase 1 complete (STORY-001 to STORY-032): Core agents, A2A protocol, ground truth dataset (30 narratives), Docker deployment, AgentBeats registration, statistical rigor (Cohen's κ, CI), difficulty tiers, modular detectors (2/5). Phase 2 deferred (STORY-033 to STORY-046): Complete modular detectors, arena mode integration, ART fine-tuning.",
+  "source": "docs/PRD.md (symlink to docs/GreenAgent-PRD.md - Phase 1 active)",
+  "generated": "2026-01-31 19:46:15",
   "stories": [
     {
       "id": "STORY-001",
