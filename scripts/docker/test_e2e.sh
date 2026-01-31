@@ -82,6 +82,7 @@ BUILD_FLAG=""
 [[ "${E2E_BUILD:-0}" == "1" ]] && BUILD_FLAG="--build"
 
 # Docker Compose configuration (aligns with docker-compose-local.yml)
+# Use absolute path from project root
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose-local.yml}"
 
 # Parse command line arguments

@@ -52,10 +52,6 @@ USER appuser
 # Expose port 9009 for A2A server
 EXPOSE 9009
 
-# Default host and port - can be overridden via environment variables
-ENV HOST="0.0.0.0"
-ENV PORT="9009"
-
-# ENTRYPOINT runs uvicorn with the green agent server
-# Uses $PORT and $HOST environment variables
-ENTRYPOINT sh -c "python -m uvicorn bulletproof_green.server:create_app --factory --host $HOST --port $PORT"
+# ENTRYPOINT runs green agent server
+# Server reads GREEN_HOST and GREEN_PORT from environment (via settings.py)
+ENTRYPOINT ["python", "-m", "bulletproof_green.server"]

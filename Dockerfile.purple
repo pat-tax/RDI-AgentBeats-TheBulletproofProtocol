@@ -52,10 +52,6 @@ USER appuser
 # Expose port 9010 for A2A server
 EXPOSE 9010
 
-# Default host and port - can be overridden via environment variables
-ENV HOST="0.0.0.0"
-ENV PORT="9010"
-
-# ENTRYPOINT runs uvicorn with the purple agent server
-# Uses $PORT and $HOST environment variables
-ENTRYPOINT sh -c "python -m uvicorn bulletproof_purple.server:create_app --factory --host $HOST --port $PORT"
+# ENTRYPOINT runs purple agent server
+# Server reads PURPLE_HOST and PURPLE_PORT from environment (via settings.py)
+ENTRYPOINT ["python", "-m", "bulletproof_purple.server"]
