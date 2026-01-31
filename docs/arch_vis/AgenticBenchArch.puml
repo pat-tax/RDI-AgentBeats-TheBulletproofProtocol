@@ -1,0 +1,39 @@
+@startuml AgenticBenchArch
+title AgentBeats Competition - Benchmark Flow\n//<color:gray>(How does evaluation work?)</color>//
+
+skinparam component {
+    BackgroundColor<<Assessee>> #E8D5F2
+    BackgroundColor<<Assessor>> #C8E6C9
+}
+
+skinparam packageStyle rectangle
+
+' High-level actors
+component "Purple Agent\n(Assessee)" as Purple <<Assessee>>
+component "Green Agent\n(Benchmark)" as Green <<Assessor>>
+
+' Main benchmark flow
+Purple -right-> Green : 1. narrative\n(A2A tasks/send)
+Green -down-> Green : 2. evaluate\n(rules + LLM)
+Green -up-> Purple : 3. evaluation\n(risk_score,\nredline)
+
+note bottom of Purple
+  **Purple Agent (Baseline)**
+  ──────────────────
+  • Template-based generation
+  • Four-Part Test structure
+  • IRS Section 41 compliance
+  • A2A-compatible (:8001)
+end note
+
+note bottom of Green
+  **Green Agent (Benchmark)**
+  ──────────────────
+  • Rule-based evaluation
+  • LLM judge (optional)
+  • Risk scoring (0-100)
+  • Redline markup
+  • A2A-compatible (:8002)
+end note
+
+@enduml

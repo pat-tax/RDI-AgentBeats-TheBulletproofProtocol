@@ -1,0 +1,70 @@
+@startuml TracingArchitecture
+title A2A Task Execution Flow\n//<color:gray>(How do agents execute tasks?)</color>//
+
+skinparam participant {
+    BackgroundColor<<Purple>> #E8D5F2
+    BackgroundColor<<Green>> #C8E6C9
+}
+
+participant "Purple Agent\n:8001" as Purple <<Purple>>
+participant "Green Agent\n:8002" as Green <<Green>>
+
+== AgentCard Discovery ==
+
+Green -> Purple : GET /.well-known/agent-card.json
+Purple --> Green : AgentCard\n(name, capabilities,\nendpoints)
+
+Purple -> Green : GET /.well-known/agent-card.json
+Green --> Purple : AgentCard\n(name, capabilities,\nendpoints)
+
+== Task Execution: Generate Narrative ==
+
+Green -> Purple : POST /tasks/send\n{"method": "generate_narrative",\n"params": {...}}
+Purple -> Purple : Create task\n(state: pending)
+Purple --> Green : {"task_id": "uuid"}
+
+Purple -> Purple : Generate narrative\n(state: running)
+Purple -> Purple : Apply template
+Purple -> Purple : Complete task\n(state: completed)
+
+Green -> Purple : GET /tasks/get/{task_id}
+Purple --> Green : NarrativeResult\n(narrative, metadata)
+
+== Task Execution: Evaluate Narrative ==
+
+Purple -> Green : POST /tasks/send\n{"method": "evaluate_narrative",\n"params": {"narrative": "..."}}
+Green -> Green : Create task\n(state: pending)
+Green --> Purple : {"task_id": "uuid"}
+
+Green -> Green : Evaluate narrative\n(state: running)
+Green -> Green : Run rule detectors
+Green -> Green : Run LLM judge (optional)
+Green -> Green : Calculate scores
+Green -> Green : Generate redline
+Green -> Green : Complete task\n(state: completed)
+
+Purple -> Green : GET /tasks/get/{task_id}
+Green --> Purple : EvaluationResult\n(risk_score, redline,\ncomponents)
+
+== Error Handling ==
+
+Purple -> Green : POST /tasks/send\n(invalid request)
+Green --> Purple : {"error": {\n  "code": -32600,\n  "message": "Invalid Request"\n}}
+
+note right of Green
+  **Task Lifecycle:**
+  pending → running → completed/failed
+
+  **Timeout:**
+  Default 300s, configurable
+end note
+
+note right of Purple
+  **A2A Protocol:**
+  • JSON-RPC 2.0
+  • TextPart, DataPart messages
+  • Async task execution
+  • Standard error codes
+end note
+
+@enduml
