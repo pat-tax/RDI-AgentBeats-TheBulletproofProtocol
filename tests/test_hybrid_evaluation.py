@@ -73,6 +73,7 @@ class TestHybridEvaluatorIntegration:
         # Mock LLM response
         async def mock_evaluate(narrative):
             from bulletproof_green.models import LLMScoreResult
+
             return LLMScoreResult(
                 score=0.85,
                 reasoning="Strong evidence of technical uncertainty and experimentation",
@@ -94,9 +95,7 @@ class TestHybridEvaluatorIntegration:
         assert hasattr(result, "llm_score")
         assert result.llm_score is not None
 
-    def test_evaluator_falls_back_to_rules_only_when_llm_unavailable(
-        self, sample_narrative
-    ):
+    def test_evaluator_falls_back_to_rules_only_when_llm_unavailable(self, sample_narrative):
         """Test graceful fallback when LLM is unavailable."""
         # Arrange
         evaluator = RuleBasedEvaluator()
@@ -114,9 +113,7 @@ class TestHybridScorerIntegration:
     """Test that scorer combines rule-based and LLM scores."""
 
     @pytest.mark.asyncio
-    async def test_scorer_combines_rule_and_llm_scores(
-        self, sample_narrative, monkeypatch
-    ):
+    async def test_scorer_combines_rule_and_llm_scores(self, sample_narrative, monkeypatch):
         """Test weighted combination of rule and LLM scores."""
         # Arrange
         evaluator = RuleBasedEvaluator()
@@ -129,6 +126,7 @@ class TestHybridScorerIntegration:
         # Mock LLM response
         async def mock_evaluate(narrative):
             from bulletproof_green.models import LLMScoreResult
+
             return LLMScoreResult(
                 score=0.8,
                 reasoning="Good compliance",
@@ -171,9 +169,7 @@ class TestHybridEvaluationEndToEnd:
     """End-to-end tests for hybrid evaluation workflow."""
 
     @pytest.mark.asyncio
-    async def test_qualifying_narrative_hybrid_evaluation(
-        self, sample_narrative, monkeypatch
-    ):
+    async def test_qualifying_narrative_hybrid_evaluation(self, sample_narrative, monkeypatch):
         """Test hybrid evaluation on qualifying narrative."""
         # Arrange
         evaluator = RuleBasedEvaluator()
@@ -186,6 +182,7 @@ class TestHybridEvaluationEndToEnd:
         # Mock LLM to agree with rule-based (qualifying)
         async def mock_evaluate(narrative):
             from bulletproof_green.models import LLMScoreResult
+
             return LLMScoreResult(
                 score=0.9,
                 reasoning="Strong evidence of qualified research",
@@ -220,6 +217,7 @@ class TestHybridEvaluationEndToEnd:
         # Mock LLM to agree with rule-based (non-qualifying)
         async def mock_evaluate(narrative):
             from bulletproof_green.models import LLMScoreResult
+
             return LLMScoreResult(
                 score=0.2,
                 reasoning="Routine work, business focus, vague claims",
@@ -241,9 +239,7 @@ class TestHybridEvaluationEndToEnd:
         assert score_result.hybrid_score < 0.5  # Should be low
 
     @pytest.mark.asyncio
-    async def test_llm_disagrees_with_rules_hybrid_balances(
-        self, sample_narrative, monkeypatch
-    ):
+    async def test_llm_disagrees_with_rules_hybrid_balances(self, sample_narrative, monkeypatch):
         """Test that hybrid score balances when LLM disagrees with rules."""
         # Arrange
         evaluator = RuleBasedEvaluator()
@@ -256,6 +252,7 @@ class TestHybridEvaluationEndToEnd:
         # Mock LLM to give lower score than rules
         async def mock_evaluate(narrative):
             from bulletproof_green.models import LLMScoreResult
+
             return LLMScoreResult(
                 score=0.5,  # LLM is more skeptical
                 reasoning="Some uncertainty about qualification",

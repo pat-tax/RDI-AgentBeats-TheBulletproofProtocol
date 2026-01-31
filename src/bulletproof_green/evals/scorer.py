@@ -99,9 +99,7 @@ class AgentBeatsScorer:
         clamped_penalty = max(0, min(max_penalty, penalty))
         return (max_penalty - clamped_penalty) / max_penalty
 
-    def _compute_hybrid_score(
-        self, eval_result: EvaluationResult, rule_score: float
-    ) -> float:
+    def _compute_hybrid_score(self, eval_result: EvaluationResult, rule_score: float) -> float:
         """Compute hybrid score combining rule and LLM evaluations.
 
         Formula: final_score = α*rule_score + β*llm_score

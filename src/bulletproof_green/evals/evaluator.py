@@ -93,9 +93,7 @@ class RuleBasedEvaluator:
         re.IGNORECASE,
     )
 
-    def evaluate(
-        self, narrative: str, llm_judge: LLMJudge | None = None
-    ) -> EvaluationResult:
+    def evaluate(self, narrative: str, llm_judge: LLMJudge | None = None) -> EvaluationResult:
         """Evaluate a narrative and return structured results.
 
         Supports hybrid evaluation (STORY-026) when llm_judge is provided.
