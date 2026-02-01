@@ -31,32 +31,46 @@
 # 1. Setup development environment
 make setup_dev
 
-# 2. Configure environment (required for LLM features)
+# 2. Configure environment (optional - for LLM Judge hybrid scoring)
 cp .env.example .env
 # Edit .env and set GREEN_OPENAI_API_KEY=sk-your-key-here
+# Or use alternative endpoints: see docs/LLM-ENDPOINTS.md
 
 # 3. Local testing with docker-compose
-docker-compose up -d
-curl http://localhost:8001/.well-known/agent-card.json  # Purple agent
-curl http://localhost:8002/.well-known/agent-card.json  # Green agent
+docker-compose -f docker-compose-local.yml --env-file .env up -d
+curl http://localhost:9010/.well-known/agent-card.json  # Purple agent
+curl http://localhost:9009/.well-known/agent-card.json  # Green agent
 
 # 4. Run E2E tests
-bash scripts/test_e2e.sh
+bash scripts/docker/test_e2e.sh
+
+# 5. View leaderboard
+bash scripts/leaderboard/show_leaderboard.sh
 ```
 
 ## Configuration
 
 **Environment Setup:**
 
-Copy `.env.example` to `.env` and configure:
-
 ```bash
+# Create .env from template
 cp .env.example .env
-# Edit .env with your values
+
+# Edit .env and set GREEN_OPENAI_API_KEY=sk-your-actual-key-here
+# Or configure alternative endpoint (Ollama, Azure, etc.) - see docs/LLM-ENDPOINTS.md
+
+# Start agents with explicit env file
+docker-compose -f docker-compose-local.yml --env-file .env up -d
+
+# Or use different env files for different environments
+docker-compose -f docker-compose-local.yml --env-file .env.dev up -d
+docker-compose -f docker-compose-local.yml --env-file .env.prod up -d
 ```
 
-**Required Settings:**
-- `GREEN_OPENAI_API_KEY` - OpenAI API key for LLM-based evaluation (system falls back to rule-only scoring if not provided)
+**Optional Settings:**
+- `GREEN_OPENAI_API_KEY` - OpenAI API key for LLM Judge hybrid scoring (system gracefully falls back to rule-only scoring if not provided)
+- `GREEN_PORT`, `PURPLE_PORT` - Customize ports (defaults: 9009, 9010)
+- See `.env.example` for all available settings
 
 **Optional Settings:**
 - All other settings have sensible defaults (ports, timeouts, LLM weights, etc.)

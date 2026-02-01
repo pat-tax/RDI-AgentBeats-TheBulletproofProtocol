@@ -5,6 +5,9 @@ __pycache__/
 # environment
 .venv/
 *.env
+!.env.example
+!.env.dev.example
+!.env.prod.example
 
 # Distribution / packaging
 build/

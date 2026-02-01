@@ -56,11 +56,15 @@ class GreenRequestHandler(DefaultRequestHandler):
 
         Args:
             params: Message send parameters.
-            context: Optional server call context.
+            context: Optional server call context (unused, required by protocol interface).
 
         Returns:
             Message with evaluation scores or Task status.
         """
+        # TODO (Phase 2+): ServerCallContext could be used for request tracing, auth,
+        #       or rate limiting if needed. Currently unused (stateless evaluator).
+        _ = context
+
         # Create a new task from the incoming message
         task = new_task(params.message)
 

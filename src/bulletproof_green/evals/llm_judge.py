@@ -32,6 +32,7 @@ class LLMJudge:
         self,
         config: LLMJudgeConfig | None = None,
         api_key: str | None = None,
+        base_url: str | None = None,
     ) -> None:
         """Initialize the LLM Judge.
 
@@ -39,9 +40,13 @@ class LLMJudge:
             config: Optional configuration (uses defaults if not provided).
             api_key: Optional OpenAI API key (falls back to settings.llm.api_key
                 or settings.openai_api_key).
+            base_url: Optional base URL for OpenAI-compatible API (falls back to
+                settings.llm.base_url). Supports Azure OpenAI, local models (Ollama,
+                vLLM), and other OpenAI spec-compliant endpoints.
         """
         self.config = config if config is not None else LLMJudgeConfig()
         self._api_key = api_key or settings.llm.api_key or settings.openai_api_key
+        self._base_url = base_url or settings.llm.base_url
         self._client: Any = None
 
         # Initialize OpenAI client if API key is available
@@ -49,7 +54,15 @@ class LLMJudge:
             try:
                 from openai import AsyncOpenAI
 
-                self._client = AsyncOpenAI(api_key=self._api_key)
+                self._client = AsyncOpenAI(
+                    api_key=self._api_key,
+                    base_url=self._base_url,
+                    timeout=settings.llm.timeout,
+                )
+                logger.info(
+                    f"LLM Judge initialized with base_url={self._base_url}, "
+                    f"model={settings.llm.model}"
+                )
             except ImportError:
                 logger.warning("OpenAI package not installed. LLM evaluation disabled.")
                 self._client = None
