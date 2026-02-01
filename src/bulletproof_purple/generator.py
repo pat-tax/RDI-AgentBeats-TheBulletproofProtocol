@@ -2,6 +2,14 @@
 
 Generates Four-Part Test narratives from engineering signals with focus on
 Process of Experimentation and technical uncertainty evidence.
+
+FIXME (Phase 2): Arena Mode refinement NOT implemented. Current generate() method
+       ignores critique parameter and always returns same template. Need to add:
+       - CritiqueParser: Extract patterns to avoid from Green Agent feedback
+       - NarrativeRefiner: Regenerate narrative avoiding detected patterns
+       - Pattern avoidance: Remove flagged keywords (e.g., "debugging", "maintenance")
+       Expected improvement: risk_score [70→45→25→18] instead of [70→70→70]
+       See: PurpleAgent-PRD.md Feature 4, STORY-015
 """
 
 from typing import Any

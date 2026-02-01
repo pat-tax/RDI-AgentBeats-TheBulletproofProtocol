@@ -186,6 +186,12 @@ class PurpleAgentExecutor:
 
         Yields:
             Task updates and final Message with generated narrative.
+
+        FIXME (Phase 2): Arena Mode critique parsing missing. This method receives
+               critique from Green Agent but doesn't extract patterns to avoid or
+               regenerate narrative. Currently just calls generator.generate() with
+               template_type, ignoring any feedback. Need to add CritiqueParser to
+               extract problem patterns and pass to refiner. See STORY-015.
         """
         template_type, signals = self._parse_request(params)
 

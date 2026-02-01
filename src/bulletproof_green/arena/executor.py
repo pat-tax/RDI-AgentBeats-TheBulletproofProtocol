@@ -2,6 +2,14 @@
 
 Implements the iterative loop where Green Agent evaluates narratives from Purple Agent
 and provides critique for iterative refinement until quality threshold is reached.
+
+FIXME (Phase 2): Arena infrastructure (orchestration loop, A2A communication) is
+       complete and tested (6/6 tests pass). However, Purple Agent refinement
+       logic (src/bulletproof_purple/refiner.py) is NOT implemented. Current
+       behavior: narratives don't improve across iterations (risk scores stay
+       constant). Phase 1 demonstrates multi-turn framework; Phase 2 will add
+       actual critique parsing and narrative regeneration (STORY-015, PurpleAgent-PRD.md).
+       Test evidence: risk_score progression [70, 70, 70] instead of [70, 45, 18].
 """
 
 from __future__ import annotations
