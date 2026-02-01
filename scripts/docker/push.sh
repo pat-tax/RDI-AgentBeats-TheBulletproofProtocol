@@ -6,12 +6,12 @@
 #
 # Prerequisites:
 #   - GHCR_PAT environment variable must be set with a GitHub Personal Access Token
-#   - Images must be built first (run scripts/build.sh)
+#   - Images must be built first (run ./build.sh)
 #
 # Usage:
 #   export GHCR_PAT=<your-github-pat>
 #   export GH_USERNAME=<your-github-username>
-#   bash scripts/push.sh
+#   bash ./push.sh
 
 set -e
 
@@ -27,6 +27,8 @@ echo ""
 # Validate required environment variables
 GH_USERNAME="${GH_USERNAME:-}"
 GHCR_PAT="${GHCR_PAT:-}"
+GREEN_AGENT_IMAGE_NAME="bulletproof-green"
+PURPLE_AGENT_IMAGE_NAME="bulletproof-purple"
 
 if [ -z "$GH_USERNAME" ]; then
   error "GH_USERNAME environment variable is not set"
@@ -34,7 +36,7 @@ if [ -z "$GH_USERNAME" ]; then
   echo "Usage:"
   echo "  export GH_USERNAME=<your-github-username>"
   echo "  export GHCR_PAT=<your-github-pat>"
-  echo "  bash scripts/push.sh"
+  echo "  bash ./push.sh"
   echo ""
   exit 1
 fi
@@ -53,7 +55,7 @@ if [ -z "$GHCR_PAT" ]; then
   echo "Usage:"
   echo "  export GH_USERNAME=<your-github-username>"
   echo "  export GHCR_PAT=<your-github-pat>"
-  echo "  bash scripts/push.sh"
+  echo "  bash ./push.sh"
   echo ""
   exit 1
 fi
@@ -71,14 +73,14 @@ echo ""
 
 # Push Green Agent
 info "[2/3] Pushing Bulletproof Green Agent..."
-docker push ghcr.io/${GH_USERNAME}/bulletproof-green:latest
+docker push ghcr.io/${GH_USERNAME}/${GREEN_AGENT_IMAGE_NAME}:latest
 
 success "Green agent pushed successfully"
 echo ""
 
 # Push Purple Agent
 info "[3/3] Pushing Bulletproof Purple Agent..."
-docker push ghcr.io/${GH_USERNAME}/bulletproof-purple:latest
+docker push ghcr.io/${GH_USERNAME}/${PURPLE_AGENT_IMAGE_NAME}:latest
 
 success "Purple agent pushed successfully"
 echo ""
@@ -87,12 +89,12 @@ echo ""
 success "Push Complete!"
 echo ""
 echo "Images pushed to GHCR:"
-echo "  - ghcr.io/${GH_USERNAME}/bulletproof-green:latest"
-echo "  - ghcr.io/${GH_USERNAME}/bulletproof-purple:latest"
+echo "  - ghcr.io/${GH_USERNAME}/${GREEN_AGENT_IMAGE_NAME}:latest"
+echo "  - ghcr.io/${GH_USERNAME}/${PURPLE_AGENT_IMAGE_NAME}:latest"
 echo ""
 echo "View your packages at:"
 echo "  https://github.com/${GH_USERNAME}?tab=packages"
 echo ""
 echo "To use these images, update scenario.toml with:"
-echo "  ghcr_url = \"ghcr.io/${GH_USERNAME}/bulletproof-green:latest\""
+echo "  ghcr_url = \"ghcr.io/${GH_USERNAME}/${GREEN_AGENT_IMAGE_NAME}:latest\""
 echo ""

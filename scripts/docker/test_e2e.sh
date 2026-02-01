@@ -149,7 +149,7 @@ start_containers() {
     if [ -n "$BUILD_FLAG" ]; then
         echo "(with --build)"
     fi
-    docker-compose -f "$COMPOSE_FILE" up -d $BUILD_FLAG
+    docker-compose -f "$COMPOSE_FILE" --env-file .env up -d $BUILD_FLAG
 
     echo "Waiting for agents to be ready..."
     for i in {1..30}; do
@@ -162,7 +162,7 @@ start_containers() {
 
     echo ""
     echo "Step 2: Checking containers..."
-    if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
+    if docker-compose -f "$COMPOSE_FILE" --env-file .env ps | grep -q "Up"; then
         pass "Containers running"
     else
         fail "Containers not running"
@@ -462,6 +462,6 @@ ls -la "$LOG_DIR"
 echo ""
 read -p "Stop containers? (y/N): " STOP
 if [ "$STOP" = "y" ] || [ "$STOP" = "Y" ]; then
-    docker-compose -f "$COMPOSE_FILE" down
+    docker-compose -f "$COMPOSE_FILE" --env-file .env down
     echo "Containers stopped."
 fi

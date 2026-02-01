@@ -122,7 +122,7 @@ start_purple_docker() {
     local compose_file="${2:-docker-compose-local.yml}"
 
     info "Starting Purple agent via docker-compose..."
-    docker-compose -f "$compose_file" up -d purple || return 1
+    docker-compose -f "$compose_file" --env-file .env up -d purple || return 1
 
     info "Waiting for Purple agent to be ready..."
     if wait_for_purple_agent "$purple_url" 20 2; then
@@ -138,7 +138,7 @@ start_purple_docker() {
 stop_purple_docker() {
     local compose_file="${1:-docker-compose-local.yml}"
     info "Stopping Purple agent (Docker)..."
-    docker-compose -f "$compose_file" stop purple
+    docker-compose -f "$compose_file" --env-file .env stop purple
 }
 
 # Cleanup Docker containers
