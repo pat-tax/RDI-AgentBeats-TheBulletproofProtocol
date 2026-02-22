@@ -31,7 +31,7 @@ from bulletproof_green.evals import (
     ScoreResult,
 )
 from bulletproof_green.executor import GreenAgentExecutor
-from bulletproof_green.messenger import Messenger, MessengerError, create_message, send_message
+from bulletproof_green.messenger import Messenger, MessengerError, send_message
 
 __all__ = [
     # Evaluation domain
@@ -54,7 +54,6 @@ __all__ = [
     # Messaging
     "Messenger",
     "MessengerError",
-    "create_message",
     "send_message",
     "messenger",
     # Arena mode

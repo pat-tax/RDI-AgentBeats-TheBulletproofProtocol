@@ -18,6 +18,7 @@ import httpx
 from a2a.client import (
     A2AClientHTTPError,
     A2AClientTimeoutError,
+    Client,
     ClientConfig,
     ClientFactory,
 )
@@ -38,44 +39,15 @@ class MessengerError(Exception):
     """Exception raised for messenger errors."""
 
 
-def create_message(
-    text: str | None = None,
-    data: dict[str, Any] | None = None,
-    role: str = "user",
-) -> dict[str, Any]:
-    """Create an A2A-compliant message structure (raw dict).
-
-    Backward-compatible pure function — returns plain dicts, not SDK objects.
-
-    Args:
-        text: Optional text content for the message
-        data: Optional data payload for the message
-        role: Message role (default: "user")
-
-    Returns:
-        A2A message dictionary with messageId, role, and parts
-    """
-    parts: list[dict[str, Any]] = []
-
-    if text is not None:
-        parts.append({"text": text})
-
-    if data is not None:
-        parts.append({"data": data})
-
-    return {
-        "messageId": str(uuid.uuid4()),
-        "role": role,
-        "parts": parts,
-    }
-
-
 async def send_message(
     url: str,
     message: dict[str, Any],
     timeout: int | None = None,
 ) -> dict[str, Any]:
     """Send an A2A message to an agent (backward-compatible free function).
+
+    FIXME: Creates+closes a Messenger per call (no client reuse). If called
+    in a loop, callers should use Messenger class directly instead.
 
     Wraps Messenger internally for SDK client usage while preserving the
     original call signature.
@@ -162,10 +134,10 @@ class Messenger:
     def __init__(self, base_url: str, timeout: int | None = None):
         self.base_url = base_url
         self.timeout = timeout if timeout is not None else settings.timeout
-        self._clients: dict[str, Any] = {}
+        self._clients: dict[str, Client] = {}
         self._httpx_clients: dict[str, httpx.AsyncClient] = {}
 
-    async def _get_client(self, url: str) -> Any:
+    async def _get_client(self, url: str) -> Client:
         """Get or create a cached SDK Client for the given URL."""
         if url not in self._clients:
             httpx_client = httpx.AsyncClient(timeout=self.timeout)

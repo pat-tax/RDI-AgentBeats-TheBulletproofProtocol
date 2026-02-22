@@ -1,7 +1,7 @@
 {
   "project": "RDI-AgentBeats-TheBulletproofProtocol",
   "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
-  "scope": "Phase 1 complete (STORY-001 to STORY-021): Core agents, A2A protocol, ground truth dataset, Docker deployment, AgentBeats registration. Phase 2 in progress (STORY-022 to STORY-043): Output alignment (P0), Arena mode, Hybrid evaluation, Benchmark rigor.",
+  "scope": "Sprint 2 complete (STORY-033 to STORY-038): Messenger refactor from raw httpx to a2a-sdk ClientFactory.connect() pattern.",
   "source": "docs/PRD.md",
   "generated": "2026-02-22 17:14:13",
   "stories": [
@@ -22,8 +22,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "29854d8fd3457923f7ddcab328ddd47aa97a69ac6e391c68d9555e7d94cd8279",
       "depends_on": []
     },
@@ -44,8 +44,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "1f789ea6374c919bd24fbb01fde42bfccf641da9234bd15409016486ea210edd",
       "depends_on": [
         "STORY-033"
@@ -69,8 +69,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "bd5ee7371494e3e97d24f1a90b0da843c53e4f5d31a846e257f2bb23031ad722",
       "depends_on": [
         "STORY-033"
@@ -92,8 +92,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "5916761d1c158ed117c49648db35ccfa65a8a991cbf0a6290996c170e22d4640",
       "depends_on": [
         "STORY-033"
@@ -114,8 +114,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "d302ba5ad1af8c271f9a0c0047897483b2fe209fd67d859d44086bc6da69e90e",
       "depends_on": [
         "STORY-033"
@@ -142,8 +142,8 @@
         "src/bulletproof_green/messenger.py",
         "tests/test_green_messaging_a2a.py"
       ],
-      "passes": false,
-      "completed_at": null,
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
       "content_hash": "bbb54c037fc261b79bf1acd44cf141b43ec8d7027e769dd50a9039391bdde230",
       "depends_on": [
         "STORY-034",

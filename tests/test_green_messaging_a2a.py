@@ -521,32 +521,6 @@ class TestClientLifecycle:
 class TestBackwardCompatibility:
     """Test preserved public API surface."""
 
-    def test_create_message_returns_raw_dict(self):
-        """create_message() still returns raw dict."""
-        from bulletproof_green.messenger import create_message
-
-        msg = create_message(text="hello")
-        assert isinstance(msg, dict)
-        assert "messageId" in msg
-        assert msg["role"] == "user"
-        assert msg["parts"][0]["text"] == "hello"
-
-    def test_create_message_with_data(self):
-        """create_message(data=...) returns dict with data part."""
-        from bulletproof_green.messenger import create_message
-
-        msg = create_message(data={"key": "val"})
-        assert msg["parts"][0]["data"] == {"key": "val"}
-
-    def test_create_message_unique_ids(self):
-        """create_message generates unique IDs."""
-        from bulletproof_green.messenger import create_message
-
-        m1 = create_message(text="a")
-        m2 = create_message(text="b")
-        assert m1["messageId"] != m2["messageId"]
-        uuid.UUID(m1["messageId"])
-
     @pytest.mark.asyncio
     async def test_send_message_free_function(self):
         """send_message() free function is importable and callable."""
