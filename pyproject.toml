@@ -44,7 +44,7 @@ green = [
 
 [tool.uv]
 package = true
-exclude-newer = "2026-01-26T00:00:00Z"
+exclude-newer = "2026-02-22T00:00:00Z"
 
 [tool.pyright]
 pythonVersion = "3.13"
