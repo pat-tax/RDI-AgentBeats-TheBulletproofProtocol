@@ -7,16 +7,9 @@
 
 set -euo pipefail
 
-# Colors
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-log_info() { echo -e "${GREEN}[INFO]${NC} $1" >&2; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1" >&2; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
-log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1" >&2; }
+# Get script directory and source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
 
 log_info "Initializing Ralph Loop environment..."
 
@@ -75,7 +68,7 @@ check_project_structure() {
         "CONTRIBUTING.md"
         "docs/PRD.md"
         "Makefile"
-        ".claude/skills/generating-prd/SKILL.md"
+        ".claude/skills/generating-prd-json-from-prd-md/SKILL.md"
         "ralph/scripts/ralph.sh"
         "ralph/docs/templates/prompt.md"
     )
@@ -94,15 +87,6 @@ check_project_structure() {
     fi
 
     log_success "Project structure validated"
-}
-
-# Create state directories
-create_state_dirs() {
-    log_info "Creating state directories..."
-
-    mkdir -p docs/ralph
-
-    log_success "State directories created"
 }
 
 # Initialize progress.txt from template if it doesn't exist
@@ -150,8 +134,7 @@ check_prd_json() {
 
         log_info ""
         log_info "To populate prd.json with real stories, run:"
-        log_info "  claude -p"
-        log_info "  Then ask: 'Use generating-prd skill to create prd.json from PRD.md'"
+        log_info "  make ralph_prd_json"
         log_info ""
         return 1
     else
@@ -182,7 +165,6 @@ make_executable() {
 main() {
     check_prerequisites
     check_project_structure
-    create_state_dirs
     initialize_progress
     make_executable
 

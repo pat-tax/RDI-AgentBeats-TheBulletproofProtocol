@@ -1,16 +1,20 @@
 ---
 name: implementing-python
 description: Implements concise, streamlined Python code matching exact architect specifications. Use when writing Python code, creating modules, or when the user asks to implement features in Python.
+argument-hint: [feature-name]
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, WebSearch, WebFetch
 ---
 
 # Python Implementation
+
+**Target**: $ARGUMENTS
 
 Creates **focused, streamlined** Python implementations following architect
 specifications exactly. No over-engineering.
 
 ## Python Standards
 
-See `docs/python-best-practices.md` for comprehensive Python guidelines.
+See `docs/best-practices/python-best-practices.md` for comprehensive Python guidelines.
 
 ## Workflow
 

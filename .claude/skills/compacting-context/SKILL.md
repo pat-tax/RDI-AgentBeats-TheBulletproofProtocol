@@ -1,8 +1,11 @@
 ---
 name: compacting-context
 description: Compacts verbose context into structured summary. Use after pollution sources (searches, logs, JSON) or at phase milestones.
+argument-hint: [compaction-name]
 context: fork
 agent: Explore
+model: sonnet
+allowed-tools: Read, Grep, Glob
 ---
 
 # Context Compaction (ACE-FCA)
@@ -28,7 +31,7 @@ Per `.claude/rules/context-management.md`:
 # Compaction: {{name}}
 
 ## Trajectory
-<!-- start → current → next step -->
+<!-- Research status → Planning status → Implementation status -->
 
 ## Key Files
 <!-- files touched with purpose -->
@@ -48,3 +51,4 @@ Per `.claude/rules/context-management.md`:
 - Correct > Complete > Minimal
 - No raw dumps, only structured summaries
 - Enough to continue, no more
+- Update working plan with compaction output (don't orphan it)

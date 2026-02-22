@@ -1,8 +1,37 @@
 {
   "name": "Template DevEnv",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {}
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "saoudrizwan.claude-dev",
+
+        "charliermarsh.ruff",
+        "davidanson.vscode-markdownlint",
+        "donjayamanne.githistory",
+        "editorconfig.editorconfig",
+        "gruntfuggly.todo-tree",
+        "mhutchie.git-graph",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "yzhang.markdown-all-in-one",
+
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.makefile-tools"
+      ],
+      "settings": {
+        "editor.lineNumbers": "on",
+        "editor.wordWrap": "on",
+        "explorer.confirmDelete": true,
+        "files.autoSave": "onFocusChange",
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "makefile.configureOnOpen": false,
+        "redhat.telemetry.enabled": false
+      }
+    }
   },
-  "postCreateCommand": "make setup_claude_code & make setup_markdownlint & make setup_sandbox"
+  "postCreateCommand": "make setup_devc_template"
 }

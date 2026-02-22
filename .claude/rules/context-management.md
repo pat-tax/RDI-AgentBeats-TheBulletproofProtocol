@@ -30,6 +30,10 @@ These mess up context - compact/summarize immediately:
 - Test/build logs
 - Large JSON blobs from tools
 
+## Workflow Phases
+
+Research → Planning → Implementation. Compact after each phase transition.
+
 ## Compaction Triggers (When)
 
 Use `compacting-context` skill when:

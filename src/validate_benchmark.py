@@ -1,205 +1,387 @@
-#!/usr/bin/env python3
-"""Validate benchmark metrics for green agent.
+"""Benchmark validation script for IRS Section 41 narratives (STORY-009).
 
-This script runs the green agent against the ground truth dataset and
-measures classification accuracy, F1 score, precision, and recall using
-sklearn.metrics.
-
-The goal is to beat the IRS AI baseline:
-- Accuracy: 61.2% → Target: >= 70%
-- F1 Score: 0.42 → Target: >= 0.72
-- Precision: Target >= 75%
-- Recall: Target >= 70%
+Validates ground truth dataset and measures benchmark performance by running
+the Green Agent evaluator on each narrative and computing accuracy metrics.
 """
 
 import json
-import sys
 from pathlib import Path
+from typing import Any
 
-from sklearn.metrics import (  # type: ignore[import-untyped]
-    accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-)
+from pydantic import BaseModel
 
-# Add src to path so we can import our modules
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
-from bulletproof_green.evaluator import EvaluationResult, NarrativeEvaluator
+from bulletproof_green.evals.evaluator import RuleBasedEvaluator
+from bulletproof_green.evals.scorer import AgentBeatsScorer
 
 
-def load_ground_truth() -> list[dict]:
-    """Load the ground truth dataset.
+# TODO(review): New model consolidates ground truth entry defaults (DRY principle)
+# Replaces manual .get() calls with Pydantic validation for type safety
+class GroundTruthEntry(BaseModel):
+    """Ground truth dataset entry with validation.
 
-    Returns:
-        List of ground truth cases with id, narrative, label, irs_rationale
+    Defaults ensure graceful handling of incomplete entries while maintaining
+    worst-case assumptions (high score = non-qualifying).
     """
-    data_path = Path(__file__).parent.parent / "data" / "ground_truth.json"
-    with open(data_path) as f:
-        return json.load(f)
+
+    id: str = "unknown"
+    narrative: str = ""
+    expected_score: int = 100  # Worst case: assume non-qualifying
+    classification: str = "NON_QUALIFYING"  # Conservative default
+    difficulty: str = "unknown"
 
 
-def evaluate_narrative(evaluator: NarrativeEvaluator, narrative: str) -> EvaluationResult:
-    """Evaluate a single narrative using the green agent.
+class ValidationResult(BaseModel):
+    """Result of validating a single narrative entry."""
+
+    entry_id: str
+    expected_score: int
+    actual_score: int
+    expected_classification: str
+    actual_classification: str
+    classification_match: bool
+    score_delta: int
+    difficulty: str
+
+
+class DifficultyTierResult(BaseModel):
+    """Pass/fail results for a difficulty tier."""
+
+    tier: str
+    total: int
+    passed: int
+    failed: int
+    pass_rate: float
+
+
+class BenchmarkReport(BaseModel):
+    """Complete benchmark validation report."""
+
+    validation_results: list[ValidationResult]
+    metrics: dict[str, float]
+    tier_results: list[DifficultyTierResult]
+    gaps: list[dict[str, str]]
+
+    def to_summary(self) -> str:
+        """Generate a human-readable summary of the report."""
+        lines = [
+            "=" * 60,
+            "BENCHMARK VALIDATION REPORT",
+            "=" * 60,
+            "",
+            "OVERALL METRICS",
+            "-" * 30,
+            f"Accuracy:  {self.metrics['accuracy']:.2%}",
+            f"Precision: {self.metrics['precision']:.2%}",
+            f"Recall:    {self.metrics['recall']:.2%}",
+            f"F1 Score:  {self.metrics['f1_score']:.2%}",
+            "",
+            "RESULTS BY DIFFICULTY TIER",
+            "-" * 30,
+        ]
+
+        for tier in self.tier_results:
+            lines.append(
+                f"{tier.tier.upper():8} - Pass: {tier.passed}/{tier.total} ({tier.pass_rate:.0%})"
+            )
+
+        if self.gaps:
+            lines.extend(
+                [
+                    "",
+                    "IDENTIFIED GAPS",
+                    "-" * 30,
+                ]
+            )
+            for gap in self.gaps:
+                lines.append(f"  - {gap['entry_id']}: {gap.get('reason', 'Unknown issue')}")
+
+        lines.append("")
+        lines.append("=" * 60)
+        return "\n".join(lines)
+
+
+def load_ground_truth(path: Path) -> list[dict[str, Any]]:
+    """Load ground truth dataset from JSON file.
 
     Args:
-        evaluator: The NarrativeEvaluator instance
-        narrative: The R&D narrative text
+        path: Path to ground_truth.json file
 
     Returns:
-        Evaluation result dict with risk_score, classification, etc.
+        List of ground truth entries
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        ValueError: If file contains invalid JSON
     """
-    return evaluator.evaluate(narrative)
+    if not path.exists():
+        raise FileNotFoundError(f"Ground truth file not found: {path}")
+
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in ground truth file: {e}") from e
+
+    return data
 
 
-def run_validation() -> dict:
-    """Run validation against all ground truth cases.
+class BenchmarkValidator:
+    """Validates benchmark using Green Agent evaluator.
 
-    Returns:
-        Dict with metrics (accuracy, f1_score, precision, recall) and predictions
+    Runs the RuleBasedEvaluator and AgentBeatsScorer on each narrative
+    in the ground truth dataset and compares results.
     """
-    # Load ground truth data
-    ground_truth = load_ground_truth()
 
-    # Initialize evaluator
-    evaluator = NarrativeEvaluator()
+    # Threshold for considering score delta as significant
+    SCORE_DELTA_THRESHOLD = 15
 
-    # Evaluate each case
-    predictions = []
-    true_labels = []
-    predicted_labels = []
+    def __init__(self) -> None:
+        """Initialize validator with Green Agent components."""
+        self.evaluator = RuleBasedEvaluator()
+        self.scorer = AgentBeatsScorer()
 
-    print(f"Evaluating {len(ground_truth)} ground truth cases...")
+    def validate_entry(self, entry: dict[str, Any]) -> ValidationResult:
+        """Validate a single ground truth entry.
 
-    for i, case in enumerate(ground_truth, 1):
-        narrative_id = case["id"]
-        narrative = case["narrative"]
-        true_label = case["label"]
+        Args:
+            entry: Ground truth entry with narrative, expected_score, etc.
 
-        # Evaluate with green agent
-        result = evaluate_narrative(evaluator, narrative)
-        predicted_label = result["classification"]
-        risk_score = result["risk_score"]
+        Returns:
+            ValidationResult with actual vs expected comparison
+        """
+        # TODO(review): Pydantic validation replaces manual .get() calls
+        # Benefit: Type safety + automatic defaults from model
+        gt_entry = GroundTruthEntry.model_validate(entry)
 
-        # Store results
-        predictions.append(
-            {
-                "id": narrative_id,
-                "true_label": true_label,
-                "predicted_label": predicted_label,
-                "risk_score": risk_score,
-            }
+        # Run Green Agent evaluation
+        eval_result = self.evaluator.evaluate(gt_entry.narrative)
+        actual_score = eval_result.risk_score
+        actual_classification = eval_result.classification
+
+        # Compare results
+        classification_match = gt_entry.classification == actual_classification
+        score_delta = actual_score - gt_entry.expected_score
+
+        return ValidationResult(
+            entry_id=gt_entry.id,
+            expected_score=gt_entry.expected_score,
+            actual_score=actual_score,
+            expected_classification=gt_entry.classification,
+            actual_classification=actual_classification,
+            classification_match=classification_match,
+            score_delta=score_delta,
+            difficulty=gt_entry.difficulty,
         )
 
-        true_labels.append(true_label)
-        predicted_labels.append(predicted_label)
+    def validate_all(self, data: list[dict[str, Any]]) -> list[ValidationResult]:
+        """Validate all entries in ground truth dataset.
 
-        # Progress indicator
-        correct = "✓" if true_label == predicted_label else "✗"
-        print(f"  [{i:2d}/20] {narrative_id}: {correct} (score={risk_score})")
+        Args:
+            data: List of ground truth entries
 
-    # Calculate metrics using sklearn
-    accuracy = accuracy_score(true_labels, predicted_labels)
-    f1 = f1_score(
-        true_labels,
-        predicted_labels,
-        pos_label="QUALIFYING",  # type: ignore[arg-type]
-        zero_division=0.0,  # type: ignore[arg-type]
-    )
-    precision = precision_score(
-        true_labels,
-        predicted_labels,
-        pos_label="QUALIFYING",  # type: ignore[arg-type]
-        zero_division=0.0,  # type: ignore[arg-type]
-    )
-    recall = recall_score(
-        true_labels,
-        predicted_labels,
-        pos_label="QUALIFYING",  # type: ignore[arg-type]
-        zero_division=0.0,  # type: ignore[arg-type]
-    )
+        Returns:
+            List of ValidationResults
+        """
+        return [self.validate_entry(entry) for entry in data]
 
-    # Compile results
-    results = {
-        "accuracy": float(accuracy),
-        "f1_score": float(f1),
-        "precision": float(precision),
-        "recall": float(recall),
-        "n_samples": len(ground_truth),
-        "predictions": predictions,
-    }
+    def _classify_result(self, result: ValidationResult) -> str:
+        """Classify a result as TP, FP, FN, or TN.
 
-    return results
+        Args:
+            result: ValidationResult to classify.
+
+        Returns:
+            Classification string: "tp", "fp", "fn", or "tn".
+        """
+        expected_pos = result.expected_classification == "QUALIFYING"
+        actual_pos = result.actual_classification == "QUALIFYING"
+        if expected_pos and actual_pos:
+            return "tp"
+        if expected_pos:
+            return "fn"
+        if actual_pos:
+            return "fp"
+        return "tn"
+
+    def compute_metrics(self, results: list[ValidationResult]) -> dict[str, float]:
+        """Compute precision, recall, F1, and accuracy metrics.
+
+        Classification metrics treat QUALIFYING as the positive class:
+        - True Positive: Expected QUALIFYING, Actual QUALIFYING
+        - False Positive: Expected NON_QUALIFYING, Actual QUALIFYING
+        - False Negative: Expected QUALIFYING, Actual NON_QUALIFYING
+        - True Negative: Expected NON_QUALIFYING, Actual NON_QUALIFYING
+
+        Args:
+            results: List of ValidationResults
+
+        Returns:
+            Dict with precision, recall, f1_score, accuracy
+        """
+        counts = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
+        for r in results:
+            counts[self._classify_result(r)] += 1
+
+        tp, fp, fn, tn = counts["tp"], counts["fp"], counts["fn"], counts["tn"]
+
+        # Handle edge cases to avoid division by zero
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1_score = (
+            2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        )
+        accuracy = (tp + tn) / len(results) if results else 0.0
+
+        return {
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1_score,
+            "accuracy": accuracy,
+        }
+
+    def generate_tier_results(self, results: list[ValidationResult]) -> list[DifficultyTierResult]:
+        """Generate pass/fail results per difficulty tier.
+
+        Args:
+            results: List of ValidationResults
+
+        Returns:
+            List of DifficultyTierResults
+        """
+        tier_data: dict[str, dict[str, int]] = {}
+
+        for r in results:
+            tier = r.difficulty
+            if tier not in tier_data:
+                tier_data[tier] = {"total": 0, "passed": 0, "failed": 0}
+
+            tier_data[tier]["total"] += 1
+            if r.classification_match:
+                tier_data[tier]["passed"] += 1
+            else:
+                tier_data[tier]["failed"] += 1
+
+        tier_results = []
+        for tier, data in sorted(tier_data.items()):
+            pass_rate = data["passed"] / data["total"] if data["total"] > 0 else 0.0
+            tier_results.append(
+                DifficultyTierResult(
+                    tier=tier,
+                    total=data["total"],
+                    passed=data["passed"],
+                    failed=data["failed"],
+                    pass_rate=pass_rate,
+                )
+            )
+
+        return tier_results
+
+    def identify_gaps(self, results: list[ValidationResult]) -> list[dict[str, str]]:
+        """Identify gaps and improvement areas.
+
+        Gaps include:
+        - Classification mismatches
+        - Large score deltas (> threshold)
+
+        Args:
+            results: List of ValidationResults
+
+        Returns:
+            List of gap dictionaries with entry_id, reason, and suggestion
+        """
+        gaps = []
+
+        for r in results:
+            reasons: list[str] = []
+
+            if not r.classification_match:
+                reasons.append(
+                    f"Classification mismatch: expected {r.expected_classification}, "
+                    f"got {r.actual_classification}"
+                )
+
+            if abs(r.score_delta) > self.SCORE_DELTA_THRESHOLD:
+                reasons.append(
+                    f"Large score delta: {r.score_delta:+d} points "
+                    f"(expected {r.expected_score}, got {r.actual_score})"
+                )
+
+            if reasons:
+                suggestion = self._generate_suggestion(r)
+                gaps.append(
+                    {
+                        "entry_id": r.entry_id,
+                        "reason": "; ".join(reasons),
+                        "suggestion": suggestion,
+                        "difficulty": r.difficulty,
+                    }
+                )
+
+        return gaps
+
+    def _generate_suggestion(self, result: ValidationResult) -> str:
+        """Generate improvement suggestion for a gap.
+
+        Args:
+            result: ValidationResult with gap
+
+        Returns:
+            Suggestion string
+        """
+        if (
+            result.expected_classification == "QUALIFYING"
+            and result.actual_classification == "NON_QUALIFYING"
+        ):
+            return (
+                "Evaluator may be too strict. Review if narrative contains sufficient "
+                "experimentation evidence that is not being detected."
+            )
+        elif (
+            result.expected_classification == "NON_QUALIFYING"
+            and result.actual_classification == "QUALIFYING"
+        ):
+            return (
+                "Evaluator may be too lenient. Review if routine engineering, "
+                "business risk, or vague language patterns should be detected."
+            )
+        else:
+            return "Review scoring calibration for this difficulty tier."
+
+    def generate_report(self, data: list[dict[str, Any]]) -> BenchmarkReport:
+        """Generate complete benchmark validation report.
+
+        Args:
+            data: Ground truth dataset
+
+        Returns:
+            BenchmarkReport with all metrics and analysis
+        """
+        results = self.validate_all(data)
+        metrics = self.compute_metrics(results)
+        tier_results = self.generate_tier_results(results)
+        gaps = self.identify_gaps(results)
+
+        return BenchmarkReport(
+            validation_results=results,
+            metrics=metrics,
+            tier_results=tier_results,
+            gaps=gaps,
+        )
 
 
-def save_results(results: dict) -> None:
-    """Save validation results to results/benchmark_validation.json.
+def main() -> None:
+    """Run benchmark validation from command line."""
+    ground_truth_path = Path(__file__).parent.parent / "data" / "ground_truth.json"
 
-    Args:
-        results: Dict with metrics and predictions
-    """
-    output_path = Path(__file__).parent.parent / "results" / "benchmark_validation.json"
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Loading ground truth from: {ground_truth_path}")
+    data = load_ground_truth(ground_truth_path)
+    print(f"Loaded {len(data)} entries")
 
-    with open(output_path, "w") as f:
-        json.dump(results, f, indent=2)
+    validator = BenchmarkValidator()
+    report = validator.generate_report(data)
 
-    print(f"\nResults saved to: {output_path}")
-
-
-def print_summary(results: dict) -> None:
-    """Print a summary of the validation results.
-
-    Args:
-        results: Dict with metrics and predictions
-    """
-    accuracy = results["accuracy"]
-    f1 = results["f1_score"]
-    precision = results["precision"]
-    recall = results["recall"]
-
-    print("\n" + "=" * 60)
-    print("BENCHMARK VALIDATION RESULTS")
-    print("=" * 60)
-    print(f"Samples evaluated: {results['n_samples']}")
-    print()
-    print(f"Accuracy:  {accuracy:.1%} {'✓' if accuracy >= 0.70 else '✗'} (target: >= 70%)")
-    print(f"F1 Score:  {f1:.2f} {'✓' if f1 >= 0.72 else '✗'} (target: >= 0.72)")
-    print(f"Precision: {precision:.1%} {'✓' if precision >= 0.75 else '✗'} (target: >= 75%)")
-    print(f"Recall:    {recall:.1%} {'✓' if recall >= 0.70 else '✗'} (target: >= 70%)")
-    print()
-    print("Baseline comparison (IRS AI):")
-    print(f"  Accuracy: 61.2% → {accuracy:.1%} ({accuracy - 0.612:+.1%})")
-    print(f"  F1 Score: 0.42 → {f1:.2f} ({f1 - 0.42:+.2f})")
-    print("=" * 60)
-
-
-def main() -> int:
-    """Main entry point for validation script.
-
-    Returns:
-        Exit code (0 for success)
-    """
-    try:
-        # Run validation
-        results = run_validation()
-
-        # Save results
-        save_results(results)
-
-        # Print summary
-        print_summary(results)
-
-        return 0
-
-    except Exception as e:
-        print(f"Error during validation: {e}", file=sys.stderr)
-        import traceback
-
-        traceback.print_exc()
-        return 1
+    print(report.to_summary())
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

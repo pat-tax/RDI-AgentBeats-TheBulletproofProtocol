@@ -1,7 +1,9 @@
-"""Purple Agent - R&D Narrative Generator (Reference Implementation).
+"""Purple Agent - IRS Section 41 narrative generator."""
 
-This agent serves as a reference implementation for the AgentBeats benchmark.
-It generates simple R&D tax credit narratives for testing the Green Agent evaluator.
-"""
+from bulletproof_purple.generator import NarrativeGenerator
+from bulletproof_purple.models import Narrative
 
-__version__ = "0.0.0"
+__all__ = [
+    "NarrativeGenerator",
+    "Narrative",
+]

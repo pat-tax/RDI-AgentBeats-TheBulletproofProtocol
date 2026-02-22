@@ -1,6 +1,6 @@
 {
   "env": {
-    "ANTHROPIC_MODEL": "opus",
+    "ANTHROPIC_MODEL": "opusplan",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL": "1",
     "CLAUDE_CODE_SUBAGENT_MODEL": "opusplan",
@@ -9,7 +9,23 @@
     "OTEL_EXPORTER_OTLP_PROTOCOL": "",
     "OTEL_LOGS_EXPORTER": ""
   },
-  
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowLocalBinding": true,
+      "allowedHosts": ["api.github.com"]
+    },
+    "enableWeakerNestedSandbox": false,
+    "filesystem": {
+      "write": {
+        "allowOnly": [
+          "/tmp/claude-1000"
+        ]
+      }
+    }  
+  },
   "permissions": {
     "allow": [
       "Bash(date:*)",
@@ -18,6 +34,7 @@
       "Bash(git:log:*)",
       "Bash(git:status:*)",
       "Bash(git log --grep:*)",
+      "Bash(git rev-list:*)",
       "Bash(jq:*)",
       "Bash(make:*)",
       "Bash(tree:*)",
@@ -27,16 +44,17 @@
       "Bash(uv run ruff:*)",
       "Edit(AGENT_LEARNINGS.md)",
       "Edit(AGENT_REQUESTS.md)",
-      "Edit(docs/**/*.md)",
+      "Edit(docs/)",
+      "Edit(tests/)",
+      "Edit(ralph/**/*.md)",
       "Edit(ralph/docs/*.json)",
       "Edit(ralph/docs/*.txt)",
       "Edit(src/**/*.py)",
       "Edit(src/**/*.json)",
-      "Edit(tests/**/*.py)",
-      "Edit(tests/**/*.json)",
       "mcp__plugin_context7_context7__resolve-library-id",
       "mcp__plugin_context7_context7__query-docs",
-      "Read(.claude/skills/**/*.md)",
+      "Read(.claude/skills/)",
+      "Read(.claude/rules/)",
       "SlashCommand",
       "Skill"
     ],
@@ -50,12 +68,18 @@
       "Bash(ls:*)",
       "Bash(source:*)",
       "Bash(tail:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Edit(.env)",
+      "Read(.env)"
     ],
     "ask": [
       "Bash(bash:ralph/scripts/*.sh:*)",
       "Bash(chmod:+x:ralph/scripts/*.sh)",
+      "Bash(git clean:*)",
       "Bash(git commit:*)",
+      "Bash(git reset:*)",
       "Bash(mv:*)",
       "Bash(mkdir:*)",
       "Bash(rm:*)",
@@ -68,6 +92,7 @@
       "Edit(README.md)"
     ]
   },
+  "terminalProgressBarEnabled": true,
   "statusLine": {
     "type": "command",
     "command": "bash .claude/scripts/statusline.sh"
@@ -79,6 +104,7 @@
     "security-guidance@claude-plugins-official": true
   },
   "attribution": {
-    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>"
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": "🤖 Generated with Claude <noreply@anthropic.com>"
   }
 }

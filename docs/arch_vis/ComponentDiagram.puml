@@ -1,0 +1,105 @@
+@startuml ComponentDiagram
+title The Bulletproof Protocol - Component Architecture\n//<color:gray>(How is it composed?)</color>//
+
+skinparam component {
+    BackgroundColor<<Purple>> #E8D5F2
+    BackgroundColor<<Green>> #C8E6C9
+    BackgroundColor<<Eval>> #B3E5FC
+    BackgroundColor<<External>> #FFECB3
+    BackgroundColor<<Rules>> #A5D6A7
+}
+
+skinparam package {
+    BackgroundColor #FAFAFA
+}
+
+' External dependencies
+component [OpenAI API] as OpenAI <<External>>
+
+' Purple Agent
+package "Purple Agent (Assessee)" <<Purple>> #E8D5F2 {
+    component [server.py\nA2A Server] as PurpleServer
+    component [generator.py\nNarrative Gen] as Generator
+    component [agent_card.py\nAgentCard] as PurpleCard
+    component [models.py\nData Models] as PurpleModels
+    component [settings.py\nConfig] as PurpleSettings
+
+    PurpleServer -down-> Generator
+    PurpleServer -down-> PurpleCard
+    Generator --> PurpleModels
+    PurpleServer --> PurpleSettings
+}
+
+' Green Agent Core
+package "Green Agent (Benchmark)" <<Green>> #C8E6C9 {
+    component [server.py\nA2A Server] as GreenServer
+    component [executor.py\nEval Executor] as Executor
+    component [messenger.py\nA2A Messaging] as Messenger
+    component [agent.py\nAgent Def] as Agent
+    component [models.py\nData Models] as GreenModels
+    component [settings.py\nConfig] as GreenSettings
+    component [statistics.py\nStats] as Stats
+
+    package "Evaluation Engine" <<Eval>> #B3E5FC {
+        component [evaluator.py] as Evaluator
+        component [scorer.py] as Scorer
+        component [llm_judge.py] as LLMJudge
+    }
+
+    package "Rule Detectors" <<Rules>> #A5D6A7 {
+        component [business_risk] as BusinessRisk
+        component [specificity] as Specificity
+        component [routine_engineering] as RoutineEng
+        component [experimentation] as Experimentation
+    }
+
+    package "Arena Mode (Phase 2)" {
+        component [arena/executor.py] as ArenaExec
+    }
+
+    GreenServer -down-> Executor
+    GreenServer -down-> Messenger
+    GreenServer -down-> Agent
+    Executor -down-> Evaluator
+    Executor -down-> LLMJudge
+    Evaluator -down-> BusinessRisk
+    Evaluator -down-> Specificity
+    Evaluator -down-> RoutineEng
+    Evaluator -down-> Experimentation
+    Evaluator -right-> Scorer
+    LLMJudge -right-> Scorer
+    Executor --> GreenModels
+    Executor --> GreenSettings
+    Executor --> Stats
+}
+
+' Cross-package flows
+PurpleServer -right-> GreenServer : A2A Protocol
+
+LLMJudge -up-> OpenAI : gpt-4o-mini
+
+ArenaExec -left-> Messenger : call Purple
+ArenaExec -right-> Evaluator : evaluate
+
+note bottom of Generator
+  **Template-Based (Phase 1):**
+  • Four-Part Test structure
+  • Static engineering data
+  • IRS Section 41 compliance
+end note
+
+note bottom of Evaluator
+  **Rule-Based Detection:**
+  • 5 weighted dimensions
+  • Deterministic scoring
+  • IRS citation mapping
+end note
+
+note bottom of LLMJudge
+  **Optional LLM Evaluation:**
+  • Contextual compliance
+  • Weighted with rules
+  • Graceful fallback
+end note
+
+@enduml
