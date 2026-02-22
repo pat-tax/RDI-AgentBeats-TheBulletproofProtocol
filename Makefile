@@ -42,6 +42,18 @@ setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
 	fi
 	echo "Sandbox dependencies installed."
 
+setup_sandbox:  ## Install sandbox deps (bubblewrap, socat) for Linux/WSL2
+	echo "Installing sandbox dependencies ..."
+	if command -v apt-get > /dev/null; then \
+		sudo apt-get update -qq && sudo apt-get install -y bubblewrap socat; \
+	elif command -v dnf > /dev/null; then \
+		sudo dnf install -y bubblewrap socat; \
+	else \
+		echo "Unsupported package manager. Install bubblewrap and socat manually."; \
+		exit 1; \
+	fi
+	echo "Sandbox dependencies installed."
+
 setup_project:  ## Customize template with your project details. Run with help: bash scripts/setup_project.sh help
 	bash scripts/setup_project.sh || {
 		echo "";
