@@ -72,6 +72,49 @@
 
 ---
 
+## 🐛 BUGS - Sprint 3 Candidates
+
+### BUG-001: Qualifying Narrative Misclassified as NON_QUALIFYING
+
+**Severity**: High (E2E test shows incorrect classification)
+**Story**: TODO - assign new story ID (STORY-039+)
+
+**Symptom**: E2E Step 7 qualifying narrative gets `classification=NON_QUALIFYING`, `risk_score=55`, `overall_score=0.45` despite `pass_rate=100%` and `score=4/4`.
+
+**Root Cause**: `_detect_keyword_stuffing` in `evals/evaluator.py` (lines 542-608) fires a +55 penalty when 2+ R&D keyword patterns each appear 2+ times. The qualifying narrative triggers it because `experimentation`+`tested` (experiment pattern) and `failed`+`failure` (fail pattern) are natural varied forms of the same root words.
+
+**Architectural Disconnect**: `classification` and `overall_score` use full `risk_score` (includes adversarial penalties), but `pass_rate` and `score` use only the five `component_scores` (which intentionally exclude adversarial penalties). This causes contradictory output: 4/4 score but NON_QUALIFYING.
+
+**Fix Direction**:
+1. Tune `_detect_keyword_stuffing` threshold (currently `repeated_keywords >= 2` triggers 55 points — too aggressive for legitimate narratives)
+2. Consider including adversarial penalties in component scores, or excluding them from classification
+3. Review the `risk_score < 20` classification threshold
+
+**Files**: `src/bulletproof_green/evals/evaluator.py` (lines 236, 542-608), `src/bulletproof_green/evals/scorer.py` (lines 84-91)
+
+---
+
+### BUG-002: Arena Mode "No completed task received" (4/6 E2E failures)
+
+**Severity**: Critical (arena mode completely broken)
+**Story**: TODO - assign new story ID (STORY-039+)
+
+**Symptom**: All arena E2E tests that call Purple agent fail with `MessengerError: No completed task received`. Direct Purple calls (E2E Step 5 via curl) work fine.
+
+**Root Cause**: `PurpleRequestHandler.on_message_send()` in `src/bulletproof_purple/server.py` (lines 265-273) iterates `executor.execute()` and returns the *last* yielded item. The executor yields: `working_task` → `completed_task` → `Message`. So `final_result` is a `Message`, not the completed `Task`.
+
+The a2a-sdk `BaseClient.send_message()` (non-streaming path) then yields that `Message` directly. `messenger.py` line 181 skips all `Message` events with `continue`, exhausts the iterator, and raises `"No completed task received"` at line 193.
+
+**Why curl works**: `test_e2e.sh` Step 5 just greps for `"narrative"` in raw HTTP response — present regardless of Task vs Message result type.
+
+**Fix Direction**:
+1. Fix `PurpleRequestHandler.on_message_send()` to return the completed `Task` (not the trailing `Message`) — track the last Task with `TaskState.completed` separately from the final yield
+2. Alternatively, extend `messenger.py` to extract data from `Message` responses (workaround, not root fix)
+
+**Files**: `src/bulletproof_purple/server.py` (lines 265-273), `src/bulletproof_green/messenger.py` (lines 179-193)
+
+---
+
 ## ⏸️ DEFERRED - Phase 2 (Feb-March 2026)
 
 ### Feature 4: Arena Mode - Multi-Turn Adversarial Loop
@@ -111,7 +154,7 @@
 ---
 
 ### Feature 15: SSE Task Updates - Server-Sent Events Streaming
-**Story**: STORY-033
+**Story**: TODO - assign new story ID (STORY-039+; STORY-033 reassigned to Sprint 2)
 **Priority**: Low (Enhancement)
 
 **Scope**: Real-time task progress updates via Server-Sent Events for multi-turn evaluations.
@@ -123,7 +166,7 @@
 ---
 
 ### Feature 16: ART Fine-tuning Pipeline - Adversarial Reward Training
-**Stories**: STORY-034, STORY-035, STORY-036, STORY-037, STORY-038
+**Stories**: TODO - assign new story IDs (STORY-039+; STORY-034-038 reassigned to Sprint 2)
 **Priority**: Medium (Purple agent training)
 
 **Scope**: Fine-tuning pipeline for Purple agent improvement using adversarial reward training.
@@ -200,7 +243,7 @@ These Phase 2 features are **already complete** and **strengthen Phase 1 submiss
 ---
 
 ### Modular Detectors (Feature 11, Partial)
-**Stories**: STORY-022, STORY-023, STORY-033 | **Status**: ✅ Partial (2 of 5 detectors)
+**Stories**: STORY-022, STORY-023 (TODO: STORY-033 reassigned to Sprint 2, needs new ID) | **Status**: ✅ Partial (2 of 5 detectors)
 
 **Implementation**: `business_risk_detector.py`, `specificity_detector.py` integrated into evaluator
 
