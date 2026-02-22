@@ -380,11 +380,11 @@ python src/validate_benchmark.py
 
 **Current Stories:**
 ```bash
-# View all stories
-cat ralph/prd.json | jq '.stories[] | {id, title, status}'
+# View all stories (active sprint prd.json, or check archive)
+cat ralph/docs/prd.json | jq '.stories[] | {id, title, passes}'
 
-# Check active story
-cat ralph/prd.json | jq '.stories[] | select(.status=="in_progress")'
+# View archived sprints
+ls ralph/docs/archive/green/
 ```
 
 **Story Lifecycle:**
@@ -399,7 +399,7 @@ cat ralph/prd.json | jq '.stories[] | select(.status=="in_progress")'
 **Next Story Selection:**
 ```bash
 # Find next pending story
-cat ralph/prd.json | jq '.stories[] | select(.status=="pending") | {id, title, priority}' | head -1
+cat ralph/docs/prd.json | jq '.stories[] | select(.passes==false) | {id, title}' | head -1
 ```
 
 **Activate Story:**
@@ -415,7 +415,7 @@ cat ralph/prd.json | jq '.stories[] | select(.status=="pending") | {id, title, p
 
 **Manual Story Activation:**
 ```python
-# Update ralph/prd.json
+# Update ralph/docs/prd.json
 {
   "stories": [
     {
