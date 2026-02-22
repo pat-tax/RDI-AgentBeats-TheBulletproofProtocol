@@ -473,61 +473,14 @@ def enhance_stories_with_manual_details(stories: list[Story]) -> list[Story]:
                 "tests/test_business_risk_detector.py",
             ]
         },
-        # Feature 7 - Split between create (032) and integrate (033)
+        # Feature 7 - Create specificity detector (032)
+        # NOTE: STORY-033 through STORY-037 reassigned to Sprint 2 (messenger refactor)
+        # See docs/sprints/GreenAgent-Sprint2-PRD-Ralph.md
         "STORY-032": {
             "files": [
                 "src/bulletproof_green/rules/specificity_detector.py",
                 "tests/test_specificity_detector.py",
             ]
-        },
-        "STORY-033": {
-            "description": (
-                "Wire business_risk_detector and specificity_detector into evaluator pipeline"
-            ),
-            "acceptance": [
-                "Evaluator imports and uses business_risk_detector",
-                "Evaluator imports and uses specificity_detector",
-                "Both detectors integrated into evaluation flow",
-                "Integration tests verify detectors are called",
-            ],
-            "files": ["src/bulletproof_green/evaluator.py", "tests/test_evaluator_integration.py"],
-        },
-        # Feature 8 - Split between tag (034) and report (035)
-        "STORY-034": {
-            "acceptance": [
-                "Add difficulty tags (EASY, MEDIUM, HARD) to ground_truth.json",
-                "Tag at least 10 test cases per difficulty level",
-                "Tags based on IRS complexity and edge case handling",
-            ],
-            "files": ["data/ground_truth.json"],
-        },
-        "STORY-035": {
-            "description": "Extend validate_benchmark.py to report accuracy by difficulty level",
-            "acceptance": [
-                "Report accuracy breakdown by difficulty level (EASY, MEDIUM, HARD)",
-                "Show pass/fail counts per difficulty",
-                "Include difficulty distribution in output",
-            ],
-            "files": ["src/validate_benchmark.py", "tests/test_benchmark_validation.py"],
-        },
-        # Feature 9 - Split between test data (036) and LLM tests (037)
-        "STORY-036": {
-            "acceptance": [
-                "Create adversarial_narratives.json with gaming attempts",
-                "Test rule-based anti-gaming detection",
-                "Include keyword stuffing, overgeneralization, irrelevance tests",
-                "Verify rule-based detectors catch gaming attempts",
-            ],
-            "files": ["data/adversarial_narratives.json", "tests/test_anti_gaming.py"],
-        },
-        "STORY-037": {
-            "acceptance": [
-                "Test LLM reward hacking scenarios",
-                "Document known LLM judge limitations",
-                "Test cases for prompt injection, context manipulation",
-                "Add limitations to BENCHMARK_LIMITATIONS.md",
-            ],
-            "files": ["tests/test_anti_gaming.py", "docs/AgentBeats/BENCHMARK_LIMITATIONS.md"],
         },
         # Feature 11 - Split between schema (041), server (042), tests (043)
         "STORY-041": {

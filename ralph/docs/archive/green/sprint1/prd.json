@@ -1,0 +1,704 @@
+{
+  "project": "RDI-AgentBeats-TheBulletproofProtocol",
+  "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
+  "scope": "Phase 1 (STORY-001 to STORY-032)",
+  "source": "docs/GreenAgent-PRD.md",
+  "generated": "2026-01-31 21:37:53",
+  "stories": [
+    {
+      "id": "STORY-001",
+      "title": "Implement Purple Agent narrative generator",
+      "description": "Generate IRS Section 41 compliant Four-Part Test narratives from engineering signals.",
+      "acceptance": [
+        "Generates 500-word project summary focused on Process of Experimentation",
+        "Follows Four-Part Test structure (Hypothesis, Test, Failure, Iteration)",
+        "Filters business risk from technical risk",
+        "Outputs structured narrative with technical uncertainty evidence",
+        "Template-based generation (data ingestion out of scope)",
+        "Python 3.13 compatible"
+      ],
+      "files": [
+        "src/bulletproof_purple/generator.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:17:43Z",
+      "content_hash": "58e0833418793e87aaa1f36f1d5479441c0a519c63fac27915dd2678e8462ff7",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-002",
+      "title": "Implement Purple Agent A2A server",
+      "description": "A2A-compatible server exposing narrative generation via JSON-RPC 2.0 protocol.",
+      "acceptance": [
+        "A2A server on port 8000",
+        "AgentCard at /.well-known/agent-card.json",
+        "Exposes tasks/send method for receiving critique",
+        "Returns narrative in DataPart format",
+        "Proper error handling (JSON-RPC codes -32600 to -32001)",
+        "Task timeout handling (default 300s)",
+        "Python 3.13, a2a-sdk>=0.3.20, uvicorn>=0.38.0"
+      ],
+      "files": [
+        "src/bulletproof_purple/server.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:24:27Z",
+      "content_hash": "6f1335db63ea68d3dfa2e9eaa2c6cdaf23922b5a8cb374639a9f0fd06f1e9873",
+      "depends_on": [
+        "STORY-001"
+      ]
+    },
+    {
+      "id": "STORY-003",
+      "title": "Implement rule-based evaluator",
+      "description": "Evaluate narratives against IRS Section 41 audit standards using rule-based detection.",
+      "acceptance": [
+        "Detects \"Routine Engineering\" patterns",
+        "Applies \"Business Component\" test",
+        "Flags vague language without specific metrics",
+        "Requires citation of specific failure events",
+        "Outputs Risk Score (0-100) and Redline Markup",
+        "Rejects claims until Risk Score < 20",
+        "Deterministic rule-based scoring",
+        "Returns structured evaluation per Green-Agent-Metrics-Specification.md"
+      ],
+      "files": [
+        "src/bulletproof_green/evaluator.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:29:24Z",
+      "content_hash": "c2ee82deed7932970ad903dc477e7373781a38a46382c9707b0bdef1b6920354",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-004",
+      "title": "Implement Green Agent scorer",
+      "description": "Convert rule-based evaluation results into AgentBeats compatible scores.",
+      "acceptance": [
+        "Computes overall_score = (100 - risk_score) / 100",
+        "Computes component scores: correctness, safety, specificity, experimentation",
+        "Returns scores in 0.0-1.0 scale",
+        "Integrates with evaluator output",
+        "Handles edge cases (division by zero, invalid inputs)"
+      ],
+      "files": [
+        "src/bulletproof_green/scorer.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:33:08Z",
+      "content_hash": "0bac22a69cf83d3c55e174920b9009726eebe552c2fc5207a9b2bf5a20cc54ea",
+      "depends_on": [
+        "STORY-003"
+      ]
+    },
+    {
+      "id": "STORY-005",
+      "title": "Implement Green Agent A2A server",
+      "description": "A2A-compatible evaluation server exposing scoring via JSON-RPC 2.0 protocol.",
+      "acceptance": [
+        "A2A server on port 8000",
+        "AgentCard at /.well-known/agent-card.json",
+        "Exposes tasks/send method for receiving narratives",
+        "Returns score in DataPart format",
+        "Integrates evaluator and scorer",
+        "Proper error handling and timeout management",
+        "Python 3.13, a2a-sdk>=0.3.20, uvicorn>=0.38.0"
+      ],
+      "files": [
+        "src/bulletproof_green/server.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:36:32Z",
+      "content_hash": "9d45a8e69577dc746ebee6428232148020116602b7d59ee435d6618e2a0ed251",
+      "depends_on": [
+        "STORY-003",
+        "STORY-004"
+      ]
+    },
+    {
+      "id": "STORY-006",
+      "title": "Implement A2A client for inter-agent calls",
+      "description": "A2A client enabling Green Agent to call Purple Agent for narrative generation.",
+      "acceptance": [
+        "A2A client module with task send/receive",
+        "Discovers Purple Agent via agent-card.json",
+        "Sends narrative requests with context",
+        "Receives narrative responses",
+        "Handles task lifecycle (pending -> running -> completed)",
+        "Timeout and error handling"
+      ],
+      "files": [
+        "src/bulletproof_green/a2a_client.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:41:01Z",
+      "content_hash": "ba599c50179614dd5094ce948d97acd076effdf61bb4de4900ef6733cd784658",
+      "depends_on": [
+        "STORY-002",
+        "STORY-005"
+      ]
+    },
+    {
+      "id": "STORY-007",
+      "title": "Implement AgentCard discovery",
+      "description": "Enable agent-to-agent discovery via .well-known/agent-card.json endpoints.",
+      "acceptance": [
+        "Both agents expose /.well-known/agent-card.json",
+        "AgentCard contains capabilities, endpoints, name",
+        "Green Agent discovers Purple Agent AgentCard",
+        "JSON schema validation",
+        "Caching for performance"
+      ],
+      "files": [
+        "src/bulletproof_purple/agent_card.py",
+        "src/bulletproof_green/agent_card.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:46:05Z",
+      "content_hash": "1d73f95de8a22b0c7db892019a46624d96967c1a6a83d34f394ad4b6e01c5fa5",
+      "depends_on": [
+        "STORY-002",
+        "STORY-005"
+      ]
+    },
+    {
+      "id": "STORY-008",
+      "title": "Create ground truth dataset",
+      "description": "Curate labeled dataset of narratives for benchmark validation.",
+      "acceptance": [
+        "10+ labeled narratives (minimum for Phase 1)",
+        "Mix of qualifying (Risk Score < 20) and non-qualifying narratives",
+        "Covers failure patterns: vague language, business risk, routine engineering",
+        "Difficulty tiers: Easy (obvious), Medium (subtle), Hard (edge cases)",
+        "JSON format with human-readable annotations",
+        "Each entry: narrative, expected_score, classification, annotations",
+        "Anonymized to protect confidentiality"
+      ],
+      "files": [
+        "data/ground_truth.json"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:50:41Z",
+      "content_hash": "91bc778a0e16b7c00342e0ce1de170757502469bcf1833c6f07e51428dd6739e",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-009",
+      "title": "Implement benchmark validation script",
+      "description": "Validate ground truth dataset and measure benchmark performance.",
+      "acceptance": [
+        "Loads ground_truth.json",
+        "Runs Green Agent on each narrative",
+        "Compares actual vs expected scores",
+        "Computes accuracy metrics (precision, recall, F1)",
+        "Generates report with pass/fail per difficulty tier",
+        "Identifies gaps and improvement areas"
+      ],
+      "files": [
+        "src/validate_benchmark.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T18:55:47Z",
+      "content_hash": "877f8a91e687394b145b371b0324609a0f95c192d306dcc73e0d838879b94378",
+      "depends_on": [
+        "STORY-008"
+      ]
+    },
+    {
+      "id": "STORY-010",
+      "title": "Create Dockerfiles",
+      "description": "Package agents as Docker images for AgentBeats platform.",
+      "acceptance": [
+        "Platform: linux/amd64",
+        "Base: Python 3.13-slim",
+        "Exposes port 8000",
+        "ENTRYPOINT with --host, --port arguments",
+        "No hardcoded secrets (env vars only)",
+        "Multi-stage build for smaller images",
+        "uv for fast dependency management",
+        "Both bulletproof-purple and bulletproof-green images"
+      ],
+      "files": [
+        "Dockerfile.purple",
+        "Dockerfile.green"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:00:03Z",
+      "content_hash": "49a98b8db95314c6a337207316ee6eaffbe439504289ae035ecbe93ddf86c562",
+      "depends_on": [
+        "STORY-002",
+        "STORY-005"
+      ]
+    },
+    {
+      "id": "STORY-011",
+      "title": "Create docker-compose.yml",
+      "description": "Orchestrate local testing of both agents in Docker network.",
+      "acceptance": [
+        "Defines both purple and green services",
+        "Agents can reach each other via service name",
+        "Port mapping: 8001 (purple), 8002 (green) to host",
+        "Environment variables for configuration",
+        "Passes docker-compose up local test",
+        "Clean state on each run"
+      ],
+      "files": [
+        "docker-compose.yml"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:03:00Z",
+      "content_hash": "c708fc85ee418f8e959afc46566d7bc479d67fa388e520e240d53fdc4f97beec",
+      "depends_on": [
+        "STORY-010"
+      ]
+    },
+    {
+      "id": "STORY-012",
+      "title": "Create GHCR workflow",
+      "description": "Publish Docker images to GitHub Container Registry.",
+      "acceptance": [
+        "GitHub Actions workflow on push/tag",
+        "Builds: ghcr.io/<org>/bulletproof-green:latest",
+        "Builds: ghcr.io/<org>/bulletproof-purple:latest",
+        "Semantic version tags (v1.0.0, v1.0.1, etc)",
+        "Package visibility: public",
+        "GITHUB_TOKEN with packages:write scope",
+        "docker/build-push-action@v5"
+      ],
+      "files": [
+        ".github/workflows/docker-build-push.yml"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:06:20Z",
+      "content_hash": "264990d4e650f0da94d8566738ba9b5c2faa1e245c1b46d28d5c4bda84696228",
+      "depends_on": [
+        "STORY-010"
+      ]
+    },
+    {
+      "id": "STORY-013",
+      "title": "Register agents on agentbeats.dev",
+      "description": "Register both agents on the AgentBeats platform.",
+      "acceptance": [
+        "Green agent registered -> agentbeats_id obtained",
+        "Purple agent registered -> agentbeats_id obtained",
+        "scenario.toml configured with production IDs",
+        "Platform validates AgentCard endpoints",
+        "Platform can pull and run Docker images from GHCR"
+      ],
+      "files": [
+        "scenario.toml"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:10:00Z",
+      "content_hash": "691a24fa549aaac36105b43078e102466b561aae5b422318eabe180bed7a60e0",
+      "depends_on": [
+        "STORY-012"
+      ]
+    },
+    {
+      "id": "STORY-014",
+      "title": "Write abstract and demo video",
+      "description": "Prepare submission materials for AgentBeats competition.",
+      "acceptance": [
+        "Abstract (300 words) in ABSTRACT.md",
+        "Explains problem: IRS Section 41 evaluation complexity",
+        "Describes solution: adversarial agent benchmark",
+        "Highlights innovation: legal domain gap, practical use",
+        "3-minute demo video showcasing agents in action",
+        "Video demonstrates: narrative generation, evaluation, scoring"
+      ],
+      "files": [
+        "ABSTRACT.md"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:13:49Z",
+      "content_hash": "def789ghi012",
+      "depends_on": [
+        "STORY-013"
+      ]
+    },
+    {
+      "id": "STORY-015",
+      "title": "Implement Arena Mode orchestration",
+      "description": "Multi-turn adversarial loop for iterative narrative improvement.",
+      "acceptance": [
+        "Green agent accepts mode=arena parameter",
+        "Calls Purple agent via A2A tasks/send for each iteration",
+        "Purple agent receives critique and regenerates",
+        "Loop terminates when risk_score < target OR max_iterations reached",
+        "Returns ArenaResult with full iteration history",
+        "Configurable: max_iterations (default: 5), target_risk_score (default: 20)",
+        "Task state tracking per iteration"
+      ],
+      "files": [
+        "src/bulletproof_green/arena_executor.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:17:47Z",
+      "content_hash": "ee9480906340e30919e3bcbbac2b902a1d0a917df6458d0eb34115c7fcec395b",
+      "depends_on": [
+        "STORY-006"
+      ]
+    },
+    {
+      "id": "STORY-016",
+      "title": "Implement LLM-as-Judge",
+      "description": "Combine rule-based and LLM evaluation for semantic understanding.",
+      "acceptance": [
+        "Rule-based evaluation remains deterministic (primary)",
+        "LLM-as-Judge provides semantic analysis (secondary)",
+        "Combined: final_score = α*rule_score + β*llm_score",
+        "Fallback to rule-only if LLM unavailable",
+        "LLM uses temperature=0 for consistency",
+        "OpenAI GPT-4 or equivalent",
+        "Graceful degradation when LLM unavailable"
+      ],
+      "files": [
+        "src/bulletproof_green/llm_judge.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:23:19Z",
+      "content_hash": "f1d5288a768c39bf531c61563fd6688d9aee60f6addba52380cac8fe8e0099ab",
+      "depends_on": [
+        "STORY-003"
+      ]
+    },
+    {
+      "id": "STORY-017",
+      "title": "Expand ground truth dataset to 20+",
+      "description": "Scale ground truth with more diverse narratives and difficulty tiers.",
+      "acceptance": [
+        "20+ labeled narratives (Phase 2 target)",
+        "Even distribution across difficulty tiers",
+        "Additional edge cases and pattern variations",
+        "Updated JSON schema with new fields",
+        "Covers Phase 2 evaluation scenarios",
+        "Anonymized and reviewed for accuracy"
+      ],
+      "files": [
+        "data/ground_truth.json"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-25T19:28:24Z",
+      "content_hash": "28e7ffe3e1a513aee7d330c695ddc9d91a72d9d8a30c7442aea024e4d285e34b",
+      "depends_on": [
+        "STORY-008"
+      ]
+    },
+    {
+      "id": "STORY-018",
+      "title": "Wire server to accept mode=arena",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Wire server to accept mode=arena",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-28T00:38:25Z",
+      "content_hash": "2ae9cbb898298f9861a44c698d9308167d3ea0278838989c7914600bb611d0c4",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-019",
+      "title": "Integrate hybrid scoring into server",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Integrate hybrid scoring into server",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-28T00:44:55Z",
+      "content_hash": "e924401a5e099cfd59ad1a3e7f287b42753771fb01b56c7399381bf08950dd2e",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-020",
+      "title": "Update output schema per specification",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Update output schema per specification",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-27T20:57:00Z",
+      "content_hash": "c6d8994e5732c8b2b8d9685b2456c6ab72b7609032e79b0ee5e1eae010db06e5",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-021",
+      "title": "Update tests for new output schema",
+      "description": "Standardized evaluation output format per Green-Agent-Metrics-Specification.md. - Update tests for new output schema",
+      "acceptance": [
+        "Version and timestamp fields",
+        "Narrative ID (UUID)",
+        "Primary metrics object (compliance_classification, confidence, risk_score, risk_category, predicted_audit_outcome)",
+        "Component scores object (routine_engineering_penalty, vagueness_penalty, business_risk_penalty, experimentation_penalty, specificity_penalty, total_penalty)",
+        "Diagnostics object (routine_patterns_detected, vague_phrases_detected, business_keywords_detected, experimentation_evidence_score, specificity_score)",
+        "Redline object with severity counts (total_issues, critical, high, medium, issues array)",
+        "Metadata object (evaluation_time_ms, rules_version, irs_citations)",
+        "JSON schema validation",
+        "Backwards compatibility with legacy fields"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-28T00:48:18Z",
+      "content_hash": "bbce5e542eff0d53dcca7a30c345f9637df658d49bb62c3e5ca3d87233a8c7a8",
+      "depends_on": [
+        "STORY-020"
+      ]
+    },
+    {
+      "id": "STORY-022",
+      "title": "Create business_risk_detector.py",
+      "description": "Create messenger.py with A2A client utilities (create_message, send_message, Messenger class) for green agent to call purple agents via A2A protocol",
+      "acceptance": [
+        "messenger.py exposes create_message() function for A2A message construction",
+        "messenger.py exposes send_message() function for HTTP POST to purple agents",
+        "Messenger class provides high-level API for agent-to-agent communication",
+        "Handles A2A protocol errors and timeouts gracefully",
+        "Unit tests verify message format and sending logic"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_messenger.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-28T00:53:34Z",
+      "content_hash": "48291996f29aff91d2e0df571643f24b668513c03f4df60c4f2ca6a4f10693b2",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-023",
+      "title": "Create specificity_detector.py",
+      "description": "Create arena_executor.py with multi-turn orchestration: green agent iteratively calls purple agent, evaluates response, provides critique, until risk_score < target or max_iterations reached",
+      "acceptance": [
+        "Supports configurable max_iterations (default: 5)",
+        "Supports configurable target_risk_score (default: 20)",
+        "Returns structured ArenaResult with iteration history",
+        "Each iteration includes: narrative, evaluation, critique",
+        "Terminates when risk_score < target OR max_iterations reached",
+        "Critique feedback derived from redline issues to guide purple agent refinement"
+      ],
+      "files": [
+        "src/bulletproof_green/arena_executor.py",
+        "tests/test_arena_executor.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-28T00:56:38Z",
+      "content_hash": "8902275cdc12564a47236c8d15a9a124a7bc5bde893939f109ba46730c8e567b",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-024",
+      "title": "Integrate new detectors into evaluator",
+      "description": "Extend green agent server to handle arena mode requests via mode=arena parameter, routing to ArenaExecutor instead of single-shot evaluation",
+      "acceptance": [
+        "Business risk detector: market, revenue, customers, sales, ROI, profit keywords",
+        "Specificity detector: failure citations (dates, error codes, metrics), hypothesis-test-failure-iteration patterns",
+        "Integrated into evaluator scoring pipeline",
+        "Returns detection counts for diagnostics",
+        "Modular detector architecture",
+        "Pattern weight configuration"
+      ],
+      "files": [
+        "src/bulletproof_green/server.py",
+        "tests/integration/test_arena_mode.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-28T01:00:34Z",
+      "content_hash": "03f4b9df8fda961b9c4e79e63cfb831696dcebe06c05be8bd8ff41089a8f0eac",
+      "depends_on": [
+        "STORY-022",
+        "STORY-023"
+      ]
+    },
+    {
+      "id": "STORY-025",
+      "title": "Trivial agent baseline tests",
+      "description": "Create llm_judge.py with LLM-as-Judge implementation using GPT-4 to score narratives based on IRS criteria",
+      "acceptance": [
+        "llm_judge.py implements LLMJudge class with score() method",
+        "Uses OpenAI API (GPT-4) for scoring",
+        "Returns structured scores with reasoning",
+        "Handles API errors gracefully",
+        "Add openai to pyproject.toml dependencies"
+      ],
+      "files": [
+        "src/bulletproof_green/llm_judge.py",
+        "tests/test_llm_judge.py",
+        "pyproject.toml"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-28T01:03:50Z",
+      "content_hash": "46d326ee972a7f20e0731773fa485fcc0e6494b8f46c99d7f7213fc944a7a13a",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-026",
+      "title": "Statistical rigor (Cohen's κ, 95% CI)",
+      "description": "Integrate LLM judge with rule-based scoring to create hybrid evaluation system",
+      "acceptance": [
+        "Evaluator uses both rule-based and LLM scoring",
+        "Scorer combines rule-based and LLM scores",
+        "Weighted combination or fallback strategy implemented",
+        "Integration tests verify hybrid approach"
+      ],
+      "files": [
+        "src/bulletproof_green/evaluator.py",
+        "src/bulletproof_green/scorer.py",
+        "tests/test_hybrid_evaluation.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-30T23:47:08Z",
+      "content_hash": "a4dab19779b5b1606d9c67a2adbc7894eb5c71c26f477f1eb3fd8f3e65ed97f5",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-027",
+      "title": "Create held-out test set",
+      "description": "Test benchmark with trivial agents (empty response, random text) to establish baseline scores and ensure they score >80 (high risk = failing)",
+      "acceptance": [
+        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
+        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
+        "Held-out test set (separate from training/validation data)",
+        "Documented limitations and edge cases",
+        "scipy or statsmodels for statistical calculations",
+        "Test framework integration"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-31T01:06:19Z",
+      "content_hash": "ce3925e946f7121befe813bff7e47aa47b6340379dd3754973d27c752b6c33d8",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-028",
+      "title": "Document benchmark limitations",
+      "description": "Add statistical rigor: report 95% confidence intervals, run benchmark multiple times for reproducibility, calculate inter-rater reliability (Cohen's κ)",
+      "acceptance": [
+        "Trivial agent baseline (empty response → risk_score > 80, random text → risk_score > 70)",
+        "Statistical measures (Cohen's κ ≥ 0.75, 95% confidence intervals)",
+        "Held-out test set (separate from training/validation data)",
+        "Documented limitations and edge cases",
+        "scipy or statsmodels for statistical calculations",
+        "Test framework integration"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-31T01:11:18Z",
+      "content_hash": "dbe9acae0389afa2119c78550d9563e1c2f071ef1ba0805711a0f35262a830fb",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-029",
+      "title": "Add difficulty tags to ground truth",
+      "description": "Implement data contamination prevention: maintain held-out test set not in public ground truth, version tracking for all narratives, document data provenance",
+      "acceptance": [
+        "Difficulty tags in ground truth (EASY, MEDIUM, HARD)",
+        "Per-tier accuracy reporting",
+        "Even distribution across tiers",
+        "Validation script reports breakdown by difficulty",
+        "Updated JSON schema for difficulty field",
+        "Reporting dashboard or CLI output"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-31T01:23:23Z",
+      "content_hash": "f805a8ad4ce46e7c2fb00e3e079c609b38b572950ee7e3e1f1d67d6c09d538fc",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-030",
+      "title": "Report accuracy by difficulty tier",
+      "description": "Document known benchmark limitations, quantify impact of keyword-based evaluation gaps, provide guidance on result interpretation",
+      "acceptance": [
+        "Difficulty tags in ground truth (EASY, MEDIUM, HARD)",
+        "Per-tier accuracy reporting",
+        "Even distribution across tiers",
+        "Validation script reports breakdown by difficulty",
+        "Updated JSON schema for difficulty field",
+        "Reporting dashboard or CLI output"
+      ],
+      "files": [],
+      "passes": true,
+      "completed_at": "2026-01-31T01:32:26Z",
+      "content_hash": "dfdd88147dc3d439bc185910b78574617c13af60a7e7df998887fdd0d6b12484",
+      "depends_on": [
+        "STORY-029"
+      ]
+    },
+    {
+      "id": "STORY-031",
+      "title": "Create adversarial test narratives",
+      "description": "Adversarial testing to prevent benchmark exploitation. - Create adversarial test narratives",
+      "acceptance": [
+        "Adversarial test narratives (keyword stuffing, template gaming)",
+        "LLM reward hacking detection",
+        "Pattern variation resistance",
+        "Robustness tests (capitalization, whitespace, paraphrasing)",
+        "Adversarial test suite",
+        "Gaming detection metrics"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/business_risk_detector.py",
+        "src/bulletproof_green/evaluator.py",
+        "src/bulletproof_green/scorer.py",
+        "tests/test_business_risk_detector.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-31T01:37:45Z",
+      "content_hash": "49b2f7322b5375edc22f26569681d5b295dd60ee016132b4f1d80f5fa3476a5f",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-032",
+      "title": "LLM reward hacking tests",
+      "description": "Adversarial testing to prevent benchmark exploitation. - LLM reward hacking tests",
+      "acceptance": [
+        "Adversarial test narratives (keyword stuffing, template gaming)",
+        "LLM reward hacking detection",
+        "Pattern variation resistance",
+        "Robustness tests (capitalization, whitespace, paraphrasing)",
+        "Adversarial test suite",
+        "Gaming detection metrics"
+      ],
+      "files": [
+        "src/bulletproof_green/rules/specificity_detector.py",
+        "tests/test_specificity_detector.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-01-31T02:46:35Z",
+      "content_hash": "76a95defb658f6cd8999cb00115c3a97e00c2c95c87f667b7ad567e9ae51b6cf",
+      "depends_on": []
+    }
+  ]
+}
