@@ -67,6 +67,7 @@
 
 - [ ] Verify if integration tests exist in `tests/integration/`
 - [ ] Run comprehensive E2E test before submission: `bash scripts/test_comprehensive.sh`
+- [ ] Arena server mode tests (`tests/test_arena_server_mode.py` lines 107, 205, 380) mock `ArenaExecutor` — need real E2E coverage against Purple agent with actual A2A protocol
 
 **See**: [SUBMISSION-GUIDE.md](AgentBeats/SUBMISSION-GUIDE.md#local-testing) for testing workflow
 
@@ -91,6 +92,11 @@
 3. Review the `risk_score < 20` classification threshold
 
 **Files**: `src/bulletproof_green/evals/evaluator.py` (lines 236, 542-608), `src/bulletproof_green/evals/scorer.py` (lines 84-91)
+
+**Related `TODO(review)` items in evaluator.py**:
+- Line 613-614: Template penalty severity needs evaluation
+- Line 644-645: Metric stuffing density thresholds (5%/10%) need validation
+- Line 704-705: Buzzword list currency; consider semantic analysis
 
 ---
 
@@ -126,6 +132,48 @@ The a2a-sdk `BaseClient.send_message()` (non-streaming path) then yields that `M
 **Rationale for Deferral**: Complex orchestration not required for Phase 1 benchmark. Better suited for Purple agent competition phase.
 
 **See**: [PurpleAgent-PRD.md](PurpleAgent-PRD.md) Feature 4 for complete specification
+
+**Related codebase TODOs**:
+- `src/bulletproof_purple/server.py:5` — FIXME: Monolithic architecture (all-in-one server.py). Refactor to 3-layer (agent.py/executor.py/server.py) when Purple gains complex features.
+- `src/bulletproof_purple/server.py:190` — FIXME: Arena Mode critique parsing not implemented. Receives Green Agent critique but doesn't extract patterns to avoid.
+- `src/bulletproof_purple/generator.py:6` — FIXME: `generate()` ignores critique parameter, always returns same template.
+
+---
+
+### Refactor: Extract `src/common/` + Purple 3-Layer Architecture
+**Story**: TODO - assign new story ID (STORY-039+)
+**Priority**: High (prerequisite for Arena Mode)
+
+**Scope**: Extract ~150 lines of duplicated code into `src/common/` and split Purple's monolithic `server.py` so both agents share the same 5-module spine: `agent.py`, `executor.py`, `server.py`, `messenger.py`, `models.py`. Other modules (settings, domain packages) can diverge per agent.
+
+**Reference**: [qte77/RDI-AgentBeats-TestBehaveAlign@feat-green-agent](https://github.com/qte77/RDI-AgentBeats-TestBehaveAlign/tree/feat-green-agent) uses this exact structure with `src/{common,green,purple}/` each containing `agent.py`, `executor.py`, `server.py`, `messenger.py`, `models.py`, `settings.py`.
+
+**Creates** (8 files):
+- `src/common/__init__.py` — re-exports from settings, parts, messenger, models
+- `src/common/settings.py` — `BaseAgentSettings(BaseSettings)` with shared fields (`host`, `port`, `timeout`, `agent_uuid`, `card_url`, `output_file`), validators (`validate_port`, `validate_positive_int`), and `get_card_url()` method
+- `src/common/parts.py` — `extract_text_from_part(part)`, `extract_data_from_part(part)` (extracted from both executors)
+- `src/common/messenger.py` — moved from `bulletproof_green/messenger.py`, replace settings import with `DEFAULT_TIMEOUT = 300` constant
+- `src/common/models.py` — shared Pydantic `model_validate()` models: `NarrativeResponse` (used by both agents for A2A narrative exchange — currently duplicated as `green/models.py:NarrativeResponse` and `purple/models.py:Narrative`+`PurpleAgentOutput`)
+- `src/bulletproof_purple/agent.py` — `get_agent_card()` extracted verbatim from `server.py`
+- `src/bulletproof_purple/executor.py` — `PurpleAgentExecutor` extracted from `server.py`, uses `common.parts`
+- `src/bulletproof_purple/messenger.py` — re-export shim from `common.messenger` (mirrors Green's pattern, ready for Phase 2 Arena Mode)
+
+**Modifies** (7 files):
+- `src/bulletproof_purple/server.py` — slim down, import from `agent`/`executor`, re-export `get_agent_card` for backward compat
+- `src/bulletproof_purple/settings.py` — inherit `BaseAgentSettings`, keep `env_prefix="PURPLE_"` and defaults
+- `src/bulletproof_purple/__init__.py` — add `PurpleAgentExecutor`, `PurpleAgentOutput`, `get_agent_card` exports
+- `src/bulletproof_green/settings.py` — inherit `BaseAgentSettings`, remove duplicated validators/fields
+- `src/bulletproof_green/executor.py` — use `common.parts` functions instead of `self._extract_*` methods
+- `src/bulletproof_green/messenger.py` — replace with 3-line re-export shim from `common.messenger`
+- `pyproject.toml` — add `"src/common"` to `[tool.hatch.build.targets.wheel] packages`
+
+**Backward Compatibility**: All existing import paths preserved via re-exports.
+
+**Rationale for Deferral**: YAGNI — Phase 1 Purple is simple template generation. Refactor when Purple gains Arena Mode features.
+
+**Related FIXMEs**:
+- `src/bulletproof_purple/server.py:5` — Monolithic architecture FIXME
+- `src/bulletproof_purple/server.py:190` — Arena Mode critique parsing FIXME
 
 ---
 
@@ -279,6 +327,43 @@ These Phase 2 features are **already complete** and **strengthen Phase 1 submiss
 
 ---
 
+## 🧹 Code Cleanup - Low Priority
+
+### GreenAgent Class Stub
+
+- [ ] `src/bulletproof_green/agent.py:66` — TODO placeholder for `GreenAgent` class never implemented. Delete the stub or implement in Phase 2.
+
+---
+
+### Model/Validation Review Items
+
+- [ ] `src/bulletproof_green/models.py:149` — `TODO(review)`: Default `template_type` for graceful degradation. Resolve or remove.
+- [ ] `src/validate_benchmark.py:17,152` — `TODO(review)`: Pydantic model consolidates ground truth defaults (DRY). Resolve or remove.
+
+---
+
+### Schema Enhancement Documentation
+
+- [ ] `ralph/docs/LEARNINGS.md:18` — "Schema Enhancement (TODO)" section header with no content. Flesh out or remove.
+
+---
+
+## 🔧 CI/Tooling Debt
+
+### GitHub Actions Bugs
+
+- [ ] `.github/workflows/summarize-jobs-reusable.yaml:3` — FIXME: `$GITHUB_STEP_SUMMARY` files are empty ([community discussion #110283](https://github.com/orgs/community/discussions/110283))
+- [ ] `.github/workflows/bump-my-version.yaml:27` — TODO: `env` named-value unrecognized in GHA `if` condition ([SO #61240761](https://stackoverflow.com/questions/61238849))
+- [ ] `.github/workflows/bump-my-version.yaml:33` — TODO: Check for PR closed by bot to avoid PR creation loop
+
+---
+
+### Claude Code Tooling
+
+- [ ] `.claude/scripts/statusline.sh:39` — FIXME: Autocompact percentage discrepancy between docs (95%) and observed behavior (~83%). Track upstream fix.
+
+---
+
 ## 📅 Timeline
 
 **Phase 1 (Completion by January 31, 2026)**:
@@ -287,6 +372,7 @@ These Phase 2 features are **already complete** and **strengthen Phase 1 submiss
 - Final submission form (15 minutes)
 
 **Phase 2 (Feb 16 - March 31, 2026)**:
+- Week 1: Extract `src/common/` + Purple 3-layer refactor (prerequisite for Arena Mode)
 - Week 1-2: Arena Mode implementation (STORY-015)
 - Week 3-4: Hybrid LLM evaluation (STORY-016) if desired
 - Week 5-6: Complete modular detector refactoring (STORY-040-045)
