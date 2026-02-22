@@ -1,12 +1,12 @@
-"""Green Agent messenger - "How agents talk" (communication layer)
+"""Green Agent messenger - A2A SDK client integration (communication layer).
 
 Responsibilities:
-- A2A messaging utilities (create_message, send_message)
-- Inter-agent communication (Green → Purple, Purple → Green)
-- Session/context management for multi-turn conversations
+- A2A messaging via a2a-sdk ClientFactory.connect() pattern
+- Inter-agent communication (Green -> Purple, Purple -> Green)
+- Per-URL client caching with lifecycle management
 
-Pattern: messenger.py = Communication utilities, used by agent.py for A2A
-         protocol messaging
+Pattern: messenger.py = Communication utilities, used by arena/executor.py
+         for A2A protocol messaging
 """
 
 from __future__ import annotations
@@ -15,6 +15,21 @@ import uuid
 from typing import Any
 
 import httpx
+from a2a.client import (
+    A2AClientHTTPError,
+    A2AClientTimeoutError,
+    ClientConfig,
+    ClientFactory,
+)
+from a2a.types import (
+    DataPart,
+    Message,
+    Part,
+    Role,
+    Task,
+    TaskState,
+    TextPart,
+)
 
 from bulletproof_green.settings import settings
 
@@ -28,7 +43,9 @@ def create_message(
     data: dict[str, Any] | None = None,
     role: str = "user",
 ) -> dict[str, Any]:
-    """Create an A2A-compliant message structure.
+    """Create an A2A-compliant message structure (raw dict).
+
+    Backward-compatible pure function — returns plain dicts, not SDK objects.
 
     Args:
         text: Optional text content for the message
@@ -37,19 +54,12 @@ def create_message(
 
     Returns:
         A2A message dictionary with messageId, role, and parts
-
-    Examples:
-        >>> msg = create_message(text="Generate a narrative")
-        >>> msg = create_message(data={"template_type": "qualifying"})
-        >>> msg = create_message(text="Context", data={"template_type": "qualifying"})
     """
     parts: list[dict[str, Any]] = []
 
-    # Add text part if provided
     if text is not None:
         parts.append({"text": text})
 
-    # Add data part if provided
     if data is not None:
         parts.append({"data": data})
 
@@ -65,110 +75,110 @@ async def send_message(
     message: dict[str, Any],
     timeout: int | None = None,
 ) -> dict[str, Any]:
-    """Send an A2A message via HTTP POST to a purple agent.
+    """Send an A2A message to an agent (backward-compatible free function).
+
+    Wraps Messenger internally for SDK client usage while preserving the
+    original call signature.
 
     Args:
-        url: Base URL of the purple agent
+        url: Base URL of the target agent
         message: A2A message structure (from create_message)
         timeout: Request timeout in seconds (uses settings if not provided)
 
     Returns:
-        Response data extracted from JSON-RPC result
+        Response data extracted from task artifacts
 
     Raises:
         MessengerError: If the request fails or response is invalid
-
-    Examples:
-        >>> msg = create_message(text="Generate narrative")
-        >>> response = await send_message("http://localhost:8001", msg)
-        >>> narrative = response["narrative"]
     """
-    if timeout is None:
-        timeout = settings.timeout
-    # Build JSON-RPC 2.0 request
-    request_body = {
-        "jsonrpc": "2.0",
-        "method": "message/send",
-        "id": str(uuid.uuid4()),
-        "params": {"message": message},
-    }
-
+    messenger = Messenger(base_url=url, timeout=timeout)
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(
-                url,
-                json=request_body,
-                headers={"Content-Type": "application/json"},
-            )
-            response_data = response.json()
-
-            # Check for JSON-RPC error
-            if "error" in response_data:
-                error = response_data["error"]
-                raise MessengerError(f"JSON-RPC error: {error.get('message', 'Unknown error')}")
-
-            # Extract result
-            result = response_data.get("result", {})
-
-            # Extract narrative from parts
-            return _extract_data_from_result(result)
-
-    except httpx.TimeoutException as e:
-        raise MessengerError(f"Timeout sending message: {e}") from e
-    except httpx.ConnectError as e:
-        raise MessengerError(f"Connection error: {e}") from e
-    except Exception as e:
-        if isinstance(e, MessengerError):
-            raise
-        raise MessengerError(f"Error sending message: {e}") from e
+        # Extract text/data from the raw dict to rebuild as SDK Message
+        text = None
+        data = None
+        for part in message.get("parts", []):
+            if "text" in part:
+                text = part["text"]
+            elif "data" in part:
+                data = part["data"]
+        return await messenger.send(text=text, data=data)
+    finally:
+        await messenger.close()
 
 
-def _extract_data_from_result(result: dict[str, Any]) -> dict[str, Any]:
-    """Extract data from JSON-RPC result.
+def _build_sdk_message(
+    text: str | None = None,
+    data: dict[str, Any] | None = None,
+    role: Role = Role.user,
+) -> Message:
+    """Build an a2a-sdk Message with TextPart/DataPart support."""
+    parts: list[Part] = []
 
-    Args:
-        result: The result dictionary from JSON-RPC response
+    if text is not None:
+        parts.append(Part(root=TextPart(text=text)))
+
+    if data is not None:
+        parts.append(Part(root=DataPart(data=data)))
+
+    return Message(
+        role=role,
+        message_id=str(uuid.uuid4()),
+        parts=parts,
+    )
+
+
+def _extract_data_from_task(task: Task) -> dict[str, Any]:
+    """Extract response data from a completed Task's artifacts.
 
     Returns:
-        Data dictionary extracted from parts
+        dict extracted from the first DataPart, or {"text": ...} from TextPart.
 
     Raises:
-        MessengerError: If data cannot be extracted
+        MessengerError: If no artifacts or no extractable parts found.
     """
-    parts = result.get("parts", [])
+    if not task.artifacts:
+        raise MessengerError("No artifacts in completed task")
 
-    for part in parts:
-        if "data" in part:
-            return part["data"]
+    for artifact in task.artifacts:
+        for part in artifact.parts:
+            if isinstance(part.root, DataPart):
+                return part.root.data
+            if isinstance(part.root, TextPart):
+                return {"text": part.root.text}
 
-    raise MessengerError("No data found in response")
+    raise MessengerError("No data found in task artifacts")
 
 
 class Messenger:
-    """High-level API for agent-to-agent communication.
+    """High-level API for agent-to-agent communication via a2a-sdk.
 
-    Provides a simple interface for sending messages to purple agents,
-    combining create_message and send_message functionality.
+    Uses ClientFactory.connect() with per-URL client caching.
 
     Attributes:
-        base_url: Base URL of the purple agent
+        base_url: Base URL of the target agent
         timeout: Request timeout in seconds
-
-    Examples:
-        >>> messenger = Messenger(base_url="http://localhost:8001")
-        >>> response = await messenger.send(text="Generate narrative")
-        >>> narrative = response["narrative"]
     """
 
     def __init__(self, base_url: str, timeout: int | None = None):
-        """Initialize the messenger.
-
-        Args:
-            base_url: Base URL of the purple agent
-            timeout: Request timeout in seconds (uses settings if not provided)
-        """
         self.base_url = base_url
         self.timeout = timeout if timeout is not None else settings.timeout
+        self._clients: dict[str, Any] = {}
+        self._httpx_clients: dict[str, httpx.AsyncClient] = {}
+
+    async def _get_client(self, url: str) -> Any:
+        """Get or create a cached SDK Client for the given URL."""
+        if url not in self._clients:
+            httpx_client = httpx.AsyncClient(timeout=self.timeout)
+            self._httpx_clients[url] = httpx_client
+
+            config = ClientConfig(
+                streaming=False,
+                httpx_client=httpx_client,
+            )
+            self._clients[url] = await ClientFactory.connect(
+                url, client_config=config
+            )
+        return self._clients[url]
 
     async def send(
         self,
@@ -176,7 +186,7 @@ class Messenger:
         data: dict[str, Any] | None = None,
         role: str = "user",
     ) -> dict[str, Any]:
-        """Send a message to the purple agent.
+        """Send a message to the target agent via a2a-sdk.
 
         Args:
             text: Optional text content for the message
@@ -184,17 +194,46 @@ class Messenger:
             role: Message role (default: "user")
 
         Returns:
-            Response data from the purple agent
+            Response data dict from the agent
 
         Raises:
             MessengerError: If the request fails
-
-        Examples:
-            >>> messenger = Messenger(base_url="http://localhost:8001")
-            >>> response = await messenger.send(text="Generate narrative")
-            >>> response = await messenger.send(
-            ...     text="Context", data={"template_type": "qualifying"}
-            ... )
         """
-        message = create_message(text=text, data=data, role=role)
-        return await send_message(self.base_url, message, timeout=self.timeout)
+        try:
+            client = await self._get_client(self.base_url)
+            sdk_role = Role.user if role == "user" else Role.agent
+            message = _build_sdk_message(text=text, data=data, role=sdk_role)
+
+            async for event in client.send_message(message):
+                # Events are (Task, UpdateEvent | None) tuples or Message
+                if isinstance(event, Message):
+                    continue
+
+                task, _update_event = event
+
+                if task.status.state == TaskState.failed:
+                    msg = task.status.message or "Task failed"
+                    raise MessengerError(f"Task failed: {msg}")
+
+                if task.status.state == TaskState.completed:
+                    return _extract_data_from_task(task)
+
+            raise MessengerError("No completed task received")
+
+        except MessengerError:
+            raise
+        except A2AClientTimeoutError as e:
+            raise MessengerError(f"Timeout: {e}") from e
+        except A2AClientHTTPError as e:
+            raise MessengerError(f"HTTP error {e.status_code}: {e}") from e
+        except httpx.ConnectError as e:
+            raise MessengerError(f"Connection error: {e}") from e
+        except Exception as e:
+            raise MessengerError(f"Error sending message: {e}") from e
+
+    async def close(self) -> None:
+        """Close managed httpx clients and clear caches."""
+        for httpx_client in self._httpx_clients.values():
+            await httpx_client.aclose()
+        self._httpx_clients.clear()
+        self._clients.clear()
