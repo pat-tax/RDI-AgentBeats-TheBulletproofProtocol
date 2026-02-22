@@ -37,3 +37,14 @@ The 37% disagreements occur precisely where benchmarks add value - exposing bord
 - **Domain Transfer**: Rule-based detectors + weighted scoring + A2A protocol architecture generalizes to other legal compliance domains
 
 Docker images are publicly available on GitHub Container Registry for reproducible deployment.
+
+## Keywords
+
+- Bulletproof Protocol
+- R&D tax credit (Compliance Audit)
+- IRS Section 41 (Compliance)
+- Section 174 (Regulatory Criteria)
+- Routine engineering, Experimentation, Investigation
+- Qualified Research, Eligible Activities
+- Green Agent Assessor, Examiner, Evaluator
+- Purple Agent: Assessee, Substantiator, Participant
