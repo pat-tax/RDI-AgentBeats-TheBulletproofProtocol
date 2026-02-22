@@ -1,30 +1,57 @@
-# Dockerfile for Bulletproof Purple Agent
-#
-# This container runs the purple agent (R&D narrative generator) as an A2A-compatible
-# HTTP server for the AgentBeats Legal Track competition.
+# syntax=docker/dockerfile:1
+# Dockerfile.purple
+# Platform: linux/amd64
 
-FROM python:3.13-slim
-
-# Set working directory
-WORKDIR /app
+# ============================================================================
+# Stage 1: Builder - Install dependencies using uv
+# ============================================================================
+FROM --platform=linux/amd64 python:3.13-slim AS builder
 
 # Install uv for fast dependency management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-# Copy project files
+WORKDIR /app
+
+# Copy dependency files first for better caching
 COPY pyproject.toml ./
-COPY uv.lock ./
-COPY LICENSE.md ./
-COPY README.md ./
-COPY src/bulletproof_purple ./src/bulletproof_purple/
+COPY uv.lock* ./
+COPY LICENSE.md README.md ./
 
-# Install dependencies using uv
-# Install the purple agent dependencies (a2a-sdk[http-server]>=0.3.0, uvicorn>=0.30.0)
-RUN uv pip install --system -e ".[purple]"
+# Create virtual environment and install dependencies
+RUN uv venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+RUN uv sync --frozen --no-dev --no-install-project
 
-# Expose port 8000 for A2A server
-EXPOSE 8000
+# Copy source code
+COPY src/ ./src/
 
-# Run the purple agent server
-# Use python -m to run as module, binding to all interfaces on port 8000
-CMD ["python", "-m", "bulletproof_purple.server", "--host", "0.0.0.0", "--port", "8000"]
+# Install the project
+RUN uv sync --frozen --no-dev
+
+# ============================================================================
+# Stage 2: Runtime - Minimal production image
+# ============================================================================
+FROM --platform=linux/amd64 python:3.13-slim AS runtime
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN groupadd --gid 1000 appgroup && \
+    useradd --uid 1000 --gid appgroup --shell /bin/bash --create-home appuser
+
+# Copy virtual environment from builder
+COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copy source code
+COPY --from=builder /app/src /app/src
+
+# Switch to non-root user
+USER appuser
+
+# Expose port 9010 for A2A server
+EXPOSE 9010
+
+# ENTRYPOINT runs purple agent server
+# Server reads PURPLE_HOST and PURPLE_PORT from environment (via settings.py)
+ENTRYPOINT ["python", "-m", "bulletproof_purple.server"]

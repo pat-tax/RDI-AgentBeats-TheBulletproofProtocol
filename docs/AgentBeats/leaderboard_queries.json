@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Overall Performance",
+    "query": "SELECT json_extract_string(r.value, '$.participant_id') AS id, ROUND(CAST(json_extract(r.value, '$.pass_rate') AS DOUBLE), 1) AS score, ROUND(CAST(json_extract(r.value, '$.overall_score') AS DOUBLE) * 100, 1) AS accuracy, CAST(json_extract(r.value, '$.metadata.risk_score') AS INTEGER) AS risk_score, json_extract_string(r.value, '$.metadata.classification') AS classification FROM read_json_auto('output/results.json') AS r ORDER BY score DESC, accuracy DESC"
+  },
+  {
+    "name": "Highest Accuracy",
+    "query": "SELECT json_extract_string(r.value, '$.participant_id') AS id, ROUND(CAST(json_extract(r.value, '$.overall_score') AS DOUBLE) * 100, 1) AS accuracy, ROUND(CAST(json_extract(r.value, '$.pass_rate') AS DOUBLE), 1) AS score, json_extract_string(r.value, '$.timestamp') AS timestamp FROM read_json_auto('output/results.json') AS r ORDER BY accuracy DESC, score DESC"
+  },
+  {
+    "name": "Recent Submissions",
+    "query": "SELECT json_extract_string(r.value, '$.participant_id') AS id, ROUND(CAST(json_extract(r.value, '$.pass_rate') AS DOUBLE), 1) AS score, ROUND(CAST(json_extract(r.value, '$.overall_score') AS DOUBLE) * 100, 1) AS accuracy, json_extract_string(r.value, '$.timestamp') AS timestamp FROM read_json_auto('output/results.json') AS r ORDER BY timestamp DESC LIMIT 10"
+  }
+]

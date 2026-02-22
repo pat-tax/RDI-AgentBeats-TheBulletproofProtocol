@@ -1,0 +1,29 @@
+{
+    "id": "Q013",
+    "jsonrpc": "2.0",
+    "result": {
+        "kind": "message",
+        "messageId": "eb02dbe4-1caa-4328-a3c6-b8ed4bbd736f",
+        "parts": [
+            {
+                "data": {
+                    "overall_score": 0.95,
+                    "correctness": 1.0,
+                    "safety": 1.0,
+                    "specificity": 1.0,
+                    "experimentation": 0.6666666666666666,
+                    "classification": "QUALIFYING",
+                    "risk_score": 5,
+                    "risk_category": "LOW",
+                    "confidence": 0.5,
+                    "redline": {
+                        "total_issues": 0,
+                        "issues": []
+                    }
+                },
+                "kind": "data"
+            }
+        ],
+        "role": "agent"
+    }
+}

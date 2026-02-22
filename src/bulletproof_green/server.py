@@ -1,166 +1,131 @@
-"""A2A Server for Bulletproof Green Agent (IRS Section 41 Evaluator).
+"""Green Agent server - "How to expose it" (transport layer)
 
-This server implements the A2A protocol for the green agent, which evaluates
-R&D tax credit narratives for compliance with IRS Section 41 criteria.
+Responsibilities:
+- HTTP server setup (FastAPI/Uvicorn)
+- Request routing (A2A JSON-RPC 2.0 endpoints)
+- Entry point (main() with CLI args)
+
+Pattern: server.py = Transport layer, separated from protocol (executor.py)
+         and domain (agent.py)
 """
 
-import argparse
-import uuid
+from __future__ import annotations
 
-import uvicorn
+from typing import TYPE_CHECKING, Any
+
 from a2a.server.apps import A2AFastAPIApplication
-from a2a.server.request_handlers.request_handler import RequestHandler
+from a2a.server.request_handlers import DefaultRequestHandler
+from a2a.server.tasks import InMemoryTaskStore
 from a2a.types import (
-    AgentCapabilities,
-    AgentCard,
-    Artifact,
     Message,
     MessageSendParams,
-    Part,
     Task,
-    TaskStatus,
-    TextPart,
 )
+from a2a.utils import new_task
+
+from bulletproof_green.agent import get_agent_card
+from bulletproof_green.executor import GreenAgentExecutor
+from bulletproof_green.settings import settings
+
+if TYPE_CHECKING:
+    from a2a.server.context import ServerCallContext
 
 
-class GreenAgentHandler(RequestHandler):
-    """Request handler for green agent evaluation tasks."""
+class GreenRequestHandler(DefaultRequestHandler):
+    """Request handler for Green Agent A2A server."""
+
+    def __init__(
+        self,
+        timeout: int | None = None,
+        purple_agent_url: str | None = None,
+    ):
+        self.task_store = InMemoryTaskStore()
+        self.executor = GreenAgentExecutor(
+            timeout=timeout,
+            purple_agent_url=purple_agent_url,
+        )
+        super().__init__(
+            agent_executor=self.executor,  # type: ignore[arg-type]
+            task_store=self.task_store,
+        )
 
     async def on_message_send(
-        self,
-        params: MessageSendParams,
-        context=None,
-    ) -> Task | Message:
-        """Handle message/send requests for narrative evaluation.
-
-        This implements the A2A protocol's message/send JSON-RPC method.
+        self, params: MessageSendParams, context: ServerCallContext | None = None
+    ) -> Message | Task:
+        """Handle message/send requests.
 
         Args:
-            params: Message parameters including the input narrative
-            context: Server call context (optional)
+            params: Message send parameters.
+            context: Optional server call context (unused, required by protocol interface).
 
         Returns:
-            Task object with evaluation result artifact
+            Message with evaluation scores or Task status.
         """
-        # Extract message text from params
-        message_text = ""
-        if params.message and hasattr(params.message, "parts"):
-            for part in params.message.parts:
-                if hasattr(part, "root") and hasattr(part.root, "text"):
-                    message_text += part.root.text  # type: ignore[attr-defined]
+        # TODO (Phase 2+): ServerCallContext could be used for request tracing, auth,
+        #       or rate limiting if needed. Currently unused (stateless evaluator).
+        _ = context
 
-        # Simple evaluation placeholder (STORY-005 will implement full evaluator)
-        evaluation_result = (
-            "Evaluation: Risk score 15, Classification: QUALIFYING. "
-            "Narrative demonstrates technical uncertainty and process of experimentation."
-        )
+        # Create a new task from the incoming message
+        task = new_task(params.message)
 
-        # Return a Task with the evaluation as an artifact
-        context_id = (
-            params.message.context_id
-            if params.message and params.message.context_id
-            else str(uuid.uuid4())
-        )
-        return Task(
-            id=str(uuid.uuid4()),
-            context_id=context_id,
-            status=TaskStatus(state="completed"),  # type: ignore[arg-type]
-            artifacts=[
-                Artifact(
-                    artifact_id=str(uuid.uuid4()),
-                    name="evaluation",
-                    parts=[Part(root=TextPart(text=evaluation_result))],
-                )
-            ],
-        )
+        # Store the task
+        await self.task_store.save(task)
 
-    # Stub implementations for other required abstract methods
-    async def on_cancel_task(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
+        # Execute and collect final result
+        final_result: Message | Task = task
+        async for event in self.executor.execute(params, task):
+            if isinstance(event, Task):
+                await self.task_store.save(event)
+                final_result = event
+            else:
+                final_result = event
 
-    async def on_delete_task_push_notification_config(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_get_task(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_get_task_push_notification_config(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_list_task_push_notification_config(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_message_send_stream(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_resubscribe_to_task(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
-
-    async def on_set_task_push_notification_config(self, params, context=None):
-        """Not implemented."""
-        raise NotImplementedError
+        return final_result
 
 
-def create_app(card_url: str) -> A2AFastAPIApplication:
-    """Create A2A FastAPI application for green agent.
+def create_app(
+    timeout: int | None = None,
+    purple_agent_url: str | None = None,
+) -> Any:
+    """Create the A2A FastAPI application.
 
     Args:
-        card_url: Public URL where the agent card is accessible
+        timeout: Task timeout in seconds (uses settings.timeout if not provided).
+        purple_agent_url: Purple Agent URL for arena mode (uses settings if not provided).
 
     Returns:
-        Configured A2A FastAPI application
+        Configured FastAPI application.
     """
-    agent_card = AgentCard(
-        name="bulletproof-green-examiner",
-        description=(
-            "IRS Section 41 Evaluator - Benchmark for R&D Tax Credit Narrative Assessment"
-        ),
-        version="0.0.0",
-        url=card_url,
-        capabilities=AgentCapabilities(),  # Use empty AgentCapabilities object
-        skills=[],  # No specific skills defined
-        default_input_modes=["text"],  # Accepts text input
-        default_output_modes=["text"],  # Returns text output
+    agent_card = get_agent_card()
+    handler = GreenRequestHandler(
+        timeout=timeout,
+        purple_agent_url=purple_agent_url,
     )
 
-    handler = GreenAgentHandler()
-
-    return A2AFastAPIApplication(
+    a2a_app = A2AFastAPIApplication(
         agent_card=agent_card,
         http_handler=handler,
     )
 
+    return a2a_app.build()
+
 
 def main() -> None:
-    """Run the green agent A2A server."""
-    parser = argparse.ArgumentParser(description="Bulletproof Green Agent - A2A Server")
-    parser.add_argument(
-        "--host",
-        default="0.0.0.0",
-        help="Host to bind the server to (default: 0.0.0.0)",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port to bind the server to (default: 8000)",
-    )
-    parser.add_argument(
-        "--card-url",
-        default="http://localhost:8000",
-        help="Public URL for the agent card (default: http://localhost:8000)",
-    )
-    args = parser.parse_args()
+    """Run the Green Agent A2A server."""
+    import sys
 
-    app = create_app(args.card_url).build()
-    uvicorn.run(app, host=args.host, port=args.port)
+    import uvicorn
+    from pydantic import ValidationError
+
+    # Validate settings on startup (fail fast)
+    try:
+        _ = settings.model_dump()
+    except ValidationError as e:
+        print(f"Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    app = create_app()
+    uvicorn.run(app, host=settings.host, port=settings.port)
 
 
 if __name__ == "__main__":

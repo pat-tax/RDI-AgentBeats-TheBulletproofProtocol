@@ -1,16 +1,25 @@
 ---
 name: reviewing-code
 description: Provides concise, focused code reviews matching exact task complexity requirements. Use when reviewing code quality, security, or when the user asks for code review.
+argument-hint: [file-or-directory]
+allowed-tools: Read, Grep, Glob, WebFetch, WebSearch
 ---
 
-# Code Review
+# Review Context
+
+- Changed files: !`git diff --name-only HEAD~1 2>/dev/null || echo "No recent commits"`
+- Staged files: !`git diff --staged --name-only`
+
+## Code Review
+
+**Scope**: $ARGUMENTS
 
 Delivers **focused, streamlined** code reviews matching stated task
 requirements exactly. No over-analysis.
 
 ## Python Standards
 
-See `docs/python-best-practices.md` for comprehensive Python guidelines.
+See `docs/best-practices/python-best-practices.md` for comprehensive Python guidelines.
 
 ## Workflow
 
