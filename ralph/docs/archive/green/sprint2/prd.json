@@ -1,0 +1,156 @@
+{
+  "project": "RDI-AgentBeats-TheBulletproofProtocol",
+  "description": "Legal Domain Agent Benchmark for AgentBeats competition - IRS Section 41 R&D tax credit evaluator. Purple agent (reference implementation) generates test narratives, Green agent (benchmark) evaluates them for IRS compliance.",
+  "scope": "Sprint 2 complete (STORY-033 to STORY-038): Messenger refactor from raw httpx to a2a-sdk ClientFactory.connect() pattern.",
+  "source": "docs/PRD.md",
+  "generated": "2026-02-22 17:14:13",
+  "stories": [
+    {
+      "id": "STORY-033",
+      "title": "Implement SDK client connection with caching",
+      "description": "Replace raw httpx with a2a-sdk ClientFactory.connect() for agent-to-agent connections, with per-URL client caching.",
+      "acceptance": [
+        "Messenger.send() calls ClientFactory.connect() instead of httpx directly",
+        "Client instances are cached per URL (second call reuses first connection)",
+        "ClientConfig uses streaming=False for non-streaming agents",
+        "httpx.AsyncClient passed via ClientConfig for timeout control",
+        "a2a-sdk ClientFactory, ClientConfig, Client from a2a.client",
+        "Client cache: dict[str, Client] keyed by URL",
+        "httpx.AsyncClient cache: dict[str, httpx.AsyncClient] for lifecycle management"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "29854d8fd3457923f7ddcab328ddd47aa97a69ac6e391c68d9555e7d94cd8279",
+      "depends_on": []
+    },
+    {
+      "id": "STORY-034",
+      "title": "Build SDK Message objects with mixed parts",
+      "description": "Build proper a2a-sdk Message objects with TextPart and DataPart support for mixed-content messages.",
+      "acceptance": [
+        "send(text=...) creates Message with single TextPart",
+        "send(data=...) creates Message with single DataPart",
+        "send(text=..., data=...) creates Message with TextPart + DataPart",
+        "Message uses Role.user enum (not raw string)",
+        "Each message has unique UUID messageId",
+        "Message, Part, TextPart, DataPart, Role from a2a.types",
+        "Replace create_text_message_object for mixed-part support"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "1f789ea6374c919bd24fbb01fde42bfccf641da9234bd15409016486ea210edd",
+      "depends_on": [
+        "STORY-033"
+      ]
+    },
+    {
+      "id": "STORY-035",
+      "title": "Extract response data from task artifacts",
+      "description": "Extract response data from a2a-sdk Task artifacts instead of raw JSON-RPC dicts, returning dict[str, Any] for consumer compatibility.",
+      "acceptance": [
+        "Extracts DataPart.data dict from completed task artifacts",
+        "Wraps TextPart.text as {\"text\": \"...\"} when no DataPart present",
+        "Skips non-completed task states (working, submitted) in event stream",
+        "Raises MessengerError when completed task has no artifacts",
+        "Returns dict[str, Any] compatible with NarrativeResponse.model_validate()",
+        "TaskState from a2a.types for lifecycle checking",
+        "AsyncIterator[ClientEvent | Message] from Client.send_message()",
+        "ClientEvent = tuple[Task, UpdateEvent]"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "bd5ee7371494e3e97d24f1a90b0da843c53e4f5d31a846e257f2bb23031ad722",
+      "depends_on": [
+        "STORY-033"
+      ]
+    },
+    {
+      "id": "STORY-036",
+      "title": "Map SDK errors to MessengerError",
+      "description": "Map a2a-sdk exceptions and failed task states to MessengerError for backward-compatible error handling.",
+      "acceptance": [
+        "A2AClientTimeoutError maps to MessengerError with \"timeout\" in message",
+        "A2AClientHTTPError maps to MessengerError with status code",
+        "httpx.ConnectError during ClientFactory.connect maps to MessengerError",
+        "TaskState.failed in event stream raises MessengerError",
+        "A2AClientError, A2AClientHTTPError, A2AClientTimeoutError from a2a.client",
+        "MessengerError passthrough (no double-wrapping)"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "5916761d1c158ed117c49648db35ccfa65a8a991cbf0a6290996c170e22d4640",
+      "depends_on": [
+        "STORY-033"
+      ]
+    },
+    {
+      "id": "STORY-037",
+      "title": "Add close() for client cleanup",
+      "description": "Add close() method for proper cleanup of managed httpx clients and SDK client cache.",
+      "acceptance": [
+        "close() calls aclose() on all managed httpx.AsyncClient instances",
+        "close() clears client cache so next send() creates fresh connection",
+        "close() is idempotent (safe to call on unused Messenger)",
+        "httpx.AsyncClient.aclose() for cleanup",
+        "Clear both _clients and _httpx_clients dicts"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "d302ba5ad1af8c271f9a0c0047897483b2fe209fd67d859d44086bc6da69e90e",
+      "depends_on": [
+        "STORY-033"
+      ]
+    },
+    {
+      "id": "STORY-038",
+      "title": "Preserve public API for consumers",
+      "description": "Preserve public API surface for existing consumers (arena/executor.py, __init__.py exports).",
+      "acceptance": [
+        "create_message() still returns raw dict (unchanged pure function)",
+        "send_message() free function still importable and callable (compat shim)",
+        "Messenger importable from bulletproof_green package root",
+        "MessengerError importable from bulletproof_green package root",
+        "Messenger.send(text=..., data=...) returns dict compatible with NarrativeResponse.model_validate()",
+        "Messenger(base_url=url) constructor stores base_url as public attribute",
+        "Messenger timeout defaults to settings.timeout when not provided",
+        "Initial client cache is empty (no connections until first send)",
+        "No changes to __init__.py exports",
+        "No changes to arena/executor.py",
+        "send_message free function wraps Messenger internally"
+      ],
+      "files": [
+        "src/bulletproof_green/messenger.py",
+        "tests/test_green_messaging_a2a.py"
+      ],
+      "passes": true,
+      "completed_at": "2026-02-22T17:45:38Z",
+      "content_hash": "bbb54c037fc261b79bf1acd44cf141b43ec8d7027e769dd50a9039391bdde230",
+      "depends_on": [
+        "STORY-034",
+        "STORY-035",
+        "STORY-036",
+        "STORY-037"
+      ]
+    }
+  ]
+}
