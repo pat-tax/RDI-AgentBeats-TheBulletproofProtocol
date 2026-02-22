@@ -281,7 +281,7 @@ def main():
     env_content = generate_env_file(scenario)
     if env_content:
         with open(ENV_PATH, "w") as f:
-            f.write(env_content)
+            f.write(env_content)  # lgtm[py/clear-text-storage-sensitive-data]
         print(f"Generated {ENV_PATH}")
 
     print(f"Generated {COMPOSE_PATH} and {A2A_SCENARIO_PATH}")

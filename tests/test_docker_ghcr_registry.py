@@ -134,7 +134,7 @@ class TestGHCRLogin:
     def test_logs_into_ghcr(self) -> None:
         """Test workflow logs into ghcr.io registry."""
         content = WORKFLOW_FILE.read_text()
-        assert "ghcr.io" in content, "Workflow must log into ghcr.io"
+        assert "registry: ghcr.io" in content, "Workflow must log into ghcr.io"
 
     def test_uses_github_token(self) -> None:
         """Test workflow uses GITHUB_TOKEN for authentication."""
